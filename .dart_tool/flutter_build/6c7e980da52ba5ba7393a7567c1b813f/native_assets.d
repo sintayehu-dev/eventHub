@@ -1,1 +1,0 @@
- C:\\Users\\josinte\\Documents\\project\\eventHub\\eventhub\\foundation\\.dart_tool\\flutter_build\\6c7e980da52ba5ba7393a7567c1b813f\\native_assets.yaml: 
