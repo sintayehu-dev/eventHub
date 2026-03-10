@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "970996524919",
+    "project_id": "eventhub-d5812",
+    "storage_bucket": "eventhub-d5812.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970996524919:android:bbaa4a32489bcdd7072372",
+        "android_client_info": {
+          "package_name": "com.eventhub.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZi_EzkVZpk51a0Si77kRTv9jAGB_w-64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970996524919:android:a88b7dfe7ba9650e072372",
+        "android_client_info": {
+          "package_name": "com.example.eventhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZi_EzkVZpk51a0Si77kRTv9jAGB_w-64"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,10 @@
+export 'registration_background_decoration.dart';
+export 'registration_logo.dart';
+export 'registration_welcome_text.dart';
+export 'profile_photo_selector.dart';
+export 'registration_form.dart';
+export 'terms_and_conditions_switch.dart';
+export 'registration_button.dart';
+export 'sign_in_option.dart';
+export 'security_notice.dart';
+export 'registration_footer.dart';
