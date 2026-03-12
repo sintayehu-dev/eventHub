@@ -178,6 +178,42 @@ class LocalStorage {
     await _preferences?.remove(LocalStorageKey.userData);
   }
 
+  /// set Firebase user data
+  Future<void> setFirebaseUserData(Map<String, dynamic> userData) async {
+    if (_preferences == null) {
+      return;
+    }
+    final userDataString = jsonEncode(userData);
+    await _preferences?.setString(
+        LocalStorageKey.firebaseUserData, userDataString);
+  }
+
+  /// get Firebase user data
+  Map<String, dynamic>? getFirebaseUserData() {
+    if (_preferences == null) {
+      return null;
+    }
+    final userDataString =
+        _preferences?.getString(LocalStorageKey.firebaseUserData);
+    if (userDataString == null) {
+      return null;
+    }
+    return jsonDecode(userDataString) as Map<String, dynamic>;
+  }
+
+  /// delete Firebase user data
+  Future<void> deleteFirebaseUserData() async {
+    if (_preferences == null) {
+      return;
+    }
+    await _preferences?.remove(LocalStorageKey.firebaseUserData);
+  }
+
+  /// clear Firebase user data
+  Future<void> clearFirebaseUserData() async {
+    await deleteFirebaseUserData();
+  }
+
   /// clear user session (tokens and data)
   Future<void> clearUserSession() async {
     if (_preferences == null) {
@@ -186,5 +222,6 @@ class LocalStorage {
     await deleteAccessToken();
     await deleteRefreshToken();
     await deleteUserData();
+    await deleteFirebaseUserData();
   }
 }
