@@ -129,3 +129,14 @@ class ProfilePhoto extends AbstractValueObject<String?> {
   @override
   final Either<ValueFailure<String?>, String?> value;
 }
+class UserRole extends AbstractValueObject<String> {
+  factory UserRole(String input) {
+    return UserRole._(
+      validateUserRole(input),
+    );
+  }
+
+  const UserRole._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
 import 'package:eventhub/core/application/app/bloc/app_state.dart';
 import 'package:eventhub/core/application/app/bloc/app_event.dart';
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/core/router/router.dart';
-import 'package:eventhub/core/router/slide_transition.dart';
 import 'package:eventhub/core/theme/app_theme.dart';
-import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,8 +19,15 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove();
 
-    return BlocProvider(
-      create: (context) => AppBloc()..add(const AppEvent.getThemeMode()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AppBloc()..add(const AppEvent.getThemeMode()),
+        ),
+        BlocProvider(
+          create: (context) => GetIt.instance<AuthStatusBloc>(),
+        ),
+      ],
       child: const App(),
     );
   }
@@ -47,9 +54,9 @@ class App extends StatelessWidget {
           routerConfig: router,
           builder: (context, child) {
             return BlocBuilder<AppBloc, AppState>(
-              buildWhen: (previous, current) => 
-                previous.isConnected != current.isConnected || 
-                previous.isInitialized != current.isInitialized,
+              buildWhen: (previous, current) =>
+                  previous.isConnected != current.isConnected ||
+                  previous.isInitialized != current.isInitialized,
               builder: (context, state) {
                 // If app is not initialized and not connected, show offline screen
                 if (!state.isInitialized && !state.isConnected) {
@@ -61,7 +68,7 @@ class App extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             AppColors.surface,
-                            AppColors.primaryContainer.withOpacity(0.1),
+                            AppColors.primaryContainer.withValues(alpha: 0.1),
                           ],
                         ),
                       ),
@@ -79,7 +86,8 @@ class App extends StatelessWidget {
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.primaryIndigo.withOpacity(0.1),
+                                        color: AppColors.primaryIndigo
+                                            .withValues(alpha: 0.1),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),

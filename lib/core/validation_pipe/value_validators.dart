@@ -494,3 +494,32 @@ Either<ValueFailure<String?>, String?> validateProfilePhoto(String? input) {
   
   return right(input);
 }
+
+Either<ValueFailure<String>, String> validateUserRole(String input) {
+  // Trim the input to handle whitespace
+  final trimmedInput = input.trim();
+
+  // Check for empty or whitespace-only input
+  if (trimmedInput.isEmpty) {
+    return left(
+      const ValueFailure.invalidRole(
+        failedValue: 'Please select a role',
+      ),
+    );
+  }
+
+  // Define valid roles for EventHub
+  const validRoles = ['organizer', 'attendee', 'staff'];
+
+  // Check if the role is valid
+  if (!validRoles.contains(trimmedInput.toLowerCase())) {
+    return left(
+      const ValueFailure.invalidRole(
+        failedValue:
+            'Please select a valid role (Organizer, Attendee, or Staff)',
+      ),
+    );
+  }
+
+  return right(trimmedInput.toLowerCase());
+}

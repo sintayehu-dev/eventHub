@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:eventhub/core/theme/app_colors.dart';
 
 class TermsAndConditionsScreen extends StatelessWidget {
   const TermsAndConditionsScreen({super.key});
@@ -9,171 +9,139 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
         title: Text(
           'Terms & Conditions',
-          style: GoogleFonts.outfit(
-            fontSize: 20.sp,
+          style: GoogleFonts.poppins(
+            fontSize: 18.sp,
             fontWeight: FontWeight.w600,
-            color: AppColors.darkIndigo,
+            color: const Color(0xFF1F2937),
           ),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: AppColors.darkIndigo,
+          onPressed: () => context.pop(),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFF374151),
           ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.all(24.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Terms and Conditions',
-              style: GoogleFonts.outfit(
+              'EventHub Terms of Service',
+              style: GoogleFonts.poppins(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
-                color: AppColors.darkIndigo,
+                color: const Color(0xFF1F2937),
               ),
             ),
-            SizedBox(height: 8.h),
+            
+            SizedBox(height: 16.h),
+            
             Text(
-              'Last Updated: ${DateTime.now().toString().substring(0, 10)}',
-              style: GoogleFonts.outfit(
+              'Last updated: ${DateTime.now().toString().split(' ')[0]}',
+              style: GoogleFonts.poppins(
                 fontSize: 14.sp,
-                color: AppColors.lightIndigo,
+                color: const Color(0xFF6B7280),
               ),
             ),
+            
             SizedBox(height: 24.h),
             
             _buildSection(
-              title: '1. Introduction',
-              content: 'Welcome to EventHub, your comprehensive event management platform. These Terms and Conditions govern your use of our application and services. By using EventHub, you agree to these terms.',
+              'Acceptance of Terms',
+              'By accessing and using EventHub, you accept and agree to be bound by the terms and provision of this agreement.',
             ),
             
             _buildSection(
-              title: '2. Definitions',
-              content: '"App" refers to EventHub event management application.\n"Services" refers to the event creation, management, and coordination features provided.\n"User," "You," and "Your" refer to the individual using the App.\n"We," "Us," and "Our" refer to the team operating EventHub.',
+              'Use License',
+              'Permission is granted to temporarily download one copy of EventHub for personal, non-commercial transitory viewing only.',
             ),
             
             _buildSection(
-              title: '3. Privacy & Data',
-              content: 'We take your emotional well-being and privacy seriously. Your mood data and journal entries are private and protected. We collect and store your information securely and will never share your personal data without your explicit consent.',
+              'User Account',
+              'When you create an account with us, you must provide information that is accurate, complete, and current at all times.',
             ),
             
             _buildSection(
-              title: '4. User Content',
-              content: 'The events, schedules, and information you create in EventHub are yours. While we provide tools to organize and manage your events, you are responsible for the content you create and share through the App.',
+              'Event Creation',
+              'Users may create events through our platform. You are responsible for the accuracy of event information and compliance with local laws.',
             ),
             
             _buildSection(
-              title: '5. Health Disclaimer',
-              content: 'EventHub is an event management and coordination tool. We are not responsible for the success or failure of events organized through our platform. Users are responsible for their own event planning and execution.',
+              'Privacy Policy',
+              'Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your information when you use our service.',
             ),
             
             _buildSection(
-              title: '6. User Guidelines',
-              content: 'Use EventHub responsibly and professionally. Create accurate event information and respect the privacy of event attendees. Do not use the App for illegal activities or to harm others. Be respectful when coordinating with other users.',
+              'Prohibited Uses',
+              'You may not use our service for any unlawful purpose or to solicit others to perform unlawful acts.',
             ),
             
             _buildSection(
-              title: '7. App Features',
-              content: 'EventHub provides event creation, management, scheduling, and coordination features. While we strive for reliability in our platform, event success depends on many factors beyond our control and should be considered a collaborative tool rather than a guarantee of event success.',
+              'Termination',
+              'We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever.',
             ),
             
             _buildSection(
-              title: '8. Changes & Updates',
-              content: 'We may update these terms as we improve EventHub. We\'ll notify you of significant changes. Your continued use of the App after changes indicates your acceptance of the updated terms.',
+              'Contact Information',
+              'If you have any questions about these Terms and Conditions, please contact us at support@eventhub.com',
             ),
             
-            _buildSection(
-              title: '9. Support',
-              content: 'If you need help with EventHub or have questions about these terms, please contact our support team. We\'re here to help you make the most of your event management experience.',
-            ),
+            SizedBox(height: 32.h),
             
-            SizedBox(height: 30.h),
-            
-            // Accept button with gradient
             Container(
-              width: double.infinity,
-              height: 56.h,
+              padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryIndigo,
-                    AppColors.lightIndigo,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryIndigo.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: const Color(0xFFF3F4F6),
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: AppColors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                ),
-                child: Text(
-                  'I Accept',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.white,
-                  ),
+              child: Text(
+                'By using EventHub, you acknowledge that you have read and understood these terms and conditions.',
+                style: GoogleFonts.poppins(
+                  fontSize: 14.sp,
+                  color: const Color(0xFF374151),
+                  fontStyle: FontStyle.italic,
                 ),
               ),
             ),
-            
-            SizedBox(height: 40.h),
           ],
         ),
       ),
     );
   }
-  
-  Widget _buildSection({required String title, required String content}) {
+
+  Widget _buildSection(String title, String content) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 20.h),
+      padding: EdgeInsets.only(bottom: 24.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: GoogleFonts.outfit(
+            style: GoogleFonts.poppins(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
-              color: AppColors.darkIndigo,
+              color: const Color(0xFF1F2937),
             ),
           ),
           SizedBox(height: 8.h),
           Text(
             content,
-            style: GoogleFonts.outfit(
-              fontSize: 16.sp,
-              color: AppColors.lightIndigo,
-              height: 1.5,
+            style: GoogleFonts.poppins(
+              fontSize: 14.sp,
+              color: const Color(0xFF4B5563),
+              height: 1.6,
             ),
           ),
         ],
       ),
     );
   }
-} 
+}

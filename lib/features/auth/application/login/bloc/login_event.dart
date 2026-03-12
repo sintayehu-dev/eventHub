@@ -9,4 +9,5 @@ class LoginEvent with _$LoginEvent {
   const factory LoginEvent.toggleShowPassword() = ToggleShowPassword;
   const factory LoginEvent.loginSubmitted() = LoginSubmitted;
   const factory LoginEvent.googleSignInSubmitted() = GoogleSignInSubmitted;
+  const factory LoginEvent.passwordResetRequested() = PasswordResetRequested;
 } 

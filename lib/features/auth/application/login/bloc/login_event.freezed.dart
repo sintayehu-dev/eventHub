@@ -23,6 +23,7 @@ mixin _$LoginEvent {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -32,6 +33,7 @@ mixin _$LoginEvent {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -41,6 +43,7 @@ mixin _$LoginEvent {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -52,6 +55,8 @@ mixin _$LoginEvent {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -61,6 +66,7 @@ mixin _$LoginEvent {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -70,6 +76,7 @@ mixin _$LoginEvent {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -169,6 +176,7 @@ class _$EmailChangedImpl implements EmailChanged {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) {
     return emailChanged(email);
   }
@@ -181,6 +189,7 @@ class _$EmailChangedImpl implements EmailChanged {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) {
     return emailChanged?.call(email);
   }
@@ -193,6 +202,7 @@ class _$EmailChangedImpl implements EmailChanged {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (emailChanged != null) {
@@ -210,6 +220,8 @@ class _$EmailChangedImpl implements EmailChanged {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) {
     return emailChanged(this);
   }
@@ -222,6 +234,7 @@ class _$EmailChangedImpl implements EmailChanged {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) {
     return emailChanged?.call(this);
   }
@@ -234,6 +247,7 @@ class _$EmailChangedImpl implements EmailChanged {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (emailChanged != null) {
@@ -330,6 +344,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) {
     return passwordChanged(password);
   }
@@ -342,6 +357,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) {
     return passwordChanged?.call(password);
   }
@@ -354,6 +370,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (passwordChanged != null) {
@@ -371,6 +388,8 @@ class _$PasswordChangedImpl implements PasswordChanged {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) {
     return passwordChanged(this);
   }
@@ -383,6 +402,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) {
     return passwordChanged?.call(this);
   }
@@ -395,6 +415,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (passwordChanged != null) {
@@ -462,6 +483,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) {
     return toggleShowPassword();
   }
@@ -474,6 +496,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) {
     return toggleShowPassword?.call();
   }
@@ -486,6 +509,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (toggleShowPassword != null) {
@@ -503,6 +527,8 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) {
     return toggleShowPassword(this);
   }
@@ -515,6 +541,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) {
     return toggleShowPassword?.call(this);
   }
@@ -527,6 +554,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (toggleShowPassword != null) {
@@ -586,6 +614,7 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) {
     return loginSubmitted();
   }
@@ -598,6 +627,7 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) {
     return loginSubmitted?.call();
   }
@@ -610,6 +640,7 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (loginSubmitted != null) {
@@ -627,6 +658,8 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) {
     return loginSubmitted(this);
   }
@@ -639,6 +672,7 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) {
     return loginSubmitted?.call(this);
   }
@@ -651,6 +685,7 @@ class _$LoginSubmittedImpl implements LoginSubmitted {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (loginSubmitted != null) {
@@ -712,6 +747,7 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     required TResult Function() toggleShowPassword,
     required TResult Function() loginSubmitted,
     required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
   }) {
     return googleSignInSubmitted();
   }
@@ -724,6 +760,7 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     TResult? Function()? toggleShowPassword,
     TResult? Function()? loginSubmitted,
     TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
   }) {
     return googleSignInSubmitted?.call();
   }
@@ -736,6 +773,7 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     TResult Function()? toggleShowPassword,
     TResult Function()? loginSubmitted,
     TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (googleSignInSubmitted != null) {
@@ -753,6 +791,8 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     required TResult Function(LoginSubmitted value) loginSubmitted,
     required TResult Function(GoogleSignInSubmitted value)
         googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
   }) {
     return googleSignInSubmitted(this);
   }
@@ -765,6 +805,7 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(LoginSubmitted value)? loginSubmitted,
     TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
   }) {
     return googleSignInSubmitted?.call(this);
   }
@@ -777,6 +818,7 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(LoginSubmitted value)? loginSubmitted,
     TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
     required TResult orElse(),
   }) {
     if (googleSignInSubmitted != null) {
@@ -788,4 +830,138 @@ class _$GoogleSignInSubmittedImpl implements GoogleSignInSubmitted {
 
 abstract class GoogleSignInSubmitted implements LoginEvent {
   const factory GoogleSignInSubmitted() = _$GoogleSignInSubmittedImpl;
+}
+
+/// @nodoc
+abstract class _$$PasswordResetRequestedImplCopyWith<$Res> {
+  factory _$$PasswordResetRequestedImplCopyWith(
+          _$PasswordResetRequestedImpl value,
+          $Res Function(_$PasswordResetRequestedImpl) then) =
+      __$$PasswordResetRequestedImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$PasswordResetRequestedImplCopyWithImpl<$Res>
+    extends _$LoginEventCopyWithImpl<$Res, _$PasswordResetRequestedImpl>
+    implements _$$PasswordResetRequestedImplCopyWith<$Res> {
+  __$$PasswordResetRequestedImplCopyWithImpl(
+      _$PasswordResetRequestedImpl _value,
+      $Res Function(_$PasswordResetRequestedImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of LoginEvent
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$PasswordResetRequestedImpl implements PasswordResetRequested {
+  const _$PasswordResetRequestedImpl();
+
+  @override
+  String toString() {
+    return 'LoginEvent.passwordResetRequested()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PasswordResetRequestedImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String email) emailChanged,
+    required TResult Function(String password) passwordChanged,
+    required TResult Function() toggleShowPassword,
+    required TResult Function() loginSubmitted,
+    required TResult Function() googleSignInSubmitted,
+    required TResult Function() passwordResetRequested,
+  }) {
+    return passwordResetRequested();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String email)? emailChanged,
+    TResult? Function(String password)? passwordChanged,
+    TResult? Function()? toggleShowPassword,
+    TResult? Function()? loginSubmitted,
+    TResult? Function()? googleSignInSubmitted,
+    TResult? Function()? passwordResetRequested,
+  }) {
+    return passwordResetRequested?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String email)? emailChanged,
+    TResult Function(String password)? passwordChanged,
+    TResult Function()? toggleShowPassword,
+    TResult Function()? loginSubmitted,
+    TResult Function()? googleSignInSubmitted,
+    TResult Function()? passwordResetRequested,
+    required TResult orElse(),
+  }) {
+    if (passwordResetRequested != null) {
+      return passwordResetRequested();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(EmailChanged value) emailChanged,
+    required TResult Function(PasswordChanged value) passwordChanged,
+    required TResult Function(ToggleShowPassword value) toggleShowPassword,
+    required TResult Function(LoginSubmitted value) loginSubmitted,
+    required TResult Function(GoogleSignInSubmitted value)
+        googleSignInSubmitted,
+    required TResult Function(PasswordResetRequested value)
+        passwordResetRequested,
+  }) {
+    return passwordResetRequested(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(EmailChanged value)? emailChanged,
+    TResult? Function(PasswordChanged value)? passwordChanged,
+    TResult? Function(ToggleShowPassword value)? toggleShowPassword,
+    TResult? Function(LoginSubmitted value)? loginSubmitted,
+    TResult? Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult? Function(PasswordResetRequested value)? passwordResetRequested,
+  }) {
+    return passwordResetRequested?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(EmailChanged value)? emailChanged,
+    TResult Function(PasswordChanged value)? passwordChanged,
+    TResult Function(ToggleShowPassword value)? toggleShowPassword,
+    TResult Function(LoginSubmitted value)? loginSubmitted,
+    TResult Function(GoogleSignInSubmitted value)? googleSignInSubmitted,
+    TResult Function(PasswordResetRequested value)? passwordResetRequested,
+    required TResult orElse(),
+  }) {
+    if (passwordResetRequested != null) {
+      return passwordResetRequested(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class PasswordResetRequested implements LoginEvent {
+  const factory PasswordResetRequested() = _$PasswordResetRequestedImpl;
 }

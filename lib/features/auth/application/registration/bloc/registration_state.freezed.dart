@@ -16,24 +16,19 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$RegistrationState {
-  Name get firstName => throw _privateConstructorUsedError;
-  Name get lastName => throw _privateConstructorUsedError;
-  EmailAddress get email => throw _privateConstructorUsedError;
-  Password get password => throw _privateConstructorUsedError;
-  ConfirmPassword get confirmPassword => throw _privateConstructorUsedError;
-  TermsAcceptance get termsAcceptance => throw _privateConstructorUsedError;
-  ProfilePhoto get profilePhoto => throw _privateConstructorUsedError;
+  EmailAddress? get email => throw _privateConstructorUsedError;
+  Password? get password => throw _privateConstructorUsedError;
+  ConfirmPassword? get confirmPassword => throw _privateConstructorUsedError;
+  UserRole? get userRole => throw _privateConstructorUsedError;
+  TermsAcceptance? get termsAcceptance => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   bool get isRegistrationError => throw _privateConstructorUsedError;
   bool get showErrorMessages => throw _privateConstructorUsedError;
   bool get showPassword => throw _privateConstructorUsedError;
   bool get showConfirmPassword => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
-  bool get verificationSent => throw _privateConstructorUsedError;
-  RegistrationResponse? get registrationResponse =>
-      throw _privateConstructorUsedError;
-  VerificationCodeResponse? get verificationResponse =>
-      throw _privateConstructorUsedError;
+  bool get isRegistrationSuccessful => throw _privateConstructorUsedError;
+  String? get routeName => throw _privateConstructorUsedError;
 
   /// Create a copy of RegistrationState
   /// with the given fields replaced by the non-null parameter values.
@@ -49,25 +44,19 @@ abstract class $RegistrationStateCopyWith<$Res> {
       _$RegistrationStateCopyWithImpl<$Res, RegistrationState>;
   @useResult
   $Res call(
-      {Name firstName,
-      Name lastName,
-      EmailAddress email,
-      Password password,
-      ConfirmPassword confirmPassword,
-      TermsAcceptance termsAcceptance,
-      ProfilePhoto profilePhoto,
+      {EmailAddress? email,
+      Password? password,
+      ConfirmPassword? confirmPassword,
+      UserRole? userRole,
+      TermsAcceptance? termsAcceptance,
       bool isLoading,
       bool isRegistrationError,
       bool showErrorMessages,
       bool showPassword,
       bool showConfirmPassword,
       String errorMessage,
-      bool verificationSent,
-      RegistrationResponse? registrationResponse,
-      VerificationCodeResponse? verificationResponse});
-
-  $RegistrationResponseCopyWith<$Res>? get registrationResponse;
-  $VerificationCodeResponseCopyWith<$Res>? get verificationResponse;
+      bool isRegistrationSuccessful,
+      String? routeName});
 }
 
 /// @nodoc
@@ -85,52 +74,41 @@ class _$RegistrationStateCopyWithImpl<$Res, $Val extends RegistrationState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? firstName = null,
-    Object? lastName = null,
-    Object? email = null,
-    Object? password = null,
-    Object? confirmPassword = null,
-    Object? termsAcceptance = null,
-    Object? profilePhoto = null,
+    Object? email = freezed,
+    Object? password = freezed,
+    Object? confirmPassword = freezed,
+    Object? userRole = freezed,
+    Object? termsAcceptance = freezed,
     Object? isLoading = null,
     Object? isRegistrationError = null,
     Object? showErrorMessages = null,
     Object? showPassword = null,
     Object? showConfirmPassword = null,
     Object? errorMessage = null,
-    Object? verificationSent = null,
-    Object? registrationResponse = freezed,
-    Object? verificationResponse = freezed,
+    Object? isRegistrationSuccessful = null,
+    Object? routeName = freezed,
   }) {
     return _then(_value.copyWith(
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as Name,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as Name,
-      email: null == email
+      email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as EmailAddress,
-      password: null == password
+              as EmailAddress?,
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as Password,
-      confirmPassword: null == confirmPassword
+              as Password?,
+      confirmPassword: freezed == confirmPassword
           ? _value.confirmPassword
           : confirmPassword // ignore: cast_nullable_to_non_nullable
-              as ConfirmPassword,
-      termsAcceptance: null == termsAcceptance
+              as ConfirmPassword?,
+      userRole: freezed == userRole
+          ? _value.userRole
+          : userRole // ignore: cast_nullable_to_non_nullable
+              as UserRole?,
+      termsAcceptance: freezed == termsAcceptance
           ? _value.termsAcceptance
           : termsAcceptance // ignore: cast_nullable_to_non_nullable
-              as TermsAcceptance,
-      profilePhoto: null == profilePhoto
-          ? _value.profilePhoto
-          : profilePhoto // ignore: cast_nullable_to_non_nullable
-              as ProfilePhoto,
+              as TermsAcceptance?,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -155,49 +133,15 @@ class _$RegistrationStateCopyWithImpl<$Res, $Val extends RegistrationState>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
-      verificationSent: null == verificationSent
-          ? _value.verificationSent
-          : verificationSent // ignore: cast_nullable_to_non_nullable
+      isRegistrationSuccessful: null == isRegistrationSuccessful
+          ? _value.isRegistrationSuccessful
+          : isRegistrationSuccessful // ignore: cast_nullable_to_non_nullable
               as bool,
-      registrationResponse: freezed == registrationResponse
-          ? _value.registrationResponse
-          : registrationResponse // ignore: cast_nullable_to_non_nullable
-              as RegistrationResponse?,
-      verificationResponse: freezed == verificationResponse
-          ? _value.verificationResponse
-          : verificationResponse // ignore: cast_nullable_to_non_nullable
-              as VerificationCodeResponse?,
+      routeName: freezed == routeName
+          ? _value.routeName
+          : routeName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
-  }
-
-  /// Create a copy of RegistrationState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $RegistrationResponseCopyWith<$Res>? get registrationResponse {
-    if (_value.registrationResponse == null) {
-      return null;
-    }
-
-    return $RegistrationResponseCopyWith<$Res>(_value.registrationResponse!,
-        (value) {
-      return _then(_value.copyWith(registrationResponse: value) as $Val);
-    });
-  }
-
-  /// Create a copy of RegistrationState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $VerificationCodeResponseCopyWith<$Res>? get verificationResponse {
-    if (_value.verificationResponse == null) {
-      return null;
-    }
-
-    return $VerificationCodeResponseCopyWith<$Res>(_value.verificationResponse!,
-        (value) {
-      return _then(_value.copyWith(verificationResponse: value) as $Val);
-    });
   }
 }
 
@@ -210,27 +154,19 @@ abstract class _$$RegistrationStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {Name firstName,
-      Name lastName,
-      EmailAddress email,
-      Password password,
-      ConfirmPassword confirmPassword,
-      TermsAcceptance termsAcceptance,
-      ProfilePhoto profilePhoto,
+      {EmailAddress? email,
+      Password? password,
+      ConfirmPassword? confirmPassword,
+      UserRole? userRole,
+      TermsAcceptance? termsAcceptance,
       bool isLoading,
       bool isRegistrationError,
       bool showErrorMessages,
       bool showPassword,
       bool showConfirmPassword,
       String errorMessage,
-      bool verificationSent,
-      RegistrationResponse? registrationResponse,
-      VerificationCodeResponse? verificationResponse});
-
-  @override
-  $RegistrationResponseCopyWith<$Res>? get registrationResponse;
-  @override
-  $VerificationCodeResponseCopyWith<$Res>? get verificationResponse;
+      bool isRegistrationSuccessful,
+      String? routeName});
 }
 
 /// @nodoc
@@ -246,52 +182,41 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? firstName = null,
-    Object? lastName = null,
-    Object? email = null,
-    Object? password = null,
-    Object? confirmPassword = null,
-    Object? termsAcceptance = null,
-    Object? profilePhoto = null,
+    Object? email = freezed,
+    Object? password = freezed,
+    Object? confirmPassword = freezed,
+    Object? userRole = freezed,
+    Object? termsAcceptance = freezed,
     Object? isLoading = null,
     Object? isRegistrationError = null,
     Object? showErrorMessages = null,
     Object? showPassword = null,
     Object? showConfirmPassword = null,
     Object? errorMessage = null,
-    Object? verificationSent = null,
-    Object? registrationResponse = freezed,
-    Object? verificationResponse = freezed,
+    Object? isRegistrationSuccessful = null,
+    Object? routeName = freezed,
   }) {
     return _then(_$RegistrationStateImpl(
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as Name,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as Name,
-      email: null == email
+      email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as EmailAddress,
-      password: null == password
+              as EmailAddress?,
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as Password,
-      confirmPassword: null == confirmPassword
+              as Password?,
+      confirmPassword: freezed == confirmPassword
           ? _value.confirmPassword
           : confirmPassword // ignore: cast_nullable_to_non_nullable
-              as ConfirmPassword,
-      termsAcceptance: null == termsAcceptance
+              as ConfirmPassword?,
+      userRole: freezed == userRole
+          ? _value.userRole
+          : userRole // ignore: cast_nullable_to_non_nullable
+              as UserRole?,
+      termsAcceptance: freezed == termsAcceptance
           ? _value.termsAcceptance
           : termsAcceptance // ignore: cast_nullable_to_non_nullable
-              as TermsAcceptance,
-      profilePhoto: null == profilePhoto
-          ? _value.profilePhoto
-          : profilePhoto // ignore: cast_nullable_to_non_nullable
-              as ProfilePhoto,
+              as TermsAcceptance?,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -316,18 +241,14 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String,
-      verificationSent: null == verificationSent
-          ? _value.verificationSent
-          : verificationSent // ignore: cast_nullable_to_non_nullable
+      isRegistrationSuccessful: null == isRegistrationSuccessful
+          ? _value.isRegistrationSuccessful
+          : isRegistrationSuccessful // ignore: cast_nullable_to_non_nullable
               as bool,
-      registrationResponse: freezed == registrationResponse
-          ? _value.registrationResponse
-          : registrationResponse // ignore: cast_nullable_to_non_nullable
-              as RegistrationResponse?,
-      verificationResponse: freezed == verificationResponse
-          ? _value.verificationResponse
-          : verificationResponse // ignore: cast_nullable_to_non_nullable
-              as VerificationCodeResponse?,
+      routeName: freezed == routeName
+          ? _value.routeName
+          : routeName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -336,38 +257,31 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
 
 class _$RegistrationStateImpl extends _RegistrationState {
   const _$RegistrationStateImpl(
-      {required this.firstName,
-      required this.lastName,
-      required this.email,
-      required this.password,
-      required this.confirmPassword,
-      required this.termsAcceptance,
-      required this.profilePhoto,
+      {this.email,
+      this.password,
+      this.confirmPassword,
+      this.userRole,
+      this.termsAcceptance,
       this.isLoading = false,
       this.isRegistrationError = false,
       this.showErrorMessages = false,
       this.showPassword = false,
       this.showConfirmPassword = false,
       this.errorMessage = '',
-      this.verificationSent = false,
-      this.registrationResponse,
-      this.verificationResponse})
+      this.isRegistrationSuccessful = false,
+      this.routeName})
       : super._();
 
   @override
-  final Name firstName;
+  final EmailAddress? email;
   @override
-  final Name lastName;
+  final Password? password;
   @override
-  final EmailAddress email;
+  final ConfirmPassword? confirmPassword;
   @override
-  final Password password;
+  final UserRole? userRole;
   @override
-  final ConfirmPassword confirmPassword;
-  @override
-  final TermsAcceptance termsAcceptance;
-  @override
-  final ProfilePhoto profilePhoto;
+  final TermsAcceptance? termsAcceptance;
   @override
   @JsonKey()
   final bool isLoading;
@@ -388,15 +302,13 @@ class _$RegistrationStateImpl extends _RegistrationState {
   final String errorMessage;
   @override
   @JsonKey()
-  final bool verificationSent;
+  final bool isRegistrationSuccessful;
   @override
-  final RegistrationResponse? registrationResponse;
-  @override
-  final VerificationCodeResponse? verificationResponse;
+  final String? routeName;
 
   @override
   String toString() {
-    return 'RegistrationState(firstName: $firstName, lastName: $lastName, email: $email, password: $password, confirmPassword: $confirmPassword, termsAcceptance: $termsAcceptance, profilePhoto: $profilePhoto, isLoading: $isLoading, isRegistrationError: $isRegistrationError, showErrorMessages: $showErrorMessages, showPassword: $showPassword, showConfirmPassword: $showConfirmPassword, errorMessage: $errorMessage, verificationSent: $verificationSent, registrationResponse: $registrationResponse, verificationResponse: $verificationResponse)';
+    return 'RegistrationState(email: $email, password: $password, confirmPassword: $confirmPassword, userRole: $userRole, termsAcceptance: $termsAcceptance, isLoading: $isLoading, isRegistrationError: $isRegistrationError, showErrorMessages: $showErrorMessages, showPassword: $showPassword, showConfirmPassword: $showConfirmPassword, errorMessage: $errorMessage, isRegistrationSuccessful: $isRegistrationSuccessful, routeName: $routeName)';
   }
 
   @override
@@ -404,19 +316,15 @@ class _$RegistrationStateImpl extends _RegistrationState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$RegistrationStateImpl &&
-            (identical(other.firstName, firstName) ||
-                other.firstName == firstName) &&
-            (identical(other.lastName, lastName) ||
-                other.lastName == lastName) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
                 other.password == password) &&
             (identical(other.confirmPassword, confirmPassword) ||
                 other.confirmPassword == confirmPassword) &&
+            (identical(other.userRole, userRole) ||
+                other.userRole == userRole) &&
             (identical(other.termsAcceptance, termsAcceptance) ||
                 other.termsAcceptance == termsAcceptance) &&
-            (identical(other.profilePhoto, profilePhoto) ||
-                other.profilePhoto == profilePhoto) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.isRegistrationError, isRegistrationError) ||
@@ -429,33 +337,29 @@ class _$RegistrationStateImpl extends _RegistrationState {
                 other.showConfirmPassword == showConfirmPassword) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage) &&
-            (identical(other.verificationSent, verificationSent) ||
-                other.verificationSent == verificationSent) &&
-            (identical(other.registrationResponse, registrationResponse) ||
-                other.registrationResponse == registrationResponse) &&
-            (identical(other.verificationResponse, verificationResponse) ||
-                other.verificationResponse == verificationResponse));
+            (identical(
+                    other.isRegistrationSuccessful, isRegistrationSuccessful) ||
+                other.isRegistrationSuccessful == isRegistrationSuccessful) &&
+            (identical(other.routeName, routeName) ||
+                other.routeName == routeName));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      firstName,
-      lastName,
       email,
       password,
       confirmPassword,
+      userRole,
       termsAcceptance,
-      profilePhoto,
       isLoading,
       isRegistrationError,
       showErrorMessages,
       showPassword,
       showConfirmPassword,
       errorMessage,
-      verificationSent,
-      registrationResponse,
-      verificationResponse);
+      isRegistrationSuccessful,
+      routeName);
 
   /// Create a copy of RegistrationState
   /// with the given fields replaced by the non-null parameter values.
@@ -469,39 +373,31 @@ class _$RegistrationStateImpl extends _RegistrationState {
 
 abstract class _RegistrationState extends RegistrationState {
   const factory _RegistrationState(
-          {required final Name firstName,
-          required final Name lastName,
-          required final EmailAddress email,
-          required final Password password,
-          required final ConfirmPassword confirmPassword,
-          required final TermsAcceptance termsAcceptance,
-          required final ProfilePhoto profilePhoto,
-          final bool isLoading,
-          final bool isRegistrationError,
-          final bool showErrorMessages,
-          final bool showPassword,
-          final bool showConfirmPassword,
-          final String errorMessage,
-          final bool verificationSent,
-          final RegistrationResponse? registrationResponse,
-          final VerificationCodeResponse? verificationResponse}) =
-      _$RegistrationStateImpl;
+      {final EmailAddress? email,
+      final Password? password,
+      final ConfirmPassword? confirmPassword,
+      final UserRole? userRole,
+      final TermsAcceptance? termsAcceptance,
+      final bool isLoading,
+      final bool isRegistrationError,
+      final bool showErrorMessages,
+      final bool showPassword,
+      final bool showConfirmPassword,
+      final String errorMessage,
+      final bool isRegistrationSuccessful,
+      final String? routeName}) = _$RegistrationStateImpl;
   const _RegistrationState._() : super._();
 
   @override
-  Name get firstName;
+  EmailAddress? get email;
   @override
-  Name get lastName;
+  Password? get password;
   @override
-  EmailAddress get email;
+  ConfirmPassword? get confirmPassword;
   @override
-  Password get password;
+  UserRole? get userRole;
   @override
-  ConfirmPassword get confirmPassword;
-  @override
-  TermsAcceptance get termsAcceptance;
-  @override
-  ProfilePhoto get profilePhoto;
+  TermsAcceptance? get termsAcceptance;
   @override
   bool get isLoading;
   @override
@@ -515,11 +411,9 @@ abstract class _RegistrationState extends RegistrationState {
   @override
   String get errorMessage;
   @override
-  bool get verificationSent;
+  bool get isRegistrationSuccessful;
   @override
-  RegistrationResponse? get registrationResponse;
-  @override
-  VerificationCodeResponse? get verificationResponse;
+  String? get routeName;
 
   /// Create a copy of RegistrationState
   /// with the given fields replaced by the non-null parameter values.

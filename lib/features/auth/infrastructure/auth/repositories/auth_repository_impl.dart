@@ -1,73 +1,123 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
-import 'package:eventhub/features/auth/domain/entities/login/login_request.dart';
-import 'package:eventhub/features/auth/domain/entities/login/login_response.dart';
-import 'package:eventhub/features/auth/domain/entities/registration/registration.dart';
-import 'package:eventhub/features/auth/domain/entities/registration/registration_response.dart';
+import 'package:eventhub/features/auth/domain/entities/firebase_user_entity.dart';
 import 'package:eventhub/features/auth/domain/repositories/auth_repository.dart';
-import 'package:eventhub/features/auth/domain/verification/entities/verification_code_response.dart';
-import 'package:eventhub/features/auth/domain/verification/entities/verification_confirm_response.dart';
-import 'package:eventhub/features/auth/infrastructure/auth/datasources/auth_remote_data_source.dart';
+import 'package:eventhub/features/auth/infrastructure/auth/datasources/firebase_auth_data_source.dart';
 
 @Injectable(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
+  final FirebaseAuthDataSource _firebaseDataSource;
 
-  AuthRepositoryImpl(this._remoteDataSource);
-  final AuthRemoteDataSource _remoteDataSource;
+  AuthRepositoryImpl(this._firebaseDataSource);
 
   @override
-  Future<Either<NetworkExceptions, RegistrationResponse>> register(RegistrationRequest registration) async {
+  Future<Either<NetworkExceptions, FirebaseUserEntity>>
+      signInWithEmailAndPassword(String email, String password) async {
     try {
-      final response = await _remoteDataSource.register(registration);
-      return right(response);
-    } on DioException catch (e) {
-      return left(NetworkExceptions.getDioException(e));
-    }
-  }
-  
-  @override
-  Future<Either<NetworkExceptions, VerificationCodeResponse>> sendVerificationCode(String phoneNumber) async {
-    try {
-      final response = await _remoteDataSource.sendVerificationCode(phoneNumber);
-      return right(response);
-    } on DioException catch (e) {
-      return left(NetworkExceptions.getDioException(e));
+      final user =
+          await _firebaseDataSource.signInWithEmailAndPassword(email, password);
+      return right(user);
+    } on FirebaseAuthException catch (e) {
+      return left(NetworkExceptions.defaultError(_getFirebaseErrorMessage(e)));
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
     }
   }
 
   @override
-  Future<Either<NetworkExceptions, VerificationConfirmResponse>> verifyOtp(String phoneNumber, String otp) async {
+  Future<Either<NetworkExceptions, FirebaseUserEntity>>
+      registerWithEmailAndPassword(String email, String password) async {
     try {
-      final response = await _remoteDataSource.verifyOtp(phoneNumber, otp);
-      return right(response);
-    } on DioException catch (e) {
-      return left(NetworkExceptions.getDioException(e));
+      final user = await _firebaseDataSource.registerWithEmailAndPassword(
+          email, password);
+      return right(user);
+    } on FirebaseAuthException catch (e) {
+      return left(NetworkExceptions.defaultError(_getFirebaseErrorMessage(e)));
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
     }
   }
 
   @override
-  Future<Either<NetworkExceptions, LoginResponse>> login(LoginRequest loginRequest) async {
+  Future<Either<NetworkExceptions, void>> signOut() async {
     try {
-      final email = loginRequest.email;
-      final password = loginRequest.password;
-      final response = await _remoteDataSource.login(email, password);
-    
-      
-      return right(response);
-    } on DioException catch (e) {
-      return left(NetworkExceptions.getDioException(e));
+      await _firebaseDataSource.signOut();
+      return right(null);
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
     }
   }
 
   @override
-  Future<Either<NetworkExceptions, LoginResponse>> googleLogin(String idToken) async {
+  Future<Either<NetworkExceptions, FirebaseUserEntity>>
+      signInWithGoogle() async {
     try {
-      final response = await _remoteDataSource.googleLogin(idToken);
-      return right(response);
-    } on DioException catch (e) {
-      return left(NetworkExceptions.getDioException(e));
+      final user = await _firebaseDataSource.signInWithGoogle();
+      return right(user);
+    } on FirebaseAuthException catch (e) {
+      return left(NetworkExceptions.defaultError(_getFirebaseErrorMessage(e)));
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<NetworkExceptions, void>> sendPasswordResetEmail(
+      String email) async {
+    try {
+      await _firebaseDataSource.sendPasswordResetEmail(email);
+      return right(null);
+    } on FirebaseAuthException catch (e) {
+      return left(NetworkExceptions.defaultError(_getFirebaseErrorMessage(e)));
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<NetworkExceptions, FirebaseUserEntity?>>
+      getCurrentUser() async {
+    try {
+      final user = await _firebaseDataSource.getCurrentUser();
+      return right(user);
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
+    }
+  }
+
+  @override
+  Stream<FirebaseUserEntity?> get authStateChanges {
+    return _firebaseDataSource.authStateChanges;
+  }
+
+  String _getFirebaseErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No user found with this email address.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'email-already-in-use':
+        return 'An account already exists with this email address.';
+      case 'weak-password':
+        return 'Password is too weak. Please choose a stronger password.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'user-disabled':
+        return 'This account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'operation-not-allowed':
+        return 'This sign-in method is not enabled.';
+      case 'network-request-failed':
+        return 'Network error. Please check your connection.';
+      case 'google-sign-in-cancelled':
+        return 'Google sign-in was cancelled.';
+      case 'google-sign-in-failed':
+        return 'Failed to sign in with Google. Please try again.';
+      default:
+        return e.message ?? 'An unexpected error occurred. Please try again.';
     }
   }
 } 
