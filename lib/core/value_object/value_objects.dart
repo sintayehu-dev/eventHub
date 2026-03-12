@@ -140,3 +140,106 @@ class UserRole extends AbstractValueObject<String> {
   @override
   final Either<ValueFailure<String>, String> value;
 }
+
+// Event-related value objects
+class EventTitle extends AbstractValueObject<String> {
+  factory EventTitle(String input) {
+    return EventTitle._(
+      validateEventTitle(input),
+    );
+  }
+
+  const EventTitle._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}
+
+class EventDescription extends AbstractValueObject<String> {
+  factory EventDescription(String input) {
+    return EventDescription._(
+      validateEventDescription(input),
+    );
+  }
+
+  const EventDescription._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}
+
+class EventLocation extends AbstractValueObject<String> {
+  factory EventLocation(String input) {
+    return EventLocation._(
+      validateEventLocation(input),
+    );
+  }
+
+  const EventLocation._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}
+
+class EventCapacity extends AbstractValueObject<int> {
+  factory EventCapacity(int input) {
+    return EventCapacity._(
+      validateEventCapacity(input),
+    );
+  }
+
+  const EventCapacity._(this.value);
+  @override
+  final Either<ValueFailure<int>, int> value;
+}
+
+class TicketPrice extends AbstractValueObject<double> {
+  factory TicketPrice(double input) {
+    return TicketPrice._(
+      validateTicketPrice(input),
+    );
+  }
+
+  const TicketPrice._(this.value);
+  @override
+  final Either<ValueFailure<double>, double> value;
+}
+
+class TicketQuantity extends AbstractValueObject<int> {
+  factory TicketQuantity(int input) {
+    return TicketQuantity._(
+      validateTicketQuantity(input),
+    );
+  }
+
+  const TicketQuantity._(this.value);
+  @override
+  final Either<ValueFailure<int>, int> value;
+}
+
+class TicketTypeName extends AbstractValueObject<String> {
+  factory TicketTypeName(String input) {
+    return TicketTypeName._(
+      validateTicketTypeName(input),
+    );
+  }
+
+  const TicketTypeName._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}
+
+class UniqueId extends AbstractValueObject<String> {
+  factory UniqueId() {
+    return UniqueId._(
+      right(DateTime.now().millisecondsSinceEpoch.toString()),
+    );
+  }
+
+  factory UniqueId.fromString(String id) {
+    return UniqueId._(
+      right(id),
+    );
+  }
+
+  const UniqueId._(this.value);
+  @override
+  final Either<ValueFailure<String>, String> value;
+}
