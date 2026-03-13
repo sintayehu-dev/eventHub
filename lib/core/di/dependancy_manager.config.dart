@@ -38,7 +38,16 @@ import '../../features/auth/infrastructure/auth/repositories/auth_repository_imp
     as _i446;
 import '../../features/auth/infrastructure/firestore/datasources/user_firestore_data_source.dart'
     as _i470;
+import '../../features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart'
+    as _i263;
+import '../../features/organizer/event_management/domain/repositories/event_repository.dart'
+    as _i520;
+import '../../features/organizer/event_management/infrastructure/datasources/firebase_event_data_source.dart'
+    as _i912;
+import '../../features/organizer/event_management/infrastructure/repositories/event_repository_impl.dart'
+    as _i413;
 import '../handlers/http_service.dart' as _i350;
+import '../services/cloudinary_service.dart' as _i837;
 import 'firebase_module.dart' as _i616;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -58,8 +67,14 @@ extension GetItInjectableX on _i174.GetIt {
         () => firebaseModule.firebaseFirestore);
     gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
     gh.lazySingleton<_i350.HttpService>(() => _i350.HttpService());
+    gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
+    gh.factory<_i912.FirebaseEventDataSource>(
+        () => _i912.FirebaseEventDataSourceImpl(
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i837.CloudinaryService>(),
+            ));
     gh.factory<_i516.UserService>(
         () => _i516.UserServiceImpl(gh<_i470.UserFirestoreDataSource>()));
     gh.factory<_i413.FirebaseAuthDataSource>(
@@ -69,6 +84,10 @@ extension GetItInjectableX on _i174.GetIt {
             ));
     gh.factory<_i787.AuthRepository>(
         () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
+    gh.factory<_i520.EventRepository>(
+        () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
+    gh.factory<_i263.EventManagementBloc>(
+        () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
     gh.factory<_i17.GetCurrentUserUseCase>(
         () => _i17.GetCurrentUserUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i91.GoogleSignInUseCase>(

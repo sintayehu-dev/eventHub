@@ -24,6 +24,7 @@ import 'package:eventhub/features/organizer/event_management/presentation/pages/
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_events_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_analytics_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/create_event_screen.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/pages/edit_event_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_event_detail_screen.dart';
 import 'package:eventhub/features/organizer/attendee_management/presentation/pages/event_attendees_screen.dart';
 import 'package:eventhub/features/organizer/attendee_management/presentation/pages/attendee_list_screen.dart';
@@ -37,6 +38,7 @@ import 'package:eventhub/features/staff/profile/presentation/pages/staff_setting
 
 // Shared screens
 import 'package:eventhub/features/shared/event_details/presentation/pages/event_detail_screen.dart';
+import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
 final router = GoRouter(
   navigatorKey: NavigationService.navigatorKey,
@@ -275,6 +277,16 @@ final router = GoRouter(
       name: RouteName.createEventScreen,
       path: '/organizer/create-event',
       builder: (context, state) => const CreateEventScreen(),
+    ),
+
+    // Edit Event Screen
+    GoRoute(
+      name: RouteName.editEventScreen,
+      path: '/organizer/event/:eventId/edit',
+      builder: (context, state) {
+        final event = state.extra as EventEntity;
+        return EditEventScreen(event: event);
+      },
     ),
 
     // Event Attendees Screen

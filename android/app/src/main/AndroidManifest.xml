@@ -5,6 +5,20 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    
+    <!-- Camera and Gallery permissions -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    
+    <!-- Storage permissions for older Android versions (API < 33) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    
+    <!-- Granular media permissions for Android 13+ (API 33+) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    
+    <!-- Optional: For accessing media files on Android 10+ -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
     <application
         android:label="EventHub"
         android:name="${applicationName}"

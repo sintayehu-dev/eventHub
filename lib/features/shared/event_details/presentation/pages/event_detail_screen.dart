@@ -86,7 +86,8 @@ class EventDetailScreen extends StatelessWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // Concert background
+            // Event Banner Image Placeholder (since this is a mock screen)
+            // In a real implementation, you would pass the event data and display the actual banner
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(

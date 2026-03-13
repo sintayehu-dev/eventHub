@@ -34,6 +34,7 @@ class RouteName {
   static const organizerAnalytics = 'organizer_analytics';
   static const organizerProfile = 'organizer_profile';
   static const createEventScreen = 'create_event_screen';
+  static const editEventScreen = 'edit_event_screen';
   static const eventAttendees = 'event_attendees';
   static const organizerEventDetail = 'organizer_event_detail';
   static const attendeeList = 'attendee_list';
