@@ -1,44 +1,26 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'package:eventhub/core/value_object/value_objects.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'event_statistics_entity.freezed.dart';
 part 'event_statistics_entity.g.dart';
 
-// Event statistics entity
-@JsonSerializable()
-class EventStatistics {
-  @JsonKey(fromJson: _uniqueIdFromJson, toJson: _uniqueIdToJson)
-  final UniqueId eventId;
-  final int totalTickets;
-  final int soldTickets;
-  final int availableTickets;
-  final double totalRevenue;
-  final double targetRevenue;
-  final int checkedInCount;
-  final double conversionRate;
-  final Map<String, int> ticketTypesSold;
-  final Map<String, double> revenueByTicketType;
-  final DateTime lastUpdated;
+@freezed
+class EventStatistics with _$EventStatistics {
+  const factory EventStatistics({
+    required String eventId,
+    required int totalTickets,
+    required int soldTickets,
+    required int availableTickets,
+    required double totalRevenue,
+    required double targetRevenue,
+    required int checkedInCount,
+    required double conversionRate,
+    required Map<String, int> ticketTypesSold,
+    required Map<String, double> revenueByTicketType,
+    required DateTime lastUpdated,
+  }) = _EventStatistics;
 
-  const EventStatistics({
-    required this.eventId,
-    required this.totalTickets,
-    required this.soldTickets,
-    required this.availableTickets,
-    required this.totalRevenue,
-    required this.targetRevenue,
-    required this.checkedInCount,
-    required this.conversionRate,
-    required this.ticketTypesSold,
-    required this.revenueByTicketType,
-    required this.lastUpdated,
-  });
-
-  factory EventStatistics.fromJson(Map<String, dynamic> json) => _$EventStatisticsFromJson(json);
-  Map<String, dynamic> toJson() => _$EventStatisticsToJson(this);
-
-  // Helper methods for value object serialization
-  static UniqueId _uniqueIdFromJson(String json) => UniqueId.fromString(json);
-  static String _uniqueIdToJson(UniqueId id) => id.getOrCrash();
+  factory EventStatistics.fromJson(Map<String, dynamic> json) =>
+      _$EventStatisticsFromJson(json);
 }
 
 extension EventStatisticsExtension on EventStatistics {
