@@ -38,6 +38,14 @@ import '../../features/auth/infrastructure/auth/repositories/auth_repository_imp
     as _i446;
 import '../../features/auth/infrastructure/firestore/datasources/user_firestore_data_source.dart'
     as _i470;
+import '../../features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart'
+    as _i190;
+import '../../features/organizer/analytics/domain/repositories/analytics_repository.dart'
+    as _i106;
+import '../../features/organizer/analytics/infrastructure/datasources/firebase_analytics_data_source.dart'
+    as _i41;
+import '../../features/organizer/analytics/infrastructure/repositories/analytics_repository_impl.dart'
+    as _i908;
 import '../../features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart'
     as _i263;
 import '../../features/organizer/event_management/domain/repositories/event_repository.dart'
@@ -82,10 +90,14 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i59.FirebaseAuth>(),
               gh<_i116.GoogleSignIn>(),
             ));
+    gh.factory<_i41.FirebaseAnalyticsDataSource>(() =>
+        _i41.FirebaseAnalyticsDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i787.AuthRepository>(
         () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
     gh.factory<_i520.EventRepository>(
         () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
+    gh.factory<_i106.AnalyticsRepository>(() =>
+        _i908.AnalyticsRepositoryImpl(gh<_i41.FirebaseAnalyticsDataSource>()));
     gh.factory<_i263.EventManagementBloc>(
         () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
     gh.factory<_i17.GetCurrentUserUseCase>(
@@ -116,6 +128,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
         ));
+    gh.factory<_i190.AnalyticsBloc>(
+        () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
     return this;
   }
 }

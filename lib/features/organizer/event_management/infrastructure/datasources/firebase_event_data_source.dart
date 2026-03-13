@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
@@ -148,6 +147,7 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
         bannerUrl: bannerUrl,
         location: request.location,
         dateTime: request.dateTime,
+        category: request.category,
         ticketTypes: ticketTypes,
         maxCapacity: request.maxCapacity,
         status: EventStatus.active,
@@ -316,6 +316,7 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
         bannerUrl: bannerUrl,
         location: request.location ?? currentEvent.location,
         dateTime: request.dateTime ?? currentEvent.dateTime,
+        category: request.category ?? currentEvent.category,
         ticketTypes: updatedTicketTypes,
         maxCapacity: request.maxCapacity ?? currentEvent.maxCapacity,
         status: request.status ?? currentEvent.status,
@@ -528,6 +529,7 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
         description: originalEvent.description,
         location: originalEvent.location,
         dateTime: newDateTime,
+        category: originalEvent.category,
         ticketTypes: originalEvent.ticketTypes.map((ticketType) {
           return CreateTicketTypeRequest(
             name: ticketType.name,

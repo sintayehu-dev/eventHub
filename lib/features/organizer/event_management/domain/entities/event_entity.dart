@@ -13,6 +13,7 @@ class EventEntity with _$EventEntity {
     String? bannerUrl,
     required String location,
     required DateTime dateTime,
+    required EventCategory category,
     required List<TicketTypeEntity> ticketTypes,
     required int maxCapacity,
     required EventStatus status,
@@ -37,6 +38,7 @@ class EventEntity with _$EventEntity {
       'bannerUrl': bannerUrl,
       'location': location,
       'dateTime': dateTime.toIso8601String(),
+      'category': category.name,
       'ticketTypes':
           ticketTypes.map((ticket) => ticket.toFirestoreData()).toList(),
       'maxCapacity': maxCapacity,
@@ -58,6 +60,8 @@ class EventEntity with _$EventEntity {
       bannerUrl: data['bannerUrl'] as String?,
       location: data['location'] as String,
       dateTime: DateTime.parse(data['dateTime'] as String),
+      category:
+          EventCategory.values.firstWhere((e) => e.name == data['category']),
       ticketTypes: (data['ticketTypes'] as List<dynamic>)
           .map((ticketData) => TicketTypeEntity.fromFirestoreData(
               ticketData as Map<String, dynamic>))
@@ -136,6 +140,96 @@ enum EventStatus {
   cancelled,
 }
 
+enum EventCategory {
+  music,
+  technology,
+  business,
+  arts,
+  sports,
+  food,
+  education,
+  health,
+  networking,
+  entertainment,
+  workshop,
+  conference,
+  festival,
+  charity,
+  other,
+}
+
+extension EventCategoryExtension on EventCategory {
+  String get displayName {
+    switch (this) {
+      case EventCategory.music:
+        return 'Music & Concerts';
+      case EventCategory.technology:
+        return 'Technology';
+      case EventCategory.business:
+        return 'Business & Professional';
+      case EventCategory.arts:
+        return 'Arts & Culture';
+      case EventCategory.sports:
+        return 'Sports & Fitness';
+      case EventCategory.food:
+        return 'Food & Drink';
+      case EventCategory.education:
+        return 'Education & Learning';
+      case EventCategory.health:
+        return 'Health & Wellness';
+      case EventCategory.networking:
+        return 'Networking';
+      case EventCategory.entertainment:
+        return 'Entertainment';
+      case EventCategory.workshop:
+        return 'Workshop & Training';
+      case EventCategory.conference:
+        return 'Conference & Seminar';
+      case EventCategory.festival:
+        return 'Festival & Fair';
+      case EventCategory.charity:
+        return 'Charity & Fundraising';
+      case EventCategory.other:
+        return 'Other';
+    }
+  }
+
+  String get icon {
+    switch (this) {
+      case EventCategory.music:
+        return '🎵';
+      case EventCategory.technology:
+        return '💻';
+      case EventCategory.business:
+        return '💼';
+      case EventCategory.arts:
+        return '🎨';
+      case EventCategory.sports:
+        return '⚽';
+      case EventCategory.food:
+        return '🍽️';
+      case EventCategory.education:
+        return '📚';
+      case EventCategory.health:
+        return '🏥';
+      case EventCategory.networking:
+        return '🤝';
+      case EventCategory.entertainment:
+        return '🎭';
+      case EventCategory.workshop:
+        return '🛠️';
+      case EventCategory.conference:
+        return '🎤';
+      case EventCategory.festival:
+        return '🎪';
+      case EventCategory.charity:
+        return '❤️';
+      case EventCategory.other:
+        return '📋';
+    }
+  }
+}
+
 extension EventStatusExtension on EventStatus {
   String get displayName {
     switch (this) {
@@ -167,6 +261,7 @@ class CreateEventRequest with _$CreateEventRequest {
     String? bannerImagePath,
     required String location,
     required DateTime dateTime,
+    required EventCategory category,
     required List<CreateTicketTypeRequest> ticketTypes,
     required int maxCapacity,
     Map<String, dynamic>? metadata,
@@ -200,6 +295,7 @@ class UpdateEventRequest with _$UpdateEventRequest {
     String? bannerImagePath,
     String? location,
     DateTime? dateTime,
+    EventCategory? category,
     List<UpdateTicketTypeRequest>? ticketTypes,
     int? maxCapacity,
     EventStatus? status,

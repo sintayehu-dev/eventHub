@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
@@ -12,10 +13,25 @@ class OrganizerHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser();
+
+    if (currentUser == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1A0B2E),
+        body: Center(
+          child: Text(
+            'Please log in to view your dashboard',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
     return BlocProvider(
       create: (_) => getIt<EventManagementBloc>()
-        ..add(const EventManagementEvent.loadOrganizerEvents(
-          organizerId: 'current_organizer_id', // TODO: Get from auth
+        ..add(EventManagementEvent.loadOrganizerEvents(
+          organizerId: currentUser.uid,
           status: EventStatus.active,
         )),
       child: const OrganizerHomeView(),
