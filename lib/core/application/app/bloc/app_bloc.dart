@@ -1,32 +1,16 @@
-import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:eventhub/core/application/app/bloc/app_event.dart';
-import 'package:eventhub/core/application/app/bloc/app_state.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:eventhub/core/utils/local_storage.dart';
-import 'package:eventhub/core/handlers/app_connectivity.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+
+part 'app_event.dart';
+part 'app_state.dart';
+part 'app_bloc.freezed.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
-
   AppBloc() : super(const AppState()) {
     on<GetThemeMode>(_onGetThemeMode);
     on<ChangeTheme>(_onChangeTheme);
-    on<ConnectivityChanged>(_onConnectivityChanged);
     on<AppInitialized>(_onAppInitialized);
-    _setupConnectivity();
-  }
-
-  Future<void> _setupConnectivity() async {
-    // Initial connectivity check
-    final isConnected = await AppConnectivity.connectivity();
-    add(AppEvent.connectivityChanged(isConnected: isConnected));
-
-    // Listen to connectivity changes
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) async {
-      final isConnected = await AppConnectivity.connectivity();
-      add(AppEvent.connectivityChanged(isConnected: isConnected));
-    });
   }
 
   Future<void> _onGetThemeMode(GetThemeMode event, Emitter<AppState> emit) async {
@@ -39,17 +23,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     emit(state.copyWith(isDarkMode: event.isDarkMode));
   }
 
-  void _onConnectivityChanged(ConnectivityChanged event, Emitter<AppState> emit) {
-    emit(state.copyWith(isConnected: event.isConnected));
-  }
-
   void _onAppInitialized(AppInitialized event, Emitter<AppState> emit) {
     emit(state.copyWith(isInitialized: true));
-  }
-
-  @override
-  Future<void> close() {
-    _connectivitySubscription.cancel();
-    return super.close();
   }
 } 
