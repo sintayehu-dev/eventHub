@@ -3,48 +3,133 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
   
-  // Base colors
+  // Core palette (used in EventHub app)
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-
-  // Brand colors
-  static const Color primaryIndigo = Color(0xFF3F51B5);
-  static const Color lightIndigo = Color(0xFF7986CB);
-  static const Color darkIndigo = Color(0xFF303F9F);
-  static const Color accentPurple = Color(0xFF9575CD);
-
-  // Theme colors (from app_theme.dart)
-  static const Color error = Color(0xFFBA1A1A);
-  static const Color errorContainer = Color(0xFFFFDAD6);
-  static const Color inversePrimary = Color(0xFFEAB308);
-  static const Color inverseSurface = Color(0xFF2E3135);
-  static const Color onErrorContainer = Color(0xFF410002);
-  static const Color onInverseSurface = Color(0xFFEFF0F7);
-  static const Color onPrimaryContainer = Color(0xFF1E0E5F);
-  static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color onSecondaryContainer = Color(0xFF1E0E5F);
-  static const Color onSurface = Color(0xFF191C20);
-  static const Color onSurfaceVariant = Color(0xFF43474E);
-  static const Color onTertiary = Color(0xFFFFFFFF);
-  static const Color onTertiaryContainer = Color(0xFF251431);
-  static const Color outline = Color(0xFF73777F);
-  static const Color outlineVariant = Color(0xFFC3C7CF);
-  static const Color primary = Color(0xFF4A2A91);
-  static const Color primaryContainer = Color(0xFFE9DDFF);
-  static const Color scrim = Color(0xFF000000);
-  static const Color secondary = Color(0xFFEAB308);
-  static const Color secondaryContainer = Color(0xFFFFF8E1);
-  static const Color shadow = Color(0xFF000000);
   static const Color surface = Color(0xFFF8F9FF);
-  static const Color surfaceContainerHighest = Color(0xFFE1E2E8);
-  static const Color surfaceTint = Color(0xFF4A2A91);
-  static const Color tertiary = Color(0xFF6B5778);
-  static const Color tertiaryContainer = Color(0xFFF2DAFF);
-
-  // Greys
+  static const Color brown = Color(0xFF191C20);
+  static const Color darkBrown = Color(0xFF000000);
+  static const Color lightBrown = Color(0xFF43474E);
+  static const Color accentPurple = Color(0xFF9575CD);
+  static const Color lightIndigo = Color(0xFF7986CB);
+  static const Color chartGreen = Color(0xFF4CAF50);
+  static const Color chartOrange = Color(0xFFFF9800);
+  static const Color chartYellow = Color(0xFFEAB308);
+  static const Color error = Color(0xFFBA1A1A);
   static const Color grey100 = Color(0xFFF5F5F5);
   static const Color grey200 = Color(0xFFEEEEEE);
   static const Color grey300 = Color(0xFFE0E0E0);
   static const Color grey400 = Color(0xFFBDBDBD);
   static const Color grey600 = Color(0xFF757575);
+  static const Color primaryIndigo = Color(0xFF3F51B5);
+  static const Color onSurface = Color(0xFF191C20);
+  static const Color primary = Color(0xFF4A2A91);
+  static const Color softGold = Color(0xFFEAB308);
+
+  static const LinearGradient chartGreenGradient = LinearGradient(
+    colors: [
+      chartGreen,
+      Color(0xCC4CAF50),
+      chartGreen,
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient chartOrangeGradient = LinearGradient(
+    colors: [
+      chartOrange,
+      Color(0xCCFF9800),
+      chartOrange,
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const Color metricCardBorder = white;
+  static const Color metricCardShadow =
+      Color(0x14000000); // Black with 8% opacity
+  static const Color vitalsCardBorder = white;
+  static const Color vitalsIconBgHeart = Color(0xFFE91E63);
+  static const Color vitalsIconBgBP = Color(0xFF2196F3);
+  static const Color vitalsIconBgSleep = Color(0xFF9C27B0);
+  static const Color vitalsDivider = Color(0x337986CB); // lightIndigo 20%
+  static const Color darkIndigo = Color(0xFF303F9F);
+  static const Color primaryContainer = Color(0xFFE9DDFF);
+
+  /// Returns a map of all colors used in the light theme for easy reference.
+  static Map<String, dynamic> light() => {
+        'white': Color(0xFFFFFFFF), // Pure white background
+        'black': Color(0xFF000000), // Pure black for text/icons
+        'surface': Color(0xFFF8F9FF), // Light surface for cards/surfaces
+        'brown': Color(0xFF191C20), // Dark text color
+        'darkBrown': Color(0xFF000000), // Pure black for strong emphasis
+        'lightBrown': Color(0xFF43474E), // Grey for secondary text
+        'accentPurple': Color(0xFF9575CD), // EventHub purple accent
+        'lightIndigo': Color(0xFF7986CB), // EventHub indigo accent
+        'chartGreen': Color(0xFF4CAF50), // Green for charts
+        'chartOrange': Color(0xFFFF9800), // Orange for charts
+        'chartYellow': Color(0xFFEAB308), // EventHub gold/yellow
+        'error': Color(0xFFBA1A1A), // Error red
+        'grey100': Color(0xFFF5F5F5), // Lightest grey
+        'grey200': Color(0xFFEEEEEE),
+        'grey300': Color(0xFFE0E0E0),
+        'grey400': Color(0xFFBDBDBD),
+        'grey600': Color(0xFF757575),
+        'primaryIndigo': Color(0xFF3F51B5), // Primary indigo
+        'onSurface': Color(0xFF191C20), // Text on surfaces
+        'primary': Color(0xFF4A2A91), // EventHub primary purple
+        'softGold': Color(0xFFEAB308), // EventHub gold
+        'chartGreenGradient': chartGreenGradient,
+        'chartOrangeGradient': chartOrangeGradient,
+        'metricCardBorder': Color(0xFFFFFFFF),
+        'metricCardShadow': Color(0x14000000),
+        'vitalsCardBorder': Color(0xFFFFFFFF),
+        'vitalsIconBgHeart': Color(0xFFE91E63),
+        'vitalsIconBgBP': Color(0xFF2196F3),
+        'vitalsIconBgSleep': Color(0xFF9C27B0),
+        'vitalsDivider': Color(0x337986CB), // 20% indigo
+        'darkIndigo': Color(0xFF303F9F),
+        'primaryContainer': Color(0xFFE9DDFF),
+        'shimmerBase': Color(0xFFE1E2E8),
+        'shimmerHighlight': Color(0xFFFFFFFF),
+      };
+
+  /// Returns a map of all colors used in the dark theme for easy reference.
+  static Map<String, dynamic> dark() => {
+        'white': Color(0xFF1A0B2E), // EventHub dark background
+        'black': Color(0xFFFFFFFF), // White for contrast
+        'surface': Color(0xFF2A1B3D), // EventHub card/surface dark
+        'brown': Color(0xFFFFFFFF), // White text for dark theme
+        'darkBrown': Color(0xFFE1E2E8), // Light grey for emphasis
+        'lightBrown': Color(0xFFBDBDBD), // Grey for secondary text
+        'accentPurple': Color(0xFF9575CD), // EventHub purple accent
+        'lightIndigo': Color(0xFF7986CB), // EventHub indigo accent
+        'chartGreen': Color(0xFF4CAF50), // Green for charts
+        'chartOrange': Color(0xFFFF9800), // Orange for charts
+        'chartYellow': Color(0xFFEAB308), // EventHub gold/yellow
+        'error': Color(0xFFFFDAD6), // Light error for dark theme
+        'grey100': Color(0xFF2A1B3D), // Use surface for greys
+        'grey200': Color(0xFF2A1B3D),
+        'grey300': Color(0xFF2A1B3D),
+        'grey400': Color(0xFF43474E), // Muted grey divider
+        'grey600': Color(0xFFBDBDBD), // Light grey for icons
+        'primaryIndigo': Color(0xFF7986CB), // Lighter indigo for dark
+        'onSurface': Color(0xFFFFFFFF), // White text on dark surfaces
+        'primary': Color(0xFF8B5CF6), // Lighter purple for dark theme
+        'softGold': Color(0xFFEAB308), // EventHub gold
+        'chartGreenGradient': chartGreenGradient,
+        'chartOrangeGradient': chartOrangeGradient,
+        'metricCardBorder': Color(0xFF2A1B3D),
+        'metricCardShadow': Color(0x33000000),
+        'vitalsCardBorder': Color(0xFF2A1B3D),
+        'vitalsIconBgHeart': Color(0xFFE91E63),
+        'vitalsIconBgBP': Color(0xFF2196F3),
+        'vitalsIconBgSleep': Color(0xFF9C27B0),
+        'vitalsDivider': Color(0x337986CB), // 20% indigo
+        'darkIndigo': Color(0xFF7986CB),
+        'primaryContainer': Color(0xFF2A1B3D),
+        'shimmerBase': Color(0xFF2A1B3D),
+        'shimmerHighlight': Color(0xFF3A2B4D),
+      };
 }

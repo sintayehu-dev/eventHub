@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/local_storage.dart';
@@ -23,21 +22,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
       description:
           'Find amazing events happening around you. From concerts to conferences, discover experiences that match your interests.',
       icon: Icons.explore,
-      gradient: const [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+      gradient: const [Color(0xFF4A2A91), Color(0xFF7986CB)], // EventHub colors
     ),
     OnboardingItem(
       title: 'Connect & Network',
       description:
           'Meet like-minded people and build meaningful connections. Expand your network at every event you attend.',
       icon: Icons.people,
-      gradient: const [Color(0xFF8B5CF6), Color(0xFFEC4899)],
+      gradient: const [Color(0xFF7986CB), Color(0xFFEAB308)], // EventHub colors
     ),
     OnboardingItem(
       title: 'Create Memories',
       description:
           'Organize your own events and create unforgettable experiences. Share moments that matter with your community.',
       icon: Icons.celebration,
-      gradient: const [Color(0xFFEC4899), Color(0xFFF59E0B)],
+      gradient: const [Color(0xFFEAB308), Color(0xFF4A2A91)], // EventHub colors
     ),
   ];
 
@@ -49,7 +48,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -62,10 +65,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   onPressed: _finishOnboarding,
                   child: Text(
                     'Skip',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF6B7280),
                     ),
                   ),
                 ),
@@ -97,8 +99,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 effect: WormEffect(
                   dotHeight: 8.h,
                   dotWidth: 8.w,
-                  activeDotColor: const Color(0xFF6366F1),
-                  dotColor: const Color(0xFFE5E7EB),
+                  activeDotColor: colorScheme.primary,
+                  dotColor: colorScheme.outline.withValues(alpha: 0.3),
                   spacing: 16.w,
                 ),
               ),
@@ -115,17 +117,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         onPressed: _previousPage,
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 16.h),
-                          side: const BorderSide(color: Color(0xFF6366F1)),
+                          side: BorderSide(color: colorScheme.primary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
                         child: Text(
                           'Previous',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16.sp,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF6366F1),
                           ),
                         ),
                       ),
@@ -140,7 +141,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           ? _finishOnboarding
                           : _nextPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
@@ -151,10 +153,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         _currentPage == _onboardingItems.length - 1
                             ? 'Get Started'
                             : 'Next',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16.sp,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onPrimary,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -198,6 +199,9 @@ class _OnboardingItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
@@ -225,7 +229,7 @@ class _OnboardingItemWidget extends StatelessWidget {
             child: Icon(
               item.icon,
               size: 60.sp,
-              color: Colors.white,
+              color: colorScheme.onPrimary,
             ),
           ),
 
@@ -234,10 +238,9 @@ class _OnboardingItemWidget extends StatelessWidget {
           // Title
           Text(
             item.title,
-            style: GoogleFonts.poppins(
-              fontSize: 28.sp,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F2937),
             ),
             textAlign: TextAlign.center,
           ),
@@ -247,10 +250,8 @@ class _OnboardingItemWidget extends StatelessWidget {
           // Description
           Text(
             item.description,
-            style: GoogleFonts.poppins(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xFF6B7280),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.5,
             ),
             textAlign: TextAlign.center,

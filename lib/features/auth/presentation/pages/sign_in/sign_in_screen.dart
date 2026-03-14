@@ -36,22 +36,25 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117), // Ensure no white background
+      backgroundColor: colorScheme.surface,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF0D1117), // Deep dark navy
-              Color(0xFF1A0B2E), // Rich dark purple
-              Color(0xFF2D1B69), // Deep royal purple
-              Color(0xFF6B46C1), // Vibrant purple
+              colorScheme.surface,
+              colorScheme.primaryContainer,
+              colorScheme.primary.withValues(alpha: 0.8),
+              colorScheme.primary,
             ],
-            stops: [0.0, 0.3, 0.7, 1.0],
+            stops: const [0.0, 0.3, 0.7, 1.0],
           ),
         ),
         child: SafeArea(
@@ -96,16 +99,16 @@ class _SignInScreenState extends State<SignInScreen> {
                         width: 80.w,
                         height: 80.w,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
-                              Color(0xFF9333EA), // Rich purple
-                              Color(0xFFEC4899), // Vibrant pink
+                              colorScheme.primary,
+                              colorScheme.secondary,
                             ],
                           ),
                           borderRadius: BorderRadius.circular(20.r),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF9333EA).withValues(alpha: 0.4),
+                              color: colorScheme.primary.withValues(alpha: 0.4),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -114,7 +117,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: Icon(
                           Icons.event,
                           size: 40.sp,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                         ),
                       ),
                       
@@ -123,8 +126,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       // App Name
                       Text(
                         'Event Hub',
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          color: Colors.white,
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -134,8 +137,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       // Tagline
                       Text(
                         'Elevate your experience. Enter the arena.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -148,34 +151,39 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Text(
                             'Email Address',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.8),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.8),
                             ),
                           ),
                           SizedBox(height: 8.h),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(32.r),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
                             child: TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Colors.white,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'name@company.com',
-                                hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white.withValues(alpha: 0.6),
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                                   size: 20.sp,
                                 ),
                                 border: InputBorder.none,
@@ -205,8 +213,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             children: [
                               Text(
                                 'Password',
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.8),
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.8),
                                 ),
                               ),
                               GestureDetector(
@@ -217,8 +226,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                 },
                                 child: Text(
                                   'Forgot password?',
-                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: const Color(0xFF9333EA),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -227,27 +236,31 @@ class _SignInScreenState extends State<SignInScreen> {
                           SizedBox(height: 8.h),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(32.r),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
                             child: TextFormField(
                               controller: _passwordController,
                               obscureText: !state.showPassword,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Colors.white,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: '••••••••',
-                                hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
-                                  color: Colors.white.withValues(alpha: 0.6),
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                                   size: 20.sp,
                                 ),
                                 suffixIcon: IconButton(
@@ -255,7 +268,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                     state.showPassword
                                         ? Icons.visibility_off_outlined
                                         : Icons.visibility_outlined,
-                                    color: Colors.white.withValues(alpha: 0.6),
+                                    color: colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
                                     size: 20.sp,
                                   ),
                                   onPressed: () {
@@ -293,8 +307,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF9333EA),
-                            foregroundColor: Colors.white,
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32.r),
@@ -304,8 +318,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               ? SizedBox(
                                   width: 24.w,
                                   height: 24.w,
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.white,
+                                  child: CircularProgressIndicator(
+                                    color: colorScheme.onPrimary,
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -314,8 +328,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   children: [
                                     Text(
                                       'Login to Hub',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        color: Colors.white,
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        color: colorScheme.onPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -337,22 +352,23 @@ class _SignInScreenState extends State<SignInScreen> {
                           Expanded(
                             child: Container(
                               height: 1,
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: colorScheme.outline.withValues(alpha: 0.3),
                             ),
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: Text(
                               'OR',
-                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.6),
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.6),
                               ),
                             ),
                           ),
                           Expanded(
                             child: Container(
                               height: 1,
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: colorScheme.outline.withValues(alpha: 0.3),
                             ),
                           ),
                         ],
@@ -403,8 +419,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                           GestureDetector(
@@ -413,8 +430,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             },
                             child: Text(
                               'Create Account',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFF9333EA),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -439,16 +456,19 @@ class _SignInScreenState extends State<SignInScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 56.w,
         height: 56.w,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
         ),

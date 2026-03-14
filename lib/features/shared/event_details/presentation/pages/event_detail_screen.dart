@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
+import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
+import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final String? eventId;
@@ -12,23 +18,116 @@ class EventDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (eventId == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1A0B2E),
+        body: Center(
+          child: Text(
+            'Event not found',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    return BlocProvider(
+      create: (_) => getIt<EventDiscoveryBloc>()
+        ..add(EventDiscoveryEvent.loadEventDetails(
+          eventId: eventId!,
+          userId: 'current_user_id', // TODO: Get from auth
+        )),
+      child: EventDetailView(eventId: eventId!),
+    );
+  }
+}
+
+class EventDetailView extends StatelessWidget {
+  final String eventId;
+
+  const EventDetailView({
+    super.key,
+    required this.eventId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A0B2E),
-      body: CustomScrollView(
-        slivers: [
-          // App Bar with Image
-          _buildSliverAppBar(),
-          
-          // Event Details
-          SliverToBoxAdapter(
-            child: _buildEventDetails(),
+      body: BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
+        builder: (context, state) {
+          return state.when(
+            initial: () => _buildLoadingState(),
+            loading: () => _buildLoadingState(),
+            loadingDetails: () => _buildLoadingState(),
+            loaded: (events, isSearchResult, selectedCategory, searchFilters) =>
+                _buildLoadingState(), // This shouldn't happen for event details
+            eventDetailsLoaded: (event) =>
+                _buildEventDetailContent(context, event),
+            error: (networkException) =>
+                _buildErrorState(networkException.toString()),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(
+        color: Color(0xFF8B5CF6),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: const Color(0xFFEF4444),
+            size: 48.sp,
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'Failed to load event details',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 14.sp,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSliverAppBar() {
+  Widget _buildEventDetailContent(
+      BuildContext context, EventDiscoveryEntity event) {
+    return CustomScrollView(
+      slivers: [
+        // App Bar with Image
+        _buildSliverAppBar(event),
+
+        // Event Details
+        SliverToBoxAdapter(
+          child: _buildEventDetails(context, event),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSliverAppBar(EventDiscoveryEntity event) {
     return SliverAppBar(
       expandedHeight: 300.h,
       pinned: true,
@@ -73,10 +172,12 @@ class EventDetailScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Implement favorite toggle
+            },
             icon: Icon(
-              Icons.favorite_border,
-              color: Colors.white,
+              event.isFavorite == true ? Icons.favorite : Icons.favorite_border,
+              color: event.isFavorite == true ? Colors.red : Colors.white,
               size: 20.sp,
             ),
           ),
@@ -86,98 +187,26 @@ class EventDetailScreen extends StatelessWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // Event Banner Image Placeholder (since this is a mock screen)
-            // In a real implementation, you would pass the event data and display the actual banner
+            // Event Banner Image or Placeholder
+            event.bannerUrl != null
+                ? Image.network(
+                    event.bannerUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildImagePlaceholder(),
+                  )
+                : _buildImagePlaceholder(),
+
+            // Gradient overlay
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF0F172A),
-                    Color(0xFF1E293B),
-                    Color(0xFF334155),
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.7),
                   ],
-                ),
-              ),
-            ),
-            
-            // Stage lights effect
-            Positioned(
-              top: 80.h,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 120.h,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: 0.8,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.8),
-                      Colors.cyan.withValues(alpha: 0.6),
-                      Colors.purple.withValues(alpha: 0.4),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            // Additional stage lights
-            Positioned(
-              top: 100.h,
-              left: 80.w,
-              child: Container(
-                width: 60.w,
-                height: 60.h,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.pink.withValues(alpha: 0.8),
-                      Colors.purple.withValues(alpha: 0.4),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            Positioned(
-              top: 100.h,
-              right: 80.w,
-              child: Container(
-                width: 60.w,
-                height: 60.h,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.blue.withValues(alpha: 0.8),
-                      Colors.cyan.withValues(alpha: 0.4),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            // Crowd silhouette
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 80.h,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.6),
-                      Colors.black.withValues(alpha: 0.8),
-                    ],
-                  ),
                 ),
               ),
             ),
@@ -187,7 +216,106 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEventDetails() {
+  Widget _buildImagePlaceholder() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF0F172A),
+            Color(0xFF1E293B),
+            Color(0xFF334155),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Stage lights effect
+          Positioned(
+            top: 80.h,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 120.h,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.center,
+                  radius: 0.8,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.8),
+                    Colors.cyan.withValues(alpha: 0.6),
+                    Colors.purple.withValues(alpha: 0.4),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Additional stage lights
+          Positioned(
+            top: 100.h,
+            left: 80.w,
+            child: Container(
+              width: 60.w,
+              height: 60.h,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.pink.withValues(alpha: 0.8),
+                    Colors.purple.withValues(alpha: 0.4),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 100.h,
+            right: 80.w,
+            child: Container(
+              width: 60.w,
+              height: 60.h,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.blue.withValues(alpha: 0.8),
+                    Colors.cyan.withValues(alpha: 0.4),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Crowd silhouette
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 80.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.6),
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEventDetails(BuildContext context, EventDiscoveryEntity event) {
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -201,7 +329,7 @@ class EventDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.r),
             ),
             child: Text(
-              'MUSIC EVENT',
+              event.category.name.toUpperCase(),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12.sp,
@@ -214,7 +342,7 @@ class EventDetailScreen extends StatelessWidget {
           
           // Event Title
           Text(
-            'Midnight Neon Symphony 2024',
+            event.title,
             style: TextStyle(
               color: Colors.white,
               fontSize: 28.sp,
@@ -228,31 +356,31 @@ class EventDetailScreen extends StatelessWidget {
           _buildInfoCard(
             icon: Icons.calendar_today,
             title: 'Date & Time',
-            subtitle: 'Saturday, Oct 21 • 7:00 PM',
+            subtitle: _formatDateTime(event.dateTime),
           ),
           SizedBox(height: 16.h),
           
           _buildInfoCard(
             icon: Icons.confirmation_number,
             title: 'Entry Price',
-            subtitle: 'From \$45.00',
+            subtitle: event.priceRange,
           ),
           SizedBox(height: 24.h),
           
           // Location Section
-          _buildLocationSection(),
+          _buildLocationSection(event),
           SizedBox(height: 24.h),
           
           // Organizer Section
-          _buildOrganizerSection(),
+          _buildOrganizerSection(event),
           SizedBox(height: 24.h),
           
           // About Event Section
-          _buildAboutSection(),
+          _buildAboutSection(event),
           SizedBox(height: 32.h),
           
           // Get Tickets Button
-          _buildGetTicketsButton(),
+          _buildGetTicketsButton(context, event),
           SizedBox(height: 20.h),
         ],
       ),
@@ -316,7 +444,7 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationSection() {
+  Widget _buildLocationSection(EventDiscoveryEntity event) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -373,7 +501,7 @@ class EventDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Grand Central Stadium',
+                      event.location,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp,
@@ -381,13 +509,14 @@ class EventDetailScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4.h),
-                    Text(
-                      '123 Main St, New York, NY 10001',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14.sp,
+                    if (event.distance != null)
+                      Text(
+                        '${event.distance!.toStringAsFixed(1)} km away',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 14.sp,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -414,7 +543,7 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrganizerSection() {
+  Widget _buildOrganizerSection(EventDiscoveryEntity event) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -450,7 +579,7 @@ class EventDetailScreen extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'NP',
+                    _getInitials(event.organizerName),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18.sp,
@@ -466,7 +595,7 @@ class EventDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Nobile Productions',
+                      event.organizerName,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.sp,
@@ -507,7 +636,7 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSection() {
+  Widget _buildAboutSection(EventDiscoveryEntity event) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -522,7 +651,7 @@ class EventDetailScreen extends StatelessWidget {
         SizedBox(height: 12.h),
         
         Text(
-          'Experience the magic of the Neon Symphony, where electronic beats meet orchestral grandeur. Join us for an unforgettable night of music, lights, and pure energy that will leave you mesmerized.\n\nFeaturing world-class DJs and live musicians, this event promises to be the highlight of your year. Don\'t miss out on this spectacular show!',
+          event.description,
           style: TextStyle(
             color: Colors.grey[300],
             fontSize: 15.sp,
@@ -533,13 +662,24 @@ class EventDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGetTicketsButton() {
+  Widget _buildGetTicketsButton(
+      BuildContext context, EventDiscoveryEntity event) {
+    final isAvailable =
+        event.availableTickets > 0 && event.status == EventStatus.active;
+    
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: isAvailable
+            ? () {
+                context.pushNamed(
+                  RouteName.ticketSelection,
+                  extra: event,
+                );
+              }
+            : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: isAvailable ? const Color(0xFF8B5CF6) : Colors.grey,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
@@ -556,7 +696,7 @@ class EventDetailScreen extends StatelessWidget {
             ),
             SizedBox(width: 12.w),
             Text(
-              'Get Tickets Now',
+              event.isSoldOut ? 'Sold Out' : 'Get Tickets Now',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.sp,
@@ -567,5 +707,52 @@ class EventDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    final weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+
+    final weekday = weekdays[dateTime.weekday - 1];
+    final month = months[dateTime.month - 1];
+    final day = dateTime.day;
+    final hour = dateTime.hour;
+    final minute = dateTime.minute;
+
+    final timeString =
+        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+
+    return '$weekday, $month $day • $timeString';
+  }
+
+  String _getInitials(String name) {
+    final words = name.split(' ');
+    if (words.length >= 2) {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    } else if (words.isNotEmpty) {
+      return words[0].substring(0, words[0].length >= 2 ? 2 : 1).toUpperCase();
+    }
+    return 'EO'; // Event Organizer fallback
   }
 }

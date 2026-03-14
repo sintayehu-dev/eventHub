@@ -31,22 +31,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: colorScheme.surface,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF0D1117), // Deep dark navy
-              Color(0xFF1A0B2E), // Rich dark purple
-              Color(0xFF2D1B69), // Deep royal purple
-              Color(0xFF6B46C1), // Vibrant purple
+              colorScheme.surface,
+              colorScheme.primaryContainer,
+              colorScheme.primary.withValues(alpha: 0.8),
+              colorScheme.primary,
             ],
-            stops: [0.0, 0.3, 0.7, 1.0],
+            stops: const [0.0, 0.3, 0.7, 1.0],
           ),
         ),
         child: SafeArea(
@@ -89,15 +92,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () => context.pop(),
                           icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.white,
+                            color: colorScheme.onSurface,
                             size: 24.sp,
                           ),
                         ),
                         Expanded(
                           child: Text(
                             'Event Hub',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
                             ),
                             textAlign: TextAlign.center,
@@ -125,8 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 borderRadius: BorderRadius.circular(16.r),
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFF9333EA).withValues(alpha: 0.3),
-                                    const Color(0xFFEC4899).withValues(alpha: 0.3),
+                                    colorScheme.primary.withValues(alpha: 0.3),
+                                    colorScheme.secondary
+                                        .withValues(alpha: 0.3),
                                   ],
                                 ),
                               ),
@@ -154,7 +158,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       gradient: LinearGradient(
                                         colors: [
                                           Colors.transparent,
-                                          const Color(0xFF9333EA).withValues(alpha: 0.4),
+                                          colorScheme.primary
+                                              .withValues(alpha: 0.4),
                                         ],
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
@@ -168,16 +173,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Title Section
                             Text(
                               'Join the Scene',
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                color: Colors.white,
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             SizedBox(height: 8.h),
                             Text(
                               'Create your account & start exploring.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.7),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
                               ),
                             ),
                             
@@ -186,33 +192,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Full Name Field
                             Text(
                               'Full Name',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.8),
                               ),
                             ),
                             SizedBox(height: 8.h),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: colorScheme.outline
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
                               child: TextFormField(
                                 controller: _fullNameController,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Enter your full name',
-                                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                  hintStyle:
+                                      theme.textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurface
+                                        .withValues(alpha: 0.5),
                                   ),
                                   prefixIcon: Icon(
                                     Icons.person_outline,
-                                    color: const Color(0xFF9333EA),
+                                    color: colorScheme.primary,
                                     size: 20.sp,
                                   ),
                                   border: InputBorder.none,
@@ -229,34 +240,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Email Field
                             Text(
                               'Email Address',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.8),
                               ),
                             ),
                             SizedBox(height: 8.h),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: colorScheme.outline
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
                               child: TextFormField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'name@company.com',
-                                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                  hintStyle:
+                                      theme.textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurface
+                                        .withValues(alpha: 0.5),
                                   ),
                                   prefixIcon: Icon(
                                     Icons.email_outlined,
-                                    color: const Color(0xFF9333EA),
+                                    color: colorScheme.primary,
                                     size: 20.sp,
                                   ),
                                   border: InputBorder.none,
@@ -278,34 +294,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Password Field
                             Text(
                               'Password',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.8),
                               ),
                             ),
                             SizedBox(height: 8.h),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: colorScheme.outline
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
                               child: TextFormField(
                                 controller: _passwordController,
                                 obscureText: !state.showPassword,
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: '••••••••',
-                                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                  hintStyle:
+                                      theme.textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurface
+                                        .withValues(alpha: 0.5),
                                   ),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
-                                    color: const Color(0xFF9333EA),
+                                    color: colorScheme.primary,
                                     size: 20.sp,
                                   ),
                                   suffixIcon: IconButton(
@@ -313,7 +334,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       state.showPassword
                                           ? Icons.visibility_off_outlined
                                           : Icons.visibility_outlined,
-                                      color: Colors.white.withValues(alpha: 0.6),
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                       size: 20.sp,
                                     ),
                                     onPressed: () {
@@ -341,8 +363,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Role Selection
                             Text(
                               'Select Your Role',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.8),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.8),
                               ),
                             ),
                             SizedBox(height: 16.h),
@@ -390,8 +413,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF9333EA),
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16.r),
@@ -401,8 +424,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ? SizedBox(
                                         width: 24.w,
                                         height: 24.w,
-                                        child: const CircularProgressIndicator(
-                                          color: Colors.white,
+                                        child: CircularProgressIndicator(
+                                          color: colorScheme.onPrimary,
                                           strokeWidth: 2,
                                         ),
                                       )
@@ -411,8 +434,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         children: [
                                           Text(
                                             'Sign Up',
-                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                              color: Colors.white,
+                                            style: theme.textTheme.titleMedium
+                                                ?.copyWith(
+                                              color: colorScheme.onPrimary,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -434,16 +458,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               children: [
                                 Text(
                                   'Already have an account? ',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.7),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: () => context.pop(),
                                   child: Text(
                                     'Log In',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: const Color(0xFF9333EA),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -456,8 +481,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             // Terms and Privacy
                             Text(
                               'By signing up you agree to our Terms of Service and Privacy Policy',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.5),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.5),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -483,6 +509,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required String value,
     required bool isSelected,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -496,13 +525,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
         decoration: BoxDecoration(
           color: isSelected 
-              ? const Color(0xFF9333EA).withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.05),
+              ? colorScheme.primary.withValues(alpha: 0.2)
+              : colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected 
-                ? const Color(0xFF9333EA)
-                : Colors.white.withValues(alpha: 0.1),
+                ? colorScheme.primary
+                : colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -511,17 +540,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Icon(
               icon,
               color: isSelected 
-                  ? const Color(0xFF9333EA)
-                  : Colors.white.withValues(alpha: 0.6),
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: 0.6),
               size: 24.sp,
             ),
             SizedBox(height: 8.h),
             Text(
               title,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              style: theme.textTheme.labelMedium?.copyWith(
                 color: isSelected 
-                    ? const Color(0xFF9333EA)
-                    : Colors.white.withValues(alpha: 0.8),
+                    ? colorScheme.primary
+                    : colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,

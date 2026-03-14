@@ -435,47 +435,12 @@ class _DiscoverViewState extends State<DiscoverView> {
     );
   }
 
-  Widget _buildEventCard(int index) {
-    final events = [
-      {
-        'id': 'neon-pulse-festival',
-        'title': 'Neon Pulse Electronic Festival',
-        'description': 'Experience the biggest EDM lineup of the summer with immersive light shows and world-class DJs.',
-        'date': 'AUG 24',
-        'location': 'LONDON, UK',
-        'price': '\$49-\$120',
-        'attendees': '+1.2k attending',
-        'isBookmarked': false,
-      },
-      {
-        'id': 'rhythm-bloom-concert',
-        'title': 'Rhythm & Bloom Outdoor Concert',
-        'description': 'A magical outdoor concert featuring indie and alternative artists in a beautiful garden setting.',
-        'date': 'SEP 15',
-        'location': 'MANCHESTER, UK',
-        'price': 'Free Entry',
-        'attendees': '+850 attending',
-        'isBookmarked': true,
-      },
-      {
-        'id': 'urban-beats-festival',
-        'title': 'Urban Beats Street Festival',
-        'description': 'Street music festival celebrating hip-hop, R&B, and urban culture with local and international artists.',
-        'date': 'OCT 02',
-        'location': 'BIRMINGHAM, UK',
-        'price': '\$25-\$75',
-        'attendees': '+2.1k attending',
-        'isBookmarked': false,
-      },
-    ];
-
-    final event = events[index];
-    
+  Widget _buildEventCard(EventDiscoveryEntity event) {
     return GestureDetector(
       onTap: () {
         context.pushNamed(
           RouteName.eventDetail,
-          pathParameters: {'eventId': event['id'] as String},
+          pathParameters: {'eventId': event.id},
         );
       },
       child: Container(
@@ -502,40 +467,33 @@ class _DiscoverViewState extends State<DiscoverView> {
               ),
               child: Stack(
                 children: [
-                  // Concert background
+                  // Event banner or placeholder
+                  event.bannerUrl != null
+                      ? ClipRRect(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20.r)),
+                          child: Image.network(
+                            event.bannerUrl!,
+                            height: 280.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildImagePlaceholder(),
+                          ),
+                        )
+                      : _buildImagePlaceholder(),
+
+                  // Gradient overlay
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF0F172A),
-                          Color(0xFF1E293B),
-                          Color(0xFF334155),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.7),
                         ],
-                      ),
-                    ),
-                  ),
-                  
-                  // Stage lights effect
-                  Positioned(
-                    top: 40.h,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 120.h,
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.8,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.9),
-                            Colors.cyan.withValues(alpha: 0.6),
-                            Colors.blue.withValues(alpha: 0.3),
-                            Colors.transparent,
-                          ],
-                        ),
                       ),
                     ),
                   ),
@@ -551,7 +509,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                         borderRadius: BorderRadius.circular(25.r),
                       ),
                       child: Text(
-                        event['price'] as String,
+                        event.priceRange,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14.sp,
@@ -574,7 +532,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   Row(
                     children: [
                       Text(
-                        '${event['date']} • ${event['location']}',
+                        '${_formatDate(event.dateTime)} • ${event.location}',
                         style: TextStyle(
                           color: const Color(0xFF8B5CF6),
                           fontSize: 14.sp,
@@ -584,7 +542,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                       ),
                       const Spacer(),
                       Icon(
-                        (event['isBookmarked'] as bool) 
+                        event.isFavorite == true 
                             ? Icons.bookmark 
                             : Icons.bookmark_border,
                         color: const Color(0xFF8B5CF6),
@@ -596,7 +554,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   
                   // Event Title
                   Text(
-                    event['title'] as String,
+                    event.title,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22.sp,
@@ -608,7 +566,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   
                   // Event Description
                   Text(
-                    event['description'] as String,
+                    event.description,
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 15.sp,
@@ -619,10 +577,10 @@ class _DiscoverViewState extends State<DiscoverView> {
                   ),
                   SizedBox(height: 16.h),
                   
-                  // Attendees with profile pictures
+                  // Attendees and organizer info
                   Row(
                     children: [
-                      // Profile pictures stack
+                      // Profile pictures stack (placeholder)
                       SizedBox(
                         width: 80.w,
                         height: 32.h,
@@ -645,7 +603,9 @@ class _DiscoverViewState extends State<DiscoverView> {
                       ),
                       SizedBox(width: 12.w),
                       Text(
-                        event['attendees'] as String,
+                        event.attendeeCount != null
+                            ? '+${event.attendeeCount} attending'
+                            : 'by ${event.organizerName}',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14.sp,
@@ -659,6 +619,48 @@ class _DiscoverViewState extends State<DiscoverView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF0F172A),
+            Color(0xFF1E293B),
+            Color(0xFF334155),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Stage lights effect
+          Positioned(
+            top: 40.h,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 120.h,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.center,
+                  radius: 0.8,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.9),
+                    Colors.cyan.withValues(alpha: 0.6),
+                    Colors.blue.withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -686,11 +688,29 @@ class _DiscoverViewState extends State<DiscoverView> {
         return Icons.computer;
       case 'Arts':
         return Icons.palette;
-      case 'Food':
-        return Icons.restaurant;
+      case 'Sports':
+        return Icons.sports_soccer;
       default:
         return Icons.category;
     }
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC'
+    ];
+    return '${months[dateTime.month - 1]} ${dateTime.day}';
   }
 
   @override

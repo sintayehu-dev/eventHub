@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:eventhub/features/auth/application/splash/bloc/splash_bloc.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_event.dart';
@@ -93,6 +92,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return BlocProvider(
       create: (context) {
         final splashBloc = SplashBloc();
@@ -118,18 +120,19 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           }
         },
         child: Scaffold(
+          backgroundColor: colorScheme.surface,
           body: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF1A1A2E), // Dark navy
-                  Color(0xFF16213E), // Dark blue
-                  Color(0xFF0F3460), // Deep blue
-                  Color(0xFF533483), // Purple
+                  colorScheme.surface,
+                  colorScheme.primaryContainer,
+                  colorScheme.primary.withValues(alpha: 0.8),
+                  colorScheme.primary,
                 ],
-                stops: [0.0, 0.3, 0.7, 1.0],
+                stops: const [0.0, 0.3, 0.7, 1.0],
               ),
             ),
             child: SafeArea(
@@ -151,16 +154,16 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                   width: 100.w,
                                   height: 100.w,
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       colors: [
-                                        Color(0xFF8B5CF6), // Purple
-                                        Color(0xFFEC4899), // Pink
+                                        colorScheme.primary,
+                                        colorScheme.secondary,
                                       ],
                                     ),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF8B5CF6)
+                                        color: colorScheme.primary
                                             .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         spreadRadius: 5,
@@ -170,7 +173,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                   child: Icon(
                                     Icons.event,
                                     size: 50.sp,
-                                    color: Colors.white,
+                                    color: colorScheme.onPrimary,
                                   ),
                                 ),
                               );
@@ -195,23 +198,24 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                           children: [
                                             TextSpan(
                                               text: 'Event ',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 36.sp,
+                                              style: theme
+                                                  .textTheme.displayMedium
+                                                  ?.copyWith(
+                                                color: colorScheme.onSurface,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.white,
                                               ),
                                             ),
                                             TextSpan(
                                               text: 'Hub',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 36.sp,
+                                              style: theme
+                                                  .textTheme.displayMedium
+                                                  ?.copyWith(
                                                 fontWeight: FontWeight.bold,
                                                 foreground: Paint()
-                                                  ..shader =
-                                                      const LinearGradient(
+                                                  ..shader = LinearGradient(
                                                     colors: [
-                                                      Color(0xFF8B5CF6),
-                                                      Color(0xFFEC4899),
+                                                      colorScheme.primary,
+                                                      colorScheme.secondary,
                                                     ],
                                                   ).createShader(
                                                     const Rect.fromLTWH(
@@ -225,10 +229,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                       SizedBox(height: 12.h),
                                       Text(
                                         'WHERE EXPERIENCES CONNECT',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.white
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                          color: colorScheme.onSurface
                                               .withValues(alpha: 0.7),
                                           letterSpacing: 2,
                                         ),
@@ -254,10 +257,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               // Loading Text
                               Text(
                                 'Syncing your universe',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white.withValues(alpha: 0.8),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.8),
                                 ),
                               ),
 
@@ -268,7 +270,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                 width: double.infinity,
                                 height: 4.h,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                                 child: Stack(
@@ -278,10 +281,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                           _progressAnimation.value,
                                       height: 4.h,
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
+                                        gradient: LinearGradient(
                                           colors: [
-                                            Color(0xFF8B5CF6),
-                                            Color(0xFFEC4899),
+                                            colorScheme.primary,
+                                            colorScheme.secondary,
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(2),
@@ -312,11 +315,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               // Premium Access
                               Text(
                                 'PREMIUM ACCESS',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
                                   letterSpacing: 2,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                               
@@ -337,28 +340,30 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFeatureIcon(IconData icon, String label) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       children: [
         Container(
           width: 32.w,
           height: 32.w,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: colorScheme.onSurface.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
             size: 16.sp,
-            color: const Color(0xFF8B5CF6),
+            color: colorScheme.primary,
           ),
         ),
         SizedBox(height: 4.h),
         Text(
           label,
-          style: GoogleFonts.poppins(
-            fontSize: 8.sp,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
             fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
       ],

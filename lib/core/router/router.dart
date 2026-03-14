@@ -1,5 +1,7 @@
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/navigation/navigation_service.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/auth/presentation/pages/sign_in/sign_in_screen.dart';
@@ -24,11 +26,16 @@ import 'package:eventhub/features/attendee/profile/presentation/pages/attendee_p
 import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/ticket_selection_screen.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/purchase_confirmation_screen.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/purchase_success_screen.dart';
+import 'package:eventhub/features/attendee/ticket_purchase/application/ticket_purchase/bloc/ticket_purchase_bloc.dart';
 
 // Ticket wallet screens
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_wallet_screen.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_details_screen.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_qr_screen.dart';
+import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
+
+// Auth
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 
 // Event discovery
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
@@ -165,7 +172,10 @@ final router = GoRouter(
             GoRoute(
               name: RouteName.attendeeTickets,
               path: '/attendee/tickets',
-              builder: (context, state) => const AttendeeTicketsScreen(),
+              builder: (context, state) => BlocProvider(
+                create: (_) => getIt<TicketWalletBloc>(),
+                child: const AttendeeTicketsScreen(),
+              ),
             ),
           ],
         ),
@@ -349,11 +359,14 @@ final router = GoRouter(
       path: '/purchase-confirmation',
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>;
-        return PurchaseConfirmationScreen(
-          event: data['event'] as EventDiscoveryEntity,
-          selectedTickets:
-              data['selectedTickets'] as List<Map<String, dynamic>>,
-          totalAmount: data['totalAmount'] as double,
+        return BlocProvider(
+          create: (_) => getIt<TicketPurchaseBloc>(),
+          child: PurchaseConfirmationScreen(
+            event: data['event'] as EventDiscoveryEntity,
+            selectedTickets:
+                data['selectedTickets'] as List<Map<String, dynamic>>,
+            totalAmount: data['totalAmount'] as double,
+          ),
         );
       },
     ),
@@ -371,7 +384,10 @@ final router = GoRouter(
     GoRoute(
       name: RouteName.ticketWallet,
       path: '/ticket-wallet',
-      builder: (context, state) => const TicketWalletScreen(),
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<TicketWalletBloc>(),
+        child: const TicketWalletScreen(),
+      ),
     ),
 
     GoRoute(
