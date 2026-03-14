@@ -27,6 +27,16 @@ class RouteName {
   static const attendeeDiscover = 'attendee_discover';
   static const attendeeTickets = 'attendee_tickets';
   static const attendeeProfile = 'attendee_profile';
+  
+  // Ticket purchase routes
+  static const ticketSelection = 'ticket_selection';
+  static const purchaseConfirmation = 'purchase_confirmation';
+  static const purchaseSuccess = 'purchase_success';
+
+  // Ticket wallet routes
+  static const ticketWallet = 'ticket_wallet';
+  static const ticketDetails = 'ticket_details';
+  static const ticketQR = 'ticket_qr';
 
   // Organizer routes
   static const organizerHome = 'organizer_home';

@@ -14,6 +14,34 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:google_sign_in/google_sign_in.dart' as _i116;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart'
+    as _i350;
+import '../../features/attendee/event_discovery/domain/repositories/event_discovery_repository.dart'
+    as _i818;
+import '../../features/attendee/event_discovery/infrastructure/datasources/firebase_event_discovery_data_source.dart'
+    as _i191;
+import '../../features/attendee/event_discovery/infrastructure/repositories/event_discovery_repository_impl.dart'
+    as _i872;
+import '../../features/attendee/ticket_purchase/application/ticket_purchase/bloc/ticket_purchase_bloc.dart'
+    as _i939;
+import '../../features/attendee/ticket_purchase/domain/repositories/ticket_purchase_repository.dart'
+    as _i805;
+import '../../features/attendee/ticket_purchase/domain/repositories/ticket_repository.dart'
+    as _i1005;
+import '../../features/attendee/ticket_purchase/infrastructure/datasources/firebase_ticket_data_source.dart'
+    as _i1021;
+import '../../features/attendee/ticket_purchase/infrastructure/repositories/ticket_purchase_repository_impl.dart'
+    as _i683;
+import '../../features/attendee/ticket_purchase/infrastructure/repositories/ticket_repository_impl.dart'
+    as _i699;
+import '../../features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart'
+    as _i112;
+import '../../features/attendee/ticket_wallet/domain/repositories/ticket_wallet_repository.dart'
+    as _i743;
+import '../../features/attendee/ticket_wallet/infrastructure/datasources/firebase_ticket_wallet_data_source.dart'
+    as _i776;
+import '../../features/attendee/ticket_wallet/infrastructure/repositories/ticket_wallet_repository_impl.dart'
+    as _i820;
 import '../../features/auth/application/auth_status/bloc/auth_status_bloc.dart'
     as _i364;
 import '../../features/auth/application/login/bloc/login_bloc.dart' as _i623;
@@ -83,17 +111,33 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i974.FirebaseFirestore>(),
               gh<_i837.CloudinaryService>(),
             ));
+    gh.factory<_i1021.FirebaseTicketDataSource>(() =>
+        _i1021.FirebaseTicketDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i516.UserService>(
         () => _i516.UserServiceImpl(gh<_i470.UserFirestoreDataSource>()));
+    gh.factory<_i191.FirebaseEventDiscoveryDataSource>(() =>
+        _i191.FirebaseEventDiscoveryDataSourceImpl(
+            gh<_i974.FirebaseFirestore>()));
+    gh.factory<_i818.EventDiscoveryRepository>(() =>
+        _i872.EventDiscoveryRepositoryImpl(
+            gh<_i191.FirebaseEventDiscoveryDataSource>()));
     gh.factory<_i413.FirebaseAuthDataSource>(
         () => _i413.FirebaseAuthDataSourceImpl(
               gh<_i59.FirebaseAuth>(),
               gh<_i116.GoogleSignIn>(),
             ));
+    gh.factory<_i1005.TicketRepository>(() =>
+        _i699.TicketRepositoryImpl(gh<_i1021.FirebaseTicketDataSource>()));
+    gh.factory<_i776.FirebaseTicketWalletDataSource>(() =>
+        _i776.FirebaseTicketWalletDataSourceImpl(
+            firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i41.FirebaseAnalyticsDataSource>(() =>
         _i41.FirebaseAnalyticsDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i787.AuthRepository>(
         () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
+    gh.factory<_i805.TicketPurchaseRepository>(() =>
+        _i683.TicketPurchaseRepositoryImpl(
+            gh<_i1021.FirebaseTicketDataSource>()));
     gh.factory<_i520.EventRepository>(
         () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
     gh.factory<_i106.AnalyticsRepository>(() =>
@@ -112,6 +156,11 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i915.SignOutUseCase>(
         () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i743.TicketWalletRepository>(() =>
+        _i820.TicketWalletRepositoryImpl(
+            firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));
+    gh.factory<_i350.EventDiscoveryBloc>(() => _i350.EventDiscoveryBloc(
+        repository: gh<_i818.EventDiscoveryRepository>()));
     gh.factory<_i364.AuthStatusBloc>(() => _i364.AuthStatusBloc(
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
@@ -130,6 +179,10 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i190.AnalyticsBloc>(
         () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
+    gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
+        repository: gh<_i805.TicketPurchaseRepository>()));
+    gh.factory<_i112.TicketWalletBloc>(() =>
+        _i112.TicketWalletBloc(repository: gh<_i743.TicketWalletRepository>()));
     return this;
   }
 }

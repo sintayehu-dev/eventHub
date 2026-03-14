@@ -1,3 +1,4 @@
+
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/navigation/navigation_service.dart';
 import 'package:eventhub/core/router/route_name.dart';
@@ -18,6 +19,20 @@ import 'package:eventhub/features/attendee/event_discovery/presentation/pages/at
 import 'package:eventhub/features/attendee/event_discovery/presentation/pages/discover_screen.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/attendee_tickets_screen.dart';
 import 'package:eventhub/features/attendee/profile/presentation/pages/attendee_profile_screen.dart';
+
+// Ticket purchase screens
+import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/ticket_selection_screen.dart';
+import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/purchase_confirmation_screen.dart';
+import 'package:eventhub/features/attendee/ticket_purchase/presentation/pages/purchase_success_screen.dart';
+
+// Ticket wallet screens
+import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_wallet_screen.dart';
+import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_details_screen.dart';
+import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_qr_screen.dart';
+
+// Event discovery
+import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
+import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 
 // Organizer screens
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_home_screen.dart';
@@ -316,6 +331,64 @@ final router = GoRouter(
       builder: (context, state) {
         final eventId = state.pathParameters['eventId']!;
         return AttendeeListScreen(eventId: eventId);
+      },
+    ),
+
+    // TICKET PURCHASE ROUTES
+    GoRoute(
+      name: RouteName.ticketSelection,
+      path: '/ticket-selection',
+      builder: (context, state) {
+        final event = state.extra as EventDiscoveryEntity;
+        return TicketSelectionScreen(event: event);
+      },
+    ),
+
+    GoRoute(
+      name: RouteName.purchaseConfirmation,
+      path: '/purchase-confirmation',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+        return PurchaseConfirmationScreen(
+          event: data['event'] as EventDiscoveryEntity,
+          selectedTickets:
+              data['selectedTickets'] as List<Map<String, dynamic>>,
+          totalAmount: data['totalAmount'] as double,
+        );
+      },
+    ),
+
+    GoRoute(
+      name: RouteName.purchaseSuccess,
+      path: '/purchase-success',
+      builder: (context, state) {
+        final result = state.extra as PurchaseResult;
+        return PurchaseSuccessScreen(purchaseResult: result);
+      },
+    ),
+
+    // TICKET WALLET ROUTES
+    GoRoute(
+      name: RouteName.ticketWallet,
+      path: '/ticket-wallet',
+      builder: (context, state) => const TicketWalletScreen(),
+    ),
+
+    GoRoute(
+      name: RouteName.ticketDetails,
+      path: '/ticket/:ticketId/details',
+      builder: (context, state) {
+        final ticket = state.extra as TicketEntity;
+        return TicketDetailsScreen(ticket: ticket);
+      },
+    ),
+
+    GoRoute(
+      name: RouteName.ticketQR,
+      path: '/ticket/:ticketId/qr',
+      builder: (context, state) {
+        final ticket = state.extra as TicketEntity;
+        return TicketQRScreen(ticket: ticket);
       },
     ),
   ],
