@@ -387,8 +387,6 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
   }
 
   Widget _buildStatusChip(TicketStatus status) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     Color color;
     switch (status) {
       case TicketStatus.confirmed:

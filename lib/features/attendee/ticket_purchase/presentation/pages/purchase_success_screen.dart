@@ -75,15 +75,16 @@ class PurchaseSuccessScreen extends StatelessWidget {
 
                   // Purchase Details
                   Card(
+                    color: colorScheme.primaryContainer,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Purchase Details',
-                            style: TextStyle(
-                              fontSize: 18,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -112,15 +113,16 @@ class PurchaseSuccessScreen extends StatelessWidget {
 
                   // Tickets List
                   Card(
+                    color: colorScheme.primaryContainer,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Your Tickets',
-                            style: TextStyle(
-                              fontSize: 18,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -137,15 +139,18 @@ class PurchaseSuccessScreen extends StatelessWidget {
                                       children: [
                                         Text(
                                           ticket.ticketTypeName,
-                                          style: const TextStyle(
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                            color: colorScheme.onSurface,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                         Text(
                                           ticket.eventTitle,
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: colorScheme.onSurface
+                                                .withValues(alpha: 0.6),
                                           ),
                                         ),
                                       ],
@@ -153,9 +158,9 @@ class PurchaseSuccessScreen extends StatelessWidget {
                                   ),
                                   Text(
                                     '\$${ticket.ticketPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
                                     ),
                                   ),
                                 ],
@@ -178,17 +183,17 @@ class PurchaseSuccessScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => context.pushNamed(RouteName.ticketWallet),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'View My Tickets',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -200,16 +205,17 @@ class PurchaseSuccessScreen extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => context.goNamed(RouteName.attendeeHome),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.blue,
+                      foregroundColor: colorScheme.primary,
+                      side: BorderSide(color: colorScheme.primary),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Back to Home',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

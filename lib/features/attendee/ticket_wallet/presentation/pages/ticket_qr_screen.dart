@@ -28,23 +28,22 @@ class TicketQRScreen extends StatelessWidget {
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
       ),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
             // Event Info
             Card(
-              color: colorScheme.primaryContainer,
+                color: colorScheme.primaryContainer,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Text(
                       ticket.eventTitle,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onSurface,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -52,16 +51,16 @@ class TicketQRScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       ticket.ticketTypeName,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '${ticket.eventDateTime.day}/${ticket.eventDateTime.month}/${ticket.eventDateTime.year}',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -74,31 +73,39 @@ class TicketQRScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                  color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.2),
+                      color: colorScheme.shadow.withValues(alpha: 0.2),
                     spreadRadius: 2,
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: QrImageView(
-                data: ticket.qrCode,
-                version: QrVersions.auto,
-                size: 250.0,
-                backgroundColor: colorScheme.surface,
-                errorCorrectionLevel: QrErrorCorrectLevel.H,
-                eyeStyle: QrEyeStyle(
-                  eyeShape: QrEyeShape.square,
-                  color: colorScheme.onSurface,
-                ),
-                dataModuleStyle: QrDataModuleStyle(
-                  dataModuleShape: QrDataModuleShape.square,
-                  color: colorScheme.onSurface,
-                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Make QR code responsive to screen size
+                    final screenWidth = MediaQuery.of(context).size.width;
+                    final qrSize = (screenWidth * 0.6).clamp(200.0, 280.0);
+
+                    return QrImageView(
+                      data: ticket.qrCode,
+                      version: QrVersions.auto,
+                      size: qrSize,
+                      backgroundColor: colorScheme.surface,
+                      errorCorrectionLevel: QrErrorCorrectLevel.H,
+                      eyeStyle: QrEyeStyle(
+                        eyeShape: QrEyeShape.square,
+                        color: colorScheme.onSurface,
+                      ),
+                      dataModuleStyle: QrDataModuleStyle(
+                        dataModuleShape: QrDataModuleShape.square,
+                        color: colorScheme.onSurface,
+                      ),
+                    );
+                  },
               ),
             ),
             const SizedBox(height: 24),
@@ -106,8 +113,8 @@ class TicketQRScreen extends StatelessWidget {
             // QR Code Text
             Text(
               'QR Code: ${ticket.qrCode}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 fontFamily: 'monospace',
               ),
               textAlign: TextAlign.center,
@@ -116,21 +123,21 @@ class TicketQRScreen extends StatelessWidget {
 
             // Instructions
             Card(
-              color: colorScheme.primaryContainer,
+                color: colorScheme.primaryContainer,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    Icon(
+                      Icon(
                       Icons.info_outline,
-                      color: colorScheme.primary,
+                        color: colorScheme.primary,
                       size: 32,
                     ),
                     const SizedBox(height: 12),
-                    Text(
+                      Text(
                       'Instructions',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -140,8 +147,8 @@ class TicketQRScreen extends StatelessWidget {
                       '• Make sure your screen brightness is high\n'
                       '• Keep your phone charged\n'
                       '• Arrive early to avoid queues',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         height: 1.5,
                       ),
                     ),
@@ -153,7 +160,9 @@ class TicketQRScreen extends StatelessWidget {
 
             // Status
             _buildStatusInfo(),
-          ],
+              const SizedBox(height: 24), // Add bottom padding
+            ],
+          ),
         ),
       ),
     );

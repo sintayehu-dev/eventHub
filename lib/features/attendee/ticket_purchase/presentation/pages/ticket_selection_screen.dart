@@ -178,10 +178,9 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                   ticketType.price == 0
                       ? 'Free'
                       : '\$${ticketType.price.toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -194,9 +193,8 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                   isAvailable
                       ? '${ticketType.availableQuantity} available'
                       : 'Sold out',
-                  style: TextStyle(
-                    color: isAvailable ? Colors.green : Colors.red,
-                    fontSize: 14,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isAvailable ? Colors.green : colorScheme.error,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -208,15 +206,15 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                             ? () => _updateQuantity(ticketType.id, quantity - 1)
                             : null,
                         icon: const Icon(Icons.remove_circle_outline),
-                        color: Colors.blue,
+                            color: colorScheme.primary,
                       ),
                       Container(
                         width: 40,
                         alignment: Alignment.center,
                         child: Text(
                           quantity.toString(),
-                          style: const TextStyle(
-                            fontSize: 16,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -226,7 +224,7 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                             ? () => _updateQuantity(ticketType.id, quantity + 1)
                             : null,
                         icon: const Icon(Icons.add_circle_outline),
-                        color: Colors.blue,
+                            color: colorScheme.primary,
                       ),
                     ],
                   ),
@@ -243,68 +241,74 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
   Widget _buildBottomSummary() {
     final totalTickets = _selectedQuantities.values.fold(0, (sum, qty) => sum + qty);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, -2),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.2),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '$totalTickets ticket${totalTickets > 1 ? 's' : ''}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$totalTickets ticket${totalTickets > 1 ? 's' : ''}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      'Total: \$${_totalAmount.toStringAsFixed(2)}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  'Total: \$${_totalAmount.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _proceedToCheckout(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Continue to Payment',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _proceedToCheckout(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Continue to Payment',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
