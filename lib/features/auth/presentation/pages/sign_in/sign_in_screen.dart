@@ -421,7 +421,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             "Don't have an account? ",
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color:
-                                  colorScheme.onSurface.withValues(alpha: 0.7),
+                                  colorScheme.onSurface.withValues(alpha: 0.9),
                             ),
                           ),
                           GestureDetector(
@@ -431,7 +431,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: Text(
                               'Create Account',
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.primary,
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

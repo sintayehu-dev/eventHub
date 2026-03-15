@@ -54,16 +54,14 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
         builder: (context, authState) {
           if (authState.status == AuthStatus.unknown || authState.isLoading) {
             return Scaffold(
-              backgroundColor: const Color(0xFF1A0B2E),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               body: SafeArea(
                 child: Column(
                   children: [
                     _buildHeader(),
                     const Expanded(
                       child: Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF8B5CF6),
-                        ),
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                   ],
@@ -75,16 +73,21 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
           if (authState.status != AuthStatus.authenticated ||
               authState.user == null) {
             return Scaffold(
-              backgroundColor: const Color(0xFF1A0B2E),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               body: SafeArea(
                 child: Column(
                   children: [
                     _buildHeader(),
-                    const Expanded(
+                    Expanded(
                       child: Center(
                         child: Text(
                           'Please log in to view your tickets',
-                          style: TextStyle(color: Colors.white),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                       ),
                     ),
@@ -95,7 +98,7 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
           }
 
           return Scaffold(
-            backgroundColor: const Color(0xFF1A0B2E),
+            backgroundColor: Theme.of(context).colorScheme.surface,
             body: SafeArea(
               child: Column(
                 children: [
@@ -135,162 +138,185 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A1B3D),
-                borderRadius: BorderRadius.circular(12.r),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: colorScheme.primary,
+                    size: 20.sp,
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20.sp,
+              Expanded(
+                child: Text(
+                  'My Tickets',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'My Tickets',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  Icons.search,
+                  color: colorScheme.primary,
+                  size: 20.sp,
+                ),
               ),
-            ),
+            ],
           ),
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
-              Icons.search,
-              color: Colors.white,
-              size: 20.sp,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildTabBar() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => setState(() => selectedTab = 0),
-            child: Column(
-              children: [
-                Text(
-                  'UPCOMING',
-                  style: TextStyle(
-                    color: selectedTab == 0 
-                        ? const Color(0xFF8B5CF6)
-                        : Colors.grey[400],
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => selectedTab = 0),
+                child: Column(
+                  children: [
+                    Text(
+                      'UPCOMING',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: selectedTab == 0 
+                            ? colorScheme.primary
+                            : colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 2.h,
+                      width: 60.w,
+                      color: selectedTab == 0 
+                          ? colorScheme.primary
+                          : Colors.transparent,
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8.h),
-                Container(
-                  height: 2.h,
-                  width: 60.w,
-                  color: selectedTab == 0 
-                      ? const Color(0xFF8B5CF6)
-                      : Colors.transparent,
+              ),
+              SizedBox(width: 32.w),
+              GestureDetector(
+                onTap: () => setState(() => selectedTab = 1),
+                child: Column(
+                  children: [
+                    Text(
+                      'PAST',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: selectedTab == 1 
+                            ? colorScheme.primary
+                            : colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 2.h,
+                      width: 40.w,
+                      color: selectedTab == 1 
+                          ? colorScheme.primary
+                          : Colors.transparent,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          SizedBox(width: 32.w),
-          GestureDetector(
-            onTap: () => setState(() => selectedTab = 1),
-            child: Column(
-              children: [
-                Text(
-                  'PAST',
-                  style: TextStyle(
-                    color: selectedTab == 1 
-                        ? const Color(0xFF8B5CF6)
-                        : Colors.grey[400],
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Container(
-                  height: 2.h,
-                  width: 40.w,
-                  color: selectedTab == 1 
-                      ? const Color(0xFF8B5CF6)
-                      : Colors.transparent,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(
-        color: Color(0xFF8B5CF6),
-      ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Center(
+          child: CircularProgressIndicator(
+            color: colorScheme.primary,
+          ),
+        );
+      },
     );
   }
 
   Widget _buildErrorState(NetworkExceptions error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            color: const Color(0xFFEF4444),
-            size: 48.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: colorScheme.error,
+                size: 48.sp,
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Failed to load tickets',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                NetworkExceptions.getRawErrorMessage(error),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              ElevatedButton(
+                onPressed: _refreshTickets,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
           ),
-          SizedBox(height: 16.h),
-          Text(
-            'Failed to load tickets',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            NetworkExceptions.getRawErrorMessage(error),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: _refreshTickets,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
-            ),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -303,37 +329,42 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
 
   Widget _buildTicketsListFromData(List<TicketEntity> tickets) {
     if (tickets.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.confirmation_number_outlined,
-              color: const Color(0xFF8B5CF6),
-              size: 48.sp,
+      return Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
+          
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.confirmation_number_outlined,
+                  color: colorScheme.primary,
+                  size: 48.sp,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  selectedTab == 0 ? 'No upcoming tickets' : 'No past tickets',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  selectedTab == 0
+                      ? 'Your upcoming event tickets will appear here'
+                      : 'Your past event tickets will appear here',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16.h),
-            Text(
-              selectedTab == 0 ? 'No upcoming tickets' : 'No past tickets',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              selectedTab == 0
-                  ? 'Your upcoming event tickets will appear here'
-                  : 'Your past event tickets will appear here',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       );
     }
 
@@ -348,20 +379,25 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
   }
 
   Widget _buildTicketCard(TicketEntity ticket) {
-    return GestureDetector(
-      onTap: () => _viewTicketDetails(ticket),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF2A1B3D),
-              Color(0xFF1A0B2E),
-            ],
-          ),
-        ),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return GestureDetector(
+          onTap: () => _viewTicketDetails(ticket),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.r),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  colorScheme.primaryContainer,
+                  colorScheme.surface,
+                ],
+              ),
+            ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -378,13 +414,13 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                     decoration: BoxDecoration(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.r)),
-                      gradient: const LinearGradient(
+                          gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF0F172A),
-                          Color(0xFF1E293B),
-                          Color(0xFF334155),
+                              colorScheme.surface,
+                              colorScheme.primaryContainer,
+                              colorScheme.primary.withValues(alpha: 0.3),
                         ],
                       ),
                     ),
@@ -402,8 +438,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                           center: Alignment.center,
                           radius: 0.8,
                           colors: [
-                            Colors.white.withValues(alpha: 0.6),
-                            Colors.cyan.withValues(alpha: 0.4),
+                                colorScheme.onSurface.withValues(alpha: 0.6),
+                                colorScheme.tertiary.withValues(alpha: 0.4),
                             Colors.transparent,
                           ],
                         ),
@@ -422,12 +458,13 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                           width: 60.w,
                           height: 60.h,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
+                                color:
+                                    colorScheme.surface.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Icon(
                             Icons.qr_code,
-                            color: Colors.black,
+                                color: colorScheme.onSurface,
                             size: 40.sp,
                           ),
                         ),
@@ -447,9 +484,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                       ),
                       child: Text(
                         ticket.status.displayName,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -468,9 +504,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                   // Event Title
                   Text(
                     ticket.eventTitle,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.sp,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -481,15 +516,15 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                     children: [
                       Icon(
                         Icons.access_time,
-                        color: Colors.grey[400],
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
                         size: 16.sp,
                       ),
                       SizedBox(width: 8.w),
                       Text(
                         _formatDateTime(ticket.eventDateTime),
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 14.sp,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -501,16 +536,16 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                     children: [
                       Icon(
                         Icons.location_on,
-                        color: Colors.grey[400],
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
                         size: 16.sp,
                       ),
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
                           ticket.eventLocation,
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 14.sp,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -528,9 +563,9 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                         children: [
                           Text(
                             'TICKET TYPE',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 11.sp,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
                             ),
@@ -538,9 +573,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                           SizedBox(height: 4.h),
                           Text(
                             ticket.ticketTypeName,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -580,7 +614,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                       child: ElevatedButton(
                         onPressed: () => _showQRCode(ticket),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF8B5CF6),
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
                           ),
@@ -592,15 +627,14 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
                           children: [
                             Icon(
                               Icons.qr_code_scanner,
-                              color: Colors.white,
+                                  color: colorScheme.onPrimary,
                               size: 20.sp,
                             ),
                             SizedBox(width: 8.w),
                             Text(
                               'View QR Code',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.sp,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: colorScheme.onPrimary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -615,12 +649,14 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
         ),
       ),
     );
+      },
+    );
   }
 
   Color _getStatusColor(TicketStatus status) {
     switch (status) {
       case TicketStatus.confirmed:
-        return const Color(0xFF8B5CF6);
+        return Theme.of(context).colorScheme.primary;
       case TicketStatus.pending:
         return Colors.orange;
       case TicketStatus.cancelled:

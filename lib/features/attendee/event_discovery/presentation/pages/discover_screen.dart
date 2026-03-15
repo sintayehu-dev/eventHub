@@ -39,8 +39,11 @@ class _DiscoverViewState extends State<DiscoverView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -67,207 +70,229 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A1B3D),
-                borderRadius: BorderRadius.circular(12.r),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: colorScheme.primary,
+                    size: 20.sp,
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.arrow_back,
-                color: const Color(0xFF8B5CF6),
-                size: 20.sp,
+              Expanded(
+                child: Text(
+                  'Search Events',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'Search Events',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  Icons.tune,
+                  color: colorScheme.primary,
+                  size: 20.sp,
+                ),
               ),
-            ),
+            ],
           ),
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
-              Icons.tune,
-              color: const Color(0xFF8B5CF6),
-              size: 20.sp,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildSearchBar() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.search,
-              color: const Color(0xFF8B5CF6),
-              size: 20.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search,
+                  color: colorScheme.primary,
+                  size: 20.sp,
                 ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Search events...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 16.sp,
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Search events...',
+                      hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    onSubmitted: (query) {
+                      if (query.isNotEmpty) {
+                        context.read<EventDiscoveryBloc>().add(
+                              EventDiscoveryEvent.searchEvents(
+                                filters: EventSearchFilters(query: query),
+                                limit: 20,
+                              ),
+                            );
+                      }
+                    },
                   ),
                 ),
-                onSubmitted: (query) {
-                  if (query.isNotEmpty) {
-                    context.read<EventDiscoveryBloc>().add(
-                          EventDiscoveryEvent.searchEvents(
-                            filters: EventSearchFilters(query: query),
-                            limit: 20,
-                          ),
-                        );
-                  }
-                },
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                _searchController.clear();
-                context.read<EventDiscoveryBloc>().add(
-                      const EventDiscoveryEvent.loadUpcomingEvents(limit: 20),
-                    );
-              },
-              child: Icon(
-                Icons.close,
-                color: Colors.grey[400],
-                size: 20.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryChips() {
-    final categories = [
-      {'name': 'All', 'category': null},
-      {'name': 'Music', 'category': EventCategory.music},
-      {'name': 'Tech', 'category': EventCategory.technology},
-      {'name': 'Arts', 'category': EventCategory.arts},
-      {'name': 'Sports', 'category': EventCategory.sports},
-    ];
-    
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: categories.map((category) {
-            final isSelected = category['name'] == selectedCategory;
-            return Padding(
-              padding: EdgeInsets.only(right: 8.w),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedCategory = category['name'] as String;
-                  });
-                  
-                  if (category['category'] == null) {
-                    // Load all events
+                GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
                     context.read<EventDiscoveryBloc>().add(
                           const EventDiscoveryEvent.loadUpcomingEvents(
                               limit: 20),
                         );
-                  } else {
-                    // Filter by category
-                    context.read<EventDiscoveryBloc>().add(
-                          EventDiscoveryEvent.loadEventsByCategory(
-                            category: category['category'] as EventCategory,
-                            limit: 20,
-                          ),
-                        );
-                  }
-                },
-                child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFF8B5CF6)
-                        : const Color(0xFF2A1B3D),
-                    borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _getCategoryIcon(category['name'] as String),
-                        color:
-                            isSelected ? Colors.white : const Color(0xFF8B5CF6),
-                        size: 14.sp,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        category['name'] as String,
-                        style: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : const Color(0xFF8B5CF6),
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  },
+                  child: Icon(
+                    Icons.close,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 20.sp,
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCategoryChips() {
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        final categories = [
+          {'name': 'All', 'category': null},
+          {'name': 'Music', 'category': EventCategory.music},
+          {'name': 'Tech', 'category': EventCategory.technology},
+          {'name': 'Arts', 'category': EventCategory.arts},
+          {'name': 'Sports', 'category': EventCategory.sports},
+        ];
+
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: categories.map((category) {
+                final isSelected = category['name'] == selectedCategory;
+                return Padding(
+                  padding: EdgeInsets.only(right: 8.w),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category['name'] as String;
+                      });
+
+                      if (category['category'] == null) {
+                        // Load all events
+                        context.read<EventDiscoveryBloc>().add(
+                              const EventDiscoveryEvent.loadUpcomingEvents(
+                                  limit: 20),
+                            );
+                      } else {
+                        // Filter by category
+                        context.read<EventDiscoveryBloc>().add(
+                              EventDiscoveryEvent.loadEventsByCategory(
+                                category: category['category'] as EventCategory,
+                                limit: 20,
+                              ),
+                            );
+                      }
+                    },
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? colorScheme.primary
+                            : colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _getCategoryIcon(category['name'] as String),
+                            color: isSelected
+                                ? colorScheme.onPrimary
+                                : colorScheme.primary,
+                            size: 14.sp,
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            category['name'] as String,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: isSelected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildResultsHeader() {
     return BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
       builder: (context, state) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
         final eventCount = state.maybeWhen(
           loaded: (events, _, __, ___) => events.length,
           orElse: () => 0,
@@ -279,9 +304,8 @@ class _DiscoverViewState extends State<DiscoverView> {
             children: [
               Text(
                 '$eventCount Results Found',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.sp,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -303,21 +327,27 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Widget _buildFilterIcon(IconData icon) {
-    return Container(
-      padding: EdgeInsets.all(8.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Icon(
-        icon,
-        color: const Color(0xFF8B5CF6),
-        size: 16.sp,
-      ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        
+        return Container(
+          padding: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: colorScheme.primary,
+            size: 16.sp,
+          ),
+        );
+      },
     );
   }
 
@@ -339,344 +369,382 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(
-        color: Color(0xFF8B5CF6),
-      ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Center(
+          child: CircularProgressIndicator(
+            color: colorScheme.primary,
+          ),
+        );
+      },
     );
   }
 
   Widget _buildErrorState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            color: const Color(0xFFEF4444),
-            size: 48.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: colorScheme.error,
+                size: 48.sp,
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Failed to load events',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<EventDiscoveryBloc>().add(
+                        const EventDiscoveryEvent.refreshEvents(),
+                      );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
           ),
-          SizedBox(height: 16.h),
-          Text(
-            'Failed to load events',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: () {
-              context.read<EventDiscoveryBloc>().add(
-                    const EventDiscoveryEvent.refreshEvents(),
-                  );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
-            ),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildEventsListContent(List<EventDiscoveryEntity> events) {
-    if (events.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_busy,
-              color: const Color(0xFF8B5CF6),
-              size: 48.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        if (events.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.event_busy,
+                  color: colorScheme.primary,
+                  size: 48.sp,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'No events found',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Try adjusting your search or category filter',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16.h),
-            Text(
-              'No events found',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Try adjusting your search or category filter',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+          );
+        }
 
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      itemCount: events.length,
-      separatorBuilder: (context, index) => SizedBox(height: 16.h),
-      itemBuilder: (context, index) {
-        return _buildEventCard(events[index]);
+        return ListView.separated(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          itemCount: events.length,
+          separatorBuilder: (context, index) => SizedBox(height: 16.h),
+          itemBuilder: (context, index) {
+            return _buildEventCard(events[index]);
+          },
+        );
       },
     );
   }
 
   Widget _buildEventCard(EventDiscoveryEntity event) {
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouteName.eventDetail,
-          pathParameters: {'eventId': event.id},
-        );
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 20.h),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF2A1B3D),
-              Color(0xFF1A0B2E),
-            ],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Event Image with Concert Scene
-            Container(
-              height: 280.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
+        return GestureDetector(
+          onTap: () {
+            context.pushNamed(
+              RouteName.eventDetail,
+              pathParameters: {'eventId': event.id},
+            );
+          },
+          child: Container(
+            margin: EdgeInsets.only(bottom: 20.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.r),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  colorScheme.primaryContainer,
+                  colorScheme.surface,
+                ],
               ),
-              child: Stack(
-                children: [
-                  // Event banner or placeholder
-                  event.bannerUrl != null
-                      ? ClipRRect(
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Event Image with Concert Scene
+                Container(
+                  height: 280.h,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20.r)),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Event banner or placeholder
+                      event.bannerUrl != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20.r)),
+                              child: Image.network(
+                                event.bannerUrl!,
+                                height: 280.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildImagePlaceholder(),
+                              ),
+                            )
+                          : _buildImagePlaceholder(),
+
+                      // Gradient overlay
+                      Container(
+                        decoration: BoxDecoration(
                           borderRadius:
                               BorderRadius.vertical(top: Radius.circular(20.r)),
-                          child: Image.network(
-                            event.bannerUrl!,
-                            height: 280.h,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                _buildImagePlaceholder(),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.7),
+                            ],
                           ),
-                        )
-                      : _buildImagePlaceholder(),
+                        ),
+                      ),
+                      
+                      // Price tag
+                      Positioned(
+                        top: 20.h,
+                        right: 20.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16.w, vertical: 8.h),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            borderRadius: BorderRadius.circular(25.r),
+                          ),
+                          child: Text(
+                            event.priceRange,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                  // Gradient overlay
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.7),
+                // Event Details
+                Padding(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Date, Location and Bookmark
+                      Row(
+                        children: [
+                          Text(
+                            '${_formatDate(event.dateTime)} • ${event.location}',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            event.isFavorite == true
+                                ? Icons.bookmark
+                                : Icons.bookmark_border,
+                            color: colorScheme.primary,
+                            size: 24.sp,
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                  
-                  // Price tag
-                  Positioned(
-                    top: 20.h,
-                    right: 20.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6),
-                        borderRadius: BorderRadius.circular(25.r),
-                      ),
-                      child: Text(
-                        event.priceRange,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Event Details
-            Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Date, Location and Bookmark
-                  Row(
-                    children: [
+                      SizedBox(height: 12.h),
+
+                      // Event Title
                       Text(
-                        '${_formatDate(event.dateTime)} • ${event.location}',
-                        style: TextStyle(
-                          color: const Color(0xFF8B5CF6),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                        event.title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
                         ),
                       ),
-                      const Spacer(),
-                      Icon(
-                        event.isFavorite == true 
-                            ? Icons.bookmark 
-                            : Icons.bookmark_border,
-                        color: const Color(0xFF8B5CF6),
-                        size: 24.sp,
+                      SizedBox(height: 12.h),
+
+                      // Event Description
+                      Text(
+                        event.description,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
+                          height: 1.5,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 16.h),
+                      
+                      // Attendees and organizer info
+                      Row(
+                        children: [
+                          // Profile pictures stack (placeholder)
+                          SizedBox(
+                            width: 80.w,
+                            height: 32.h,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  left: 0,
+                                  child:
+                                      _buildAttendeeAvatar(colorScheme.outline),
+                                ),
+                                Positioned(
+                                  left: 20.w,
+                                  child: _buildAttendeeAvatar(
+                                      colorScheme.outlineVariant),
+                                ),
+                                Positioned(
+                                  left: 40.w,
+                                  child: _buildAttendeeAvatar(colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.5)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Text(
+                            event.attendeeCount != null
+                                ? '+${event.attendeeCount} attending'
+                                : 'by ${event.organizerName}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 12.h),
-                  
-                  // Event Title
-                  Text(
-                    event.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  
-                  // Event Description
-                  Text(
-                    event.description,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 15.sp,
-                      height: 1.5,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 16.h),
-                  
-                  // Attendees and organizer info
-                  Row(
-                    children: [
-                      // Profile pictures stack (placeholder)
-                      SizedBox(
-                        width: 80.w,
-                        height: 32.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0,
-                              child: _buildAttendeeAvatar(const Color(0xFF64748B)),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: _buildAttendeeAvatar(const Color(0xFF475569)),
-                            ),
-                            Positioned(
-                              left: 40.w,
-                              child: _buildAttendeeAvatar(const Color(0xFF334155)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Text(
-                        event.attendeeCount != null
-                            ? '+${event.attendeeCount} attending'
-                            : 'by ${event.organizerName}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildImagePlaceholder() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF0F172A),
-            Color(0xFF1E293B),
-            Color(0xFF334155),
-          ],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Stage lights effect
-          Positioned(
-            top: 40.h,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 120.h,
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 0.8,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.9),
-                    Colors.cyan.withValues(alpha: 0.6),
-                    Colors.blue.withValues(alpha: 0.3),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorScheme.surface,
+                colorScheme.primaryContainer,
+                colorScheme.primary.withValues(alpha: 0.3),
+              ],
             ),
           ),
-        ],
-      ),
+          child: Stack(
+            children: [
+              // Stage lights effect
+              Positioned(
+                top: 40.h,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 120.h,
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.center,
+                      radius: 0.8,
+                      colors: [
+                        colorScheme.onSurface.withValues(alpha: 0.9),
+                        colorScheme.tertiary.withValues(alpha: 0.6),
+                        colorScheme.primary.withValues(alpha: 0.3),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildAttendeeAvatar(Color color) {
-    return Container(
-      width: 32.w,
-      height: 32.h,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: const Color(0xFF1A0B2E),
-          width: 3,
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        
+        return Container(
+          width: 32.w,
+          height: 32.h,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: colorScheme.surface,
+              width: 3,
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -26,8 +26,11 @@ class AttendeeHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -35,7 +38,7 @@ class AttendeeHomeView extends StatelessWidget {
                   const EventDiscoveryEvent.refreshEvents(),
                 );
           },
-          color: const Color(0xFF8B5CF6),
+          color: colorScheme.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
@@ -67,30 +70,38 @@ class AttendeeHomeView extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Welcome to EventHub',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          'Discover amazing events near you',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 16.sp,
-          ),
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome to EventHub',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Discover amazing events near you',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildSearchBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () {
         context.pushNamed(RouteName.attendeeDiscover);
@@ -98,10 +109,10 @@ class AttendeeHomeView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            color: colorScheme.primary.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -109,15 +120,14 @@ class AttendeeHomeView extends StatelessWidget {
           children: [
             Icon(
               Icons.search,
-              color: const Color(0xFF8B5CF6),
+              color: colorScheme.primary,
               size: 20.sp,
             ),
             SizedBox(width: 12.w),
             Text(
               'Search events...',
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 16.sp,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -127,6 +137,9 @@ class AttendeeHomeView extends StatelessWidget {
   }
 
   Widget _buildCategories(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final categories = [
       {
         'name': 'Music',
@@ -151,9 +164,8 @@ class AttendeeHomeView extends StatelessWidget {
       children: [
         Text(
           'Categories',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -174,10 +186,10 @@ class AttendeeHomeView extends StatelessWidget {
                 width: 70.w,
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A1B3D),
+                  color: colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                    color: colorScheme.primary.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -185,15 +197,14 @@ class AttendeeHomeView extends StatelessWidget {
                   children: [
                     Icon(
                       category['icon'] as IconData,
-                      color: const Color(0xFF8B5CF6),
+                      color: colorScheme.primary,
                       size: 24.sp,
                     ),
                     SizedBox(height: 8.h),
                     Text(
                       category['name'] as String,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.sp,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -208,108 +219,125 @@ class AttendeeHomeView extends StatelessWidget {
   }
 
   Widget _buildUpcomingEventsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Upcoming Events',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                // Navigate to discover screen to see all events
-              },
-              child: Text(
-                'See All',
-                style: TextStyle(
-                  color: const Color(0xFF8B5CF6),
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Upcoming Events',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to discover screen to see all events
+                  },
+                  child: Text(
+                    'See All',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
+              builder: (context, state) {
+                return state.when(
+                  initial: () => _buildLoadingState(),
+                  loading: () => _buildLoadingState(),
+                  loadingDetails: () => _buildLoadingState(),
+                  loaded: (events, isSearchResult, selectedCategory,
+                          searchFilters) =>
+                      _buildEventsList(context, events),
+                  eventDetailsLoaded: (event) =>
+                      _buildEventsList(context, [event]),
+                  error: (networkException) =>
+                      _buildErrorState(networkException.toString()),
+                );
+              },
             ),
           ],
-        ),
-        SizedBox(height: 16.h),
-        BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
-          builder: (context, state) {
-            return state.when(
-              initial: () => _buildLoadingState(),
-              loading: () => _buildLoadingState(),
-              loadingDetails: () => _buildLoadingState(),
-              loaded:
-                  (events, isSearchResult, selectedCategory, searchFilters) =>
-                      _buildEventsList(context, events),
-              eventDetailsLoaded: (event) => _buildEventsList(context, [event]),
-              error: (networkException) =>
-                  _buildErrorState(networkException.toString()),
-            );
-          },
-        ),
-      ],
+        );
+      },
     );
   }
 
   Widget _buildLoadingState() {
-    return SizedBox(
-      height: 200.h,
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF8B5CF6),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        
+        return SizedBox(
+          height: 200.h,
+          child: Center(
+            child: CircularProgressIndicator(
+              color: colorScheme.primary,
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildErrorState(String message) {
-    return Container(
-      height: 200.h,
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: const Color(0xFFEF4444).withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: const Color(0xFFEF4444),
-              size: 48.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Container(
+          height: 200.h,
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: colorScheme.error.withValues(alpha: 0.3),
+              width: 1,
             ),
-            SizedBox(height: 16.h),
-            Text(
-              'Failed to load events',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: colorScheme.error,
+                  size: 48.sp,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'Failed to load events',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 8.h),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -328,51 +356,59 @@ class AttendeeHomeView extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      height: 200.h,
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_busy,
-              color: const Color(0xFF8B5CF6),
-              size: 48.sp,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Container(
+          height: 200.h,
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.3),
+              width: 1,
             ),
-            SizedBox(height: 16.h),
-            Text(
-              'No events found',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.event_busy,
+                  color: colorScheme.primary,
+                  size: 48.sp,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'No events found',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Check back later for new events',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 8.h),
-            Text(
-              'Check back later for new events',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildEventCard(BuildContext context, EventDiscoveryEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () {
         context.pushNamed(
@@ -384,53 +420,54 @@ class AttendeeHomeView extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 16.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF2A1B3D),
-              Color(0xFF1A0B2E),
+              colorScheme.primaryContainer,
+              colorScheme.surface,
             ],
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Event Image Placeholder
+            // Event Image with Banner
             Container(
               height: 160.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF0F172A),
-                    Color(0xFF1E293B),
-                    Color(0xFF334155),
-                  ],
-                ),
               ),
               child: Stack(
                 children: [
-                  // Stage lights effect
-                  Positioned(
-                    top: 20.h,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 80.h,
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.8,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.9),
-                            Colors.cyan.withValues(alpha: 0.6),
-                            Colors.blue.withValues(alpha: 0.3),
-                            Colors.transparent,
-                          ],
-                        ),
+                  // Event banner or placeholder
+                  event.bannerUrl != null
+                      ? ClipRRect(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(16.r)),
+                          child: Image.network(
+                            event.bannerUrl!,
+                            height: 160.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildImagePlaceholder(colorScheme),
+                          ),
+                        )
+                      : _buildImagePlaceholder(colorScheme),
+
+                  // Gradient overlay for better text visibility
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16.r)),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.3),
+                        ],
                       ),
                     ),
                   ),
@@ -443,14 +480,13 @@ class AttendeeHomeView extends StatelessWidget {
                       padding:
                           EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6),
+                        color: colorScheme.primary,
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
                         event.priceRange,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.onPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -469,9 +505,8 @@ class AttendeeHomeView extends StatelessWidget {
                   // Date and Location
                   Text(
                     '${_formatDate(event.dateTime)} • ${event.location}',
-                    style: TextStyle(
-                      color: const Color(0xFF8B5CF6),
-                      fontSize: 12.sp,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
                     ),
@@ -481,9 +516,8 @@ class AttendeeHomeView extends StatelessWidget {
                   // Event Title
                   Text(
                     event.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       height: 1.2,
                     ),
@@ -495,9 +529,8 @@ class AttendeeHomeView extends StatelessWidget {
                   // Organizer
                   Text(
                     'by ${event.organizerName}',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -525,5 +558,47 @@ class AttendeeHomeView extends StatelessWidget {
       'DEC'
     ];
     return '${months[dateTime.month - 1]} ${dateTime.day}';
+  }
+
+  Widget _buildImagePlaceholder(ColorScheme colorScheme) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            colorScheme.surface,
+            colorScheme.primaryContainer,
+            colorScheme.primary.withValues(alpha: 0.3),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Stage lights effect
+          Positioned(
+            top: 20.h,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 80.h,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.center,
+                  radius: 0.8,
+                  colors: [
+                    colorScheme.onSurface.withValues(alpha: 0.9),
+                    colorScheme.tertiary.withValues(alpha: 0.6),
+                    colorScheme.primary.withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

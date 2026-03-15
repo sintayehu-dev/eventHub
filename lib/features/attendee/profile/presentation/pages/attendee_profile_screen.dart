@@ -9,19 +9,22 @@ class AttendeeProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.w),
           child: Column(
             children: [
               // Profile Header
-              _buildProfileHeader(),
+              _buildProfileHeader(context),
               SizedBox(height: 32.h),
               
               // Stats Cards
-              _buildStatsSection(),
+              _buildStatsSection(context),
               SizedBox(height: 32.h),
               
               // Menu Items
@@ -33,7 +36,10 @@ class AttendeeProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       children: [
         // Profile Avatar
@@ -41,18 +47,18 @@ class AttendeeProfileScreen extends StatelessWidget {
           width: 100.w,
           height: 100.h,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
+            gradient: LinearGradient(
+              colors: [colorScheme.primary, colorScheme.secondary],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF8B5CF6).withOpacity(0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               width: 3,
             ),
           ),
           child: Icon(
             Icons.person,
-            color: Colors.white,
+            color: colorScheme.onPrimary,
             size: 48.sp,
           ),
         ),
@@ -61,9 +67,8 @@ class AttendeeProfileScreen extends StatelessWidget {
         // Name and Role
         Text(
           'John Doe',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -71,14 +76,13 @@ class AttendeeProfileScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF4ADE80).withOpacity(0.2),
+            color: colorScheme.tertiary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8.r),
           ),
           child: Text(
             'Event Attendee',
-            style: TextStyle(
-              color: const Color(0xFF4ADE80),
-              fontSize: 12.sp,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.tertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -86,41 +90,45 @@ class AttendeeProfileScreen extends StatelessWidget {
         SizedBox(height: 8.h),
         Text(
           'test@gmail.com',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14.sp,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatsSection() {
+  Widget _buildStatsSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
+            context: context,
             title: 'Events Attended',
             value: '12',
-            color: const Color(0xFF06B6D4),
+            color: colorScheme.tertiary,
             icon: Icons.event_available,
           ),
         ),
         SizedBox(width: 16.w),
         Expanded(
           child: _buildStatCard(
+            context: context,
             title: 'Upcoming Events',
             value: '3',
-            color: const Color(0xFF8B5CF6),
+            color: colorScheme.primary,
             icon: Icons.upcoming,
           ),
         ),
         SizedBox(width: 16.w),
         Expanded(
           child: _buildStatCard(
+            context: context,
             title: 'Favorites',
             value: '8',
-            color: const Color(0xFFEF4444),
+            color: colorScheme.error,
             icon: Icons.favorite,
           ),
         ),
@@ -129,18 +137,22 @@ class AttendeeProfileScreen extends StatelessWidget {
   }
 
   Widget _buildStatCard({
+    required BuildContext context,
     required String title,
     required String value,
     required Color color,
     required IconData icon,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -150,7 +162,7 @@ class AttendeeProfileScreen extends StatelessWidget {
             width: 40.w,
             height: 40.h,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
@@ -162,18 +174,16 @@ class AttendeeProfileScreen extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.sp,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             title,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 10.sp,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -245,97 +255,102 @@ class AttendeeProfileScreen extends StatelessWidget {
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: isDestructive 
-                ? const Color(0xFFEF4444).withOpacity(0.3)
-                : const Color(0xFF8B5CF6).withOpacity(0.3),
-            width: 1,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: isDestructive 
+                    ? colorScheme.error.withValues(alpha: 0.3)
+                    : colorScheme.primary.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.w,
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    color: isDestructive 
+                        ? colorScheme.error.withValues(alpha: 0.2)
+                        : colorScheme.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    icon,
+                    color:
+                        isDestructive ? colorScheme.error : colorScheme.primary,
+                    size: 24.sp,
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isDestructive 
+                              ? colorScheme.error
+                              : colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: colorScheme.onSurface.withValues(alpha: 0.5),
+                  size: 16.sp,
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48.w,
-              height: 48.h,
-              decoration: BoxDecoration(
-                color: isDestructive 
-                    ? const Color(0xFFEF4444).withOpacity(0.2)
-                    : const Color(0xFF8B5CF6).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                icon,
-                color: isDestructive 
-                    ? const Color(0xFFEF4444)
-                    : const Color(0xFF8B5CF6),
-                size: 24.sp,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: isDestructive 
-                          ? const Color(0xFFEF4444)
-                          : Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey[600],
-              size: 16.sp,
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
   void _showSignOutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: colorScheme.primaryContainer,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
         title: Text(
           'Sign Out',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           'Are you sure you want to sign out of your account?',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14.sp,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         actions: [
@@ -343,9 +358,8 @@ class AttendeeProfileScreen extends StatelessWidget {
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -359,9 +373,8 @@ class AttendeeProfileScreen extends StatelessWidget {
               },
               child: Text(
                 'Sign Out',
-                style: TextStyle(
-                  color: const Color(0xFFEF4444),
-                  fontSize: 14.sp,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.error,
                   fontWeight: FontWeight.w600,
                 ),
               ),

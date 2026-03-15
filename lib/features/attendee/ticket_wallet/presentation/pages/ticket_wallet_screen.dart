@@ -43,25 +43,45 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     if (_userId == null) {
       return Scaffold(
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          title: const Text('My Tickets'),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          title: Text(
+            'My Tickets',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.onSurface,
           elevation: 0,
         ),
-        body: const Center(
-          child: Text('Please log in to view your tickets'),
+        body: Center(
+          child: Text(
+            'Please log in to view your tickets',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text('My Tickets'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text(
+          'My Tickets',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
         actions: [
           IconButton(
@@ -71,9 +91,9 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
+          labelColor: colorScheme.primary,
+          unselectedLabelColor: colorScheme.onSurface.withValues(alpha: 0.6),
+          indicatorColor: colorScheme.primary,
           tabs: const [
             Tab(text: 'Upcoming'),
             Tab(text: 'Past'),
@@ -85,8 +105,16 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
         builder: (context, state) {
           return state.when(
             initial: () => const Center(child: Text('Loading...')),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            searching: () => const Center(child: CircularProgressIndicator()),
+            loading: () => Center(
+              child: CircularProgressIndicator(
+                color: colorScheme.primary,
+              ),
+            ),
+            searching: () => Center(
+              child: CircularProgressIndicator(
+                color: colorScheme.primary,
+              ),
+            ),
             loaded: (walletData) => _buildWalletContent(walletData),
             ticketsLoaded: (tickets, filterType, selectedStatus) =>
                 _buildTicketsList(tickets),
@@ -95,10 +123,19 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Error: ${NetworkExceptions.getRawErrorMessage(message)}'),
+                  Text(
+                    'Error: ${NetworkExceptions.getRawErrorMessage(message)}',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.error,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _refreshTickets,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                    ),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -141,7 +178,7 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
               'Total Tickets',
               walletData.totalTickets.toString(),
               Icons.confirmation_number,
-              Colors.blue,
+              Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -168,7 +205,11 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
   }
 
   Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Card(
+      color: colorScheme.primaryContainer,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -177,17 +218,15 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
             const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+              style: theme.textTheme.titleLarge?.copyWith(
                 color: color,
+                fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -209,21 +248,23 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
 
   Widget _buildTicketsList(List<TicketEntity> tickets) {
     if (tickets.isEmpty) {
-      return const Center(
+      final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
+
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.confirmation_number_outlined,
               size: 64,
-              color: Colors.grey,
+              color: colorScheme.primary,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'No tickets found',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
           ],
@@ -242,8 +283,12 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
   }
 
   Widget _buildTicketCard(TicketEntity ticket) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      color: colorScheme.primaryContainer,
       child: InkWell(
         onTap: () => _viewTicketDetails(ticket),
         borderRadius: BorderRadius.circular(8),
@@ -260,17 +305,16 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
                       children: [
                         Text(
                           ticket.eventTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           ticket.ticketTypeName,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -285,29 +329,27 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: Colors.grey[600],
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${ticket.eventDateTime.day}/${ticket.eventDateTime.month}/${ticket.eventDateTime.year}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Icon(
                     Icons.location_on,
                     size: 16,
-                    color: Colors.grey[600],
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       ticket.eventLocation,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -320,10 +362,9 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
                 children: [
                   Text(
                     '\$${ticket.ticketPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
                     ),
                   ),
                   if (ticket.isActive && ticket.isUpcoming)
@@ -332,7 +373,7 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
                       icon: const Icon(Icons.qr_code, size: 16),
                       label: const Text('QR Code'),
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.blue,
+                        foregroundColor: colorScheme.primary,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                     ),
@@ -346,6 +387,8 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
   }
 
   Widget _buildStatusChip(TicketStatus status) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     Color color;
     switch (status) {
       case TicketStatus.confirmed:
@@ -366,15 +409,14 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         status.displayName,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: color,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -382,14 +424,15 @@ class _TicketWalletScreenState extends State<TicketWalletScreen>
   }
 
   Widget _buildSearchResults(List<TicketEntity> tickets, String query) {
+    final theme = Theme.of(context);
+    
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(16),
           child: Text(
             'Search results for "$query"',
-            style: const TextStyle(
-              fontSize: 16,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w500,
             ),
           ),

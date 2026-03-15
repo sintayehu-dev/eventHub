@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
-import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
-import 'package:eventhub/features/attendee/ticket_purchase/application/ticket_purchase/bloc/ticket_purchase_bloc.dart';
 
 class TicketSelectionScreen extends StatefulWidget {
   final EventDiscoveryEntity event;
@@ -24,21 +21,32 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Tickets'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text(
+          'Select Tickets',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
       ),
+      backgroundColor: colorScheme.surface,
       body: Column(
         children: [
           // Event Header
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
-              border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+              color: colorScheme.primaryContainer,
+              border: Border(
+                  bottom: BorderSide(
+                      color: colorScheme.outline.withValues(alpha: 0.3))),
             ),
             child: Row(
               children: [
@@ -54,15 +62,21 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                               Container(
                             width: 60,
                             height: 60,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.event),
+                            color: colorScheme.outline.withValues(alpha: 0.3),
+                            child: Icon(
+                              Icons.event,
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                         )
                       : Container(
                           width: 60,
                           height: 60,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.event),
+                          color: colorScheme.outline.withValues(alpha: 0.3),
+                          child: Icon(
+                            Icons.event,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                 ),
                 const SizedBox(width: 12),
@@ -72,24 +86,22 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                     children: [
                       Text(
                         widget.event.title,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${widget.event.dateTime.day}/${widget.event.dateTime.month}/${widget.event.dateTime.year}',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                       Text(
                         widget.event.location,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -122,24 +134,30 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
     final quantity = _selectedQuantities[ticketType.id] ?? 0;
     final isAvailable = ticketType.isAvailable;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          color: colorScheme.primaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                       Text(
                         ticketType.name,
-                        style: const TextStyle(
-                          fontSize: 16,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -147,9 +165,9 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                         const SizedBox(height: 4),
                         Text(
                           ticketType.description,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -217,6 +235,8 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
           ],
         ),
       ),
+    );
+      },
     );
   }
 

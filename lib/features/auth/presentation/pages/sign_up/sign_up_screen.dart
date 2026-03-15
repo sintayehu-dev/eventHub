@@ -264,7 +264,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: 'name@company.com',
+                                  hintText: 'name@gmail.com',
                                   hintStyle:
                                       theme.textTheme.bodyLarge?.copyWith(
                                     color: colorScheme.onSurface
@@ -468,7 +468,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   child: Text(
                                     'Log In',
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.primary,
+                                      color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),

@@ -141,7 +141,8 @@ class LocalStorage {
 
   bool getAppThemeMode() {
     log('getAppThemeMode ${_preferences?.getBool(LocalStorageKey.themeMode)}');
-    return _preferences?.getBool(LocalStorageKey.themeMode) ?? false;
+    return _preferences?.getBool(LocalStorageKey.themeMode) ??
+        true; // Default to dark mode
   }
 
   void deleteAppThemeMode() {
