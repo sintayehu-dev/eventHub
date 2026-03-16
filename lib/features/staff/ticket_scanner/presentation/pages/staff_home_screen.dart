@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class StaffHomeScreen extends StatelessWidget {
   const StaffHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: Column(
             children: [
               // Header
-              _buildHeader(),
+              _buildHeader(theme),
               SizedBox(height: 40.h),
               
               // Scanner Frame
               Expanded(
-                child: _buildScannerFrame(),
+                child: _buildScannerFrame(theme),
               ),
               
               // Instructions
-              _buildInstructions(),
+              _buildInstructions(theme),
               SizedBox(height: 24.h),
               
-              // Manual Entry Button
-              _buildManualEntryButton(),
+              // Start Scanning Button
+              _buildStartScanningButton(context, theme),
               SizedBox(height: 32.h),
               
               // Quick Actions
-              _buildQuickActions(),
+              _buildQuickActions(theme),
             ],
           ),
         ),
@@ -39,32 +42,29 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(
           Icons.arrow_back,
-          color: Colors.white,
+          color: theme.colorScheme.onSurface,
           size: 24.sp,
         ),
         Column(
           children: [
             Text(
               'ENTRY CONTROL',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
             ),
             SizedBox(height: 4.h),
             Text(
-              'Neon Nights • Gate A',
-              style: TextStyle(
-                color: const Color(0xFF8B5CF6),
-                fontSize: 12.sp,
+              'Event Scanner • Gate A',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -72,20 +72,20 @@ class StaffHomeScreen extends StatelessWidget {
         ),
         Icon(
           Icons.more_vert,
-          color: Colors.white,
+          color: theme.colorScheme.onSurface,
           size: 24.sp,
         ),
       ],
     );
   }
 
-  Widget _buildScannerFrame() {
+  Widget _buildScannerFrame(ThemeData theme) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withOpacity(0.3),
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -100,7 +100,7 @@ class StaffHomeScreen extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  const Color(0xFF1A0B2E).withOpacity(0.8),
+                  theme.scaffoldBackgroundColor.withValues(alpha: 0.8),
                   Colors.transparent,
                 ],
               ),
@@ -111,22 +111,22 @@ class StaffHomeScreen extends StatelessWidget {
           Positioned(
             top: 40.h,
             left: 40.w,
-            child: _buildCornerBracket(isTopLeft: true),
+            child: _buildCornerBracket(theme, isTopLeft: true),
           ),
           Positioned(
             top: 40.h,
             right: 40.w,
-            child: _buildCornerBracket(isTopRight: true),
+            child: _buildCornerBracket(theme, isTopRight: true),
           ),
           Positioned(
             bottom: 40.h,
             left: 40.w,
-            child: _buildCornerBracket(isBottomLeft: true),
+            child: _buildCornerBracket(theme, isBottomLeft: true),
           ),
           Positioned(
             bottom: 40.h,
             right: 40.w,
-            child: _buildCornerBracket(isBottomRight: true),
+            child: _buildCornerBracket(theme, isBottomRight: true),
           ),
           
           // Scanning line animation
@@ -138,7 +138,7 @@ class StaffHomeScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    const Color(0xFF8B5CF6),
+                    theme.colorScheme.primary,
                     Colors.transparent,
                   ],
                 ),
@@ -152,16 +152,16 @@ class StaffHomeScreen extends StatelessWidget {
               width: 80.w,
               height: 80.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF8B5CF6),
+                  color: theme.colorScheme.primary,
                   width: 2,
                 ),
               ),
               child: Icon(
                 Icons.qr_code_scanner,
-                color: const Color(0xFF8B5CF6),
+                color: theme.colorScheme.primary,
                 size: 40.sp,
               ),
             ),
@@ -171,7 +171,8 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCornerBracket({
+  Widget _buildCornerBracket(
+    ThemeData theme, {
     bool isTopLeft = false,
     bool isTopRight = false,
     bool isBottomLeft = false,
@@ -183,19 +184,19 @@ class StaffHomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: const Color(0xFF8B5CF6),
+            color: theme.colorScheme.primary,
             width: 3,
           ),
           left: BorderSide(
-            color: const Color(0xFF8B5CF6),
+            color: theme.colorScheme.primary,
             width: isTopLeft || isBottomLeft ? 3 : 0,
           ),
           right: BorderSide(
-            color: const Color(0xFF8B5CF6),
+            color: theme.colorScheme.primary,
             width: isTopRight || isBottomRight ? 3 : 0,
           ),
           bottom: BorderSide(
-            color: const Color(0xFF8B5CF6),
+            color: theme.colorScheme.primary,
             width: isBottomLeft || isBottomRight ? 3 : 0,
           ),
         ),
@@ -203,62 +204,61 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInstructions() {
+  Widget _buildInstructions(ThemeData theme) {
     return Column(
       children: [
         Text(
           'Align ticket QR code within frame',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.sp,
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         SizedBox(height: 8.h),
         Text(
-          'Validating Entry Point Access',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14.sp,
+          'Tap "Start Scanning" to begin validation',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildManualEntryButton() {
+  Widget _buildStartScanningButton(BuildContext context, ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 16.h),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
+      child: ElevatedButton(
+        onPressed: () => _startScanning(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
         ),
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.keyboard,
-            color: Colors.white,
-            size: 20.sp,
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            'Enter Code Manually',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.qr_code_scanner,
+              size: 20.sp,
             ),
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Text(
+              'Start Scanning',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -266,16 +266,19 @@ class StaffHomeScreen extends StatelessWidget {
           icon: Icons.refresh,
           label: 'Reset',
           onTap: () {},
+          theme: theme,
         ),
         _buildQuickActionButton(
           icon: Icons.info_outline,
           label: 'Support',
           onTap: () {},
+          theme: theme,
         ),
         _buildQuickActionButton(
           icon: Icons.people_outline,
           label: 'Stats',
           onTap: () {},
+          theme: theme,
         ),
       ],
     );
@@ -285,6 +288,7 @@ class StaffHomeScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required ThemeData theme,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -292,10 +296,10 @@ class StaffHomeScreen extends StatelessWidget {
         width: 80.w,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: const Color(0xFF8B5CF6).withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -303,15 +307,14 @@ class StaffHomeScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.grey[400],
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               size: 24.sp,
             ),
             SizedBox(height: 8.h),
             Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 12.sp,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -319,5 +322,15 @@ class StaffHomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _startScanning(BuildContext context) {
+    // For now, navigate to QR scanner with sample data
+    // In a real implementation, you would get the eventId and staffId from context/state
+    const eventId = 'sample-event-id';
+    const eventTitle = 'Sample Event';
+
+    // Navigate to QR scanner screen
+    context.push('/staff/qr-scanner?eventId=$eventId&eventTitle=$eventTitle');
   }
 }

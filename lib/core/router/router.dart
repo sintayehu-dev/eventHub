@@ -54,7 +54,8 @@ import 'package:eventhub/features/organizer/profile/presentation/pages/organizer
 
 // Staff screens
 import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/staff_home_screen.dart';
-import 'package:eventhub/features/staff/checkin_management/presentation/pages/attendees_screen.dart';
+import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/qr_scanner_screen.dart';
+import 'package:eventhub/features/staff/attendee_management/presentation/pages/attendees_screen.dart';
 import 'package:eventhub/features/staff/checkin_management/presentation/pages/staff_reports_screen.dart';
 import 'package:eventhub/features/staff/profile/presentation/pages/staff_settings_screen.dart';
 
@@ -263,7 +264,14 @@ final router = GoRouter(
             GoRoute(
               name: RouteName.staffAttendees,
               path: '/staff/attendees',
-              builder: (context, state) => const AttendeesScreen(),
+              builder: (context, state) {
+                final eventId = state.uri.queryParameters['eventId'] ?? '';
+                final staffId = state.uri.queryParameters['staffId'] ?? '';
+                return AttendeesScreen(
+                  eventId: eventId,
+                  staffId: staffId,
+                );
+              },
             ),
           ],
         ),
@@ -288,6 +296,20 @@ final router = GoRouter(
           ],
         ),
       ],
+    ),
+
+    // QR Scanner Screen (separate from shell navigation)
+    GoRoute(
+      name: RouteName.qrScanner,
+      path: '/staff/qr-scanner',
+      builder: (context, state) {
+        final eventId = state.uri.queryParameters['eventId'] ?? '';
+        final eventTitle = state.uri.queryParameters['eventTitle'] ?? 'Event';
+        return QRScannerScreen(
+          eventId: eventId,
+          eventTitle: eventTitle,
+        );
+      },
     ),
 
     // Legacy home route (redirect to attendee for now)

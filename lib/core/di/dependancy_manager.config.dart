@@ -82,6 +82,22 @@ import '../../features/organizer/event_management/infrastructure/datasources/fir
     as _i912;
 import '../../features/organizer/event_management/infrastructure/repositories/event_repository_impl.dart'
     as _i413;
+import '../../features/staff/attendee_management/application/attendee_management/bloc/attendee_management_bloc.dart'
+    as _i1063;
+import '../../features/staff/attendee_management/domain/repositories/attendee_management_repository.dart'
+    as _i531;
+import '../../features/staff/attendee_management/infrastructure/datasources/firebase_attendee_management_data_source.dart'
+    as _i430;
+import '../../features/staff/attendee_management/infrastructure/repositories/attendee_management_repository_impl.dart'
+    as _i772;
+import '../../features/staff/ticket_scanner/application/ticket_scanner/bloc/ticket_scanner_bloc.dart'
+    as _i984;
+import '../../features/staff/ticket_scanner/domain/repositories/ticket_scanner_repository.dart'
+    as _i253;
+import '../../features/staff/ticket_scanner/infrastructure/datasources/firebase_ticket_scanner_data_source.dart'
+    as _i967;
+import '../../features/staff/ticket_scanner/infrastructure/repositories/ticket_scanner_repository_impl.dart'
+    as _i807;
 import '../handlers/http_service.dart' as _i350;
 import '../services/cloudinary_service.dart' as _i837;
 import 'firebase_module.dart' as _i616;
@@ -104,6 +120,15 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
     gh.lazySingleton<_i350.HttpService>(() => _i350.HttpService());
     gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
+    gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
+        _i967.FirebaseTicketScannerDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i430.FirebaseAttendeeManagementDataSource>(() =>
+        _i430.FirebaseAttendeeManagementDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i531.AttendeeManagementRepository>(() =>
+        _i772.AttendeeManagementRepositoryImpl(
+            dataSource: gh<_i430.FirebaseAttendeeManagementDataSource>()));
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i912.FirebaseEventDataSource>(
@@ -133,11 +158,17 @@ extension GetItInjectableX on _i174.GetIt {
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i41.FirebaseAnalyticsDataSource>(() =>
         _i41.FirebaseAnalyticsDataSourceImpl(gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i253.TicketScannerRepository>(() =>
+        _i807.TicketScannerRepositoryImpl(
+            dataSource: gh<_i967.FirebaseTicketScannerDataSource>()));
     gh.factory<_i787.AuthRepository>(
         () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
     gh.factory<_i805.TicketPurchaseRepository>(() =>
         _i683.TicketPurchaseRepositoryImpl(
             gh<_i1021.FirebaseTicketDataSource>()));
+    gh.factory<_i1063.AttendeeManagementBloc>(() =>
+        _i1063.AttendeeManagementBloc(
+            gh<_i531.AttendeeManagementRepository>()));
     gh.factory<_i520.EventRepository>(
         () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
     gh.factory<_i106.AnalyticsRepository>(() =>
@@ -177,6 +208,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
         ));
+    gh.factory<_i984.TicketScannerBloc>(
+        () => _i984.TicketScannerBloc(gh<_i253.TicketScannerRepository>()));
     gh.factory<_i190.AnalyticsBloc>(
         () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
     gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
