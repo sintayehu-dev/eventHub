@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/debug_ticket_helper.dart';
 
 class StaffHomeScreen extends StatelessWidget {
   const StaffHomeScreen({super.key});
@@ -269,9 +270,9 @@ class StaffHomeScreen extends StatelessWidget {
           theme: theme,
         ),
         _buildQuickActionButton(
-          icon: Icons.info_outline,
-          label: 'Support',
-          onTap: () {},
+          icon: Icons.add_circle,
+          label: 'Test Ticket',
+          onTap: () => _createTestTicket(),
           theme: theme,
         ),
         _buildQuickActionButton(
@@ -332,5 +333,14 @@ class StaffHomeScreen extends StatelessWidget {
 
     // Navigate to QR scanner screen
     context.push('/staff/qr-scanner?eventId=$eventId&eventTitle=$eventTitle');
+  }
+
+  void _createTestTicket() async {
+    try {
+      await DebugTicketHelper.createTestTicket();
+      print('✅ Test ticket created! You can now scan the QR code.');
+    } catch (e) {
+      print('❌ Error creating test ticket: $e');
+    }
   }
 }
