@@ -85,9 +85,23 @@ class FirebaseTicketScannerDataSource {
       final ticketData = ticketDoc.data()!;
       print('Found ticket data: ${ticketData.keys}'); // Debug log
       
-      // Verify event ID matches (skip for testing if eventId is sample)
-      if (eventId != 'sample-event-id' && ticketData['eventId'] != eventId) {
-        print('Event ID mismatch: expected $eventId, got ${ticketData['eventId']}'); // Debug log
+      // Extract event ID from QR code for comparison
+      String? qrEventId;
+      if (qrCode.contains('TICKET_') && qrCode.contains('_EVENT_')) {
+        final parts = qrCode.split('_');
+        if (parts.length >= 7 && parts[0] == 'TICKET' && parts[3] == 'EVENT') {
+          // Extract the full event ID (parts[4] + '_' + parts[5])
+          qrEventId = '${parts[4]}_${parts[5]}';
+          print('Extracted event ID from QR code: $qrEventId'); // Debug log
+        }
+      }
+
+      // Verify event ID matches (use QR code event ID if available, otherwise use provided eventId)
+      final expectedEventId = qrEventId ?? eventId;
+      if (eventId != 'sample-event-id' &&
+          ticketData['eventId'] != expectedEventId) {
+        print(
+            'Event ID mismatch: expected $expectedEventId, got ${ticketData['eventId']}'); // Debug log
         return TicketValidationResult(
           isValid: false,
           ticketId: ticketId,
@@ -120,8 +134,24 @@ class FirebaseTicketScannerDataSource {
 
       // Check if expired (event date has passed) - skip for testing
       if (ticketData['eventDateTime'] != null) {
-        final eventDateTime = (ticketData['eventDateTime'] as Timestamp).toDate();
-        if (eventDateTime.isBefore(DateTime.now().subtract(const Duration(hours: 2)))) {
+        DateTime? eventDateTime;
+
+        // Handle both Timestamp and String date formats
+        if (ticketData['eventDateTime'] is Timestamp) {
+          eventDateTime = (ticketData['eventDateTime'] as Timestamp).toDate();
+        } else if (ticketData['eventDateTime'] is String) {
+          try {
+            eventDateTime =
+                DateTime.parse(ticketData['eventDateTime'] as String);
+          } catch (e) {
+            print(
+                'Error parsing date string: ${ticketData['eventDateTime']}'); // Debug log
+          }
+        }
+
+        if (eventDateTime != null &&
+            eventDateTime
+                .isBefore(DateTime.now().subtract(const Duration(hours: 2)))) {
           print('Ticket expired: $ticketId, event date: $eventDateTime'); // Debug log
           return TicketValidationResult(
             isValid: false,
@@ -136,18 +166,35 @@ class FirebaseTicketScannerDataSource {
 
       print('Ticket validation successful: $ticketId'); // Debug log
       
+      // Parse event date time
+      DateTime? eventDateTime;
+      if (ticketData['eventDateTime'] != null) {
+        if (ticketData['eventDateTime'] is Timestamp) {
+          eventDateTime = (ticketData['eventDateTime'] as Timestamp).toDate();
+        } else if (ticketData['eventDateTime'] is String) {
+          try {
+            eventDateTime =
+                DateTime.parse(ticketData['eventDateTime'] as String);
+          } catch (e) {
+            print(
+                'Error parsing date string: ${ticketData['eventDateTime']}'); // Debug log
+            eventDateTime = DateTime.now().add(const Duration(hours: 2));
+          }
+        }
+      } else {
+        eventDateTime = DateTime.now().add(const Duration(hours: 2));
+      }
+      
       // Ticket is valid
       return TicketValidationResult(
         isValid: true,
         ticketId: ticketId,
-        eventId: eventId,
+        eventId: ticketData['eventId'] ?? eventId,
         status: CheckInStatus.valid,
         ticketHolderName: ticketData['ticketHolderName'] ?? 'Test User',
         ticketTypeName: ticketData['ticketTypeName'] ?? 'General Admission',
         eventTitle: ticketData['eventTitle'] ?? 'Sample Event',
-        eventDateTime: ticketData['eventDateTime'] != null 
-            ? (ticketData['eventDateTime'] as Timestamp).toDate()
-            : DateTime.now().add(const Duration(hours: 2)),
+        eventDateTime: eventDateTime,
         eventLocation: ticketData['eventLocation'] ?? 'Sample Venue',
       );
     } catch (e) {
@@ -208,14 +255,18 @@ class FirebaseTicketScannerDataSource {
         'createdAt': Timestamp.fromDate(checkInTime),
       });
 
-      // Update ticket status to used
+      // Update ticket status to checked in for attendee management
       await _firestore
           .collection('tickets')
           .doc(ticketId)
           .update({
         'status': 'used',
+        'attendeeStatus': 'checkedIn', // Add this for attendee management
+        'checkInTime': Timestamp.fromDate(checkInTime), // Add check-in time
+        'checkInStaffId': staffId, // Add staff who checked in
         'usedAt': Timestamp.fromDate(checkInTime),
         'usedByStaff': staffId,
+        'lastUpdated': Timestamp.fromDate(checkInTime),
       });
 
       return checkInEntity;
@@ -304,12 +355,12 @@ class FirebaseTicketScannerDataSource {
     
     // Handle different QR code formats for testing
     
-    // Format 1: Your specific format: TICKET_1_7238C0036924_*35562_EVENT_*_7734*022_AKAALT7AH7C_LT73BAC036924
+    // Format 1: Your specific format: TICKET_1774346550999_555624_EVENT_1774346204603_176467_1774346551000
     if (qrCode.contains('TICKET_') && qrCode.contains('_EVENT_')) {
       final parts = qrCode.split('_');
-      if (parts.length >= 3 && parts[0] == 'TICKET') {
-        // Extract the ticket ID (second part after TICKET_)
-        final ticketId = parts[1];
+      if (parts.length >= 5 && parts[0] == 'TICKET') {
+        // Extract the full ticket ID (parts[1] + '_' + parts[2])
+        final ticketId = '${parts[1]}_${parts[2]}';
         print('Extracted ticket ID from complex format: $ticketId'); // Debug log
         return ticketId;
       }
@@ -369,6 +420,42 @@ class FirebaseTicketScannerDataSource {
       print('Demo ticket created with ID: $ticketId'); // Debug log
     } catch (e) {
       print('Error creating demo ticket: $e'); // Debug log
+    }
+  }
+
+  /// Create the specific ticket from your QR code for testing
+  static Future<void> createSpecificTicket() async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final ticketId = '1774346550999';
+      final eventId = '1774346204603';
+
+      final ticketData = {
+        'id': ticketId,
+        'eventId': eventId,
+        'ticketHolderName': 'John Doe',
+        'ticketHolderEmail': 'john.doe@example.com',
+        'ticketHolderPhone': '+1234567890',
+        'ticketTypeName': 'General Admission',
+        'eventTitle': 'Sample Event',
+        'eventLocation': 'Sample Venue',
+        'eventDateTime':
+            Timestamp.fromDate(DateTime.parse('2026-03-31 15:00:00')),
+        'price': 99.0,
+        'currency': 'USD',
+        'status': 'active',
+        'qrCode':
+            'TICKET_1774346550999_555624_EVENT_1774346204603_176467_1774346551000',
+        'createdAt': Timestamp.fromDate(DateTime.now()),
+        'updatedAt': Timestamp.fromDate(DateTime.now()),
+      };
+
+      await firestore.collection('tickets').doc(ticketId).set(ticketData);
+
+      print('✅ Specific ticket created successfully with ID: $ticketId');
+      print('📱 QR code should now work when scanned!');
+    } catch (e) {
+      print('❌ Error creating specific ticket: $e');
     }
   }
 }

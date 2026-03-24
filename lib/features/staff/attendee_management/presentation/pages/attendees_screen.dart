@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import 'package:eventhub/features/staff/attendee_management/application/attendee_management/bloc/attendee_management_bloc.dart';
 import 'package:eventhub/features/staff/attendee_management/domain/entities/attendee_entity.dart';
 
@@ -129,12 +130,15 @@ class _AttendeesViewState extends State<AttendeesView> {
             children: [
               // Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Attendees',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  AppBackButton(),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Text(
+                      'Attendees',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   IconButton(

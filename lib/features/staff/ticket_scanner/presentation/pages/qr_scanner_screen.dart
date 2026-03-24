@@ -430,10 +430,13 @@ class _QRScannerViewState extends State<QRScannerView> {
   }
 
   void _showValidTicketDialog(TicketValidationResult result) {
+    // Store reference to the bloc before showing dialog
+    final ticketScannerBloc = context.read<TicketScannerBloc>();
+    
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.green),
@@ -462,15 +465,18 @@ class _QRScannerViewState extends State<QRScannerView> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               _resetScanner();
             },
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              context.read<TicketScannerBloc>().add(
+              print(
+                  'Check In button pressed for ticket: ${result.ticketId}'); // Debug log
+              Navigator.of(dialogContext).pop();
+              // Use the stored bloc reference instead of trying to read from dialog context
+              ticketScannerBloc.add(
                 TicketScannerEvent.checkInTicket(
                   ticketId: result.ticketId,
                   eventId: widget.eventId,
@@ -511,6 +517,7 @@ class _QRScannerViewState extends State<QRScannerView> {
   }
 
   void _showCheckInSuccess(CheckInEntity checkIn) {
+    print('Check-in successful for ticket: ${checkIn.ticketId}'); // Debug log
     // Navigate to success screen or show success message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

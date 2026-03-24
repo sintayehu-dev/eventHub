@@ -21,15 +21,14 @@ class FirebaseAttendeeManagementDataSource {
     String? cursor,
   }) async {
     try {
+      print('Getting attendees for eventId: $eventId'); // Debug log
+      
       Query query = _firestore
           .collection('tickets')
           .where('eventId', isEqualTo: eventId);
 
-      // Filter by status if provided
-      if (status != null) {
-        String statusFilter = _mapStatusToFirestore(status);
-        query = query.where('attendeeStatus', isEqualTo: statusFilter);
-      }
+      // Don't filter by status in the query since not all tickets have attendeeStatus field
+      // We'll filter client-side instead
 
       // Add search functionality
       if (searchQuery != null && searchQuery.isNotEmpty) {
@@ -51,11 +50,15 @@ class FirebaseAttendeeManagementDataSource {
       final querySnapshot = await query.get();
       final docs = querySnapshot.docs;
       
+      print('Found ${docs.length} tickets for eventId: $eventId'); // Debug log
+      
       final hasMore = docs.length > limit;
       final attendeeDocs = hasMore ? docs.take(limit).toList() : docs;
       
       final attendees = attendeeDocs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
+        print(
+            'Processing ticket: ${doc.id}, data keys: ${data.keys}'); // Debug log
         return _mapFirestoreToAttendee(doc.id, data);
       }).toList();
 
@@ -70,6 +73,16 @@ class FirebaseAttendeeManagementDataSource {
         }).toList();
       }
 
+      // Apply status filter client-side if status was specified but attendeeStatus field doesn't exist
+      if (status != null) {
+        filteredAttendees = filteredAttendees
+            .where((attendee) => attendee.status == status)
+            .toList();
+      }
+
+      print(
+          'Returning ${filteredAttendees.length} filtered attendees'); // Debug log
+
       return AttendeeSearchResult(
         attendees: filteredAttendees,
         totalCount: filteredAttendees.length,
@@ -77,6 +90,7 @@ class FirebaseAttendeeManagementDataSource {
         nextCursor: hasMore ? attendeeDocs.last.id : null,
       );
     } catch (e) {
+      print('Error getting attendees: $e'); // Debug log
       throw const NetworkExceptions.unexpectedError();
     }
   }
@@ -153,6 +167,8 @@ class FirebaseAttendeeManagementDataSource {
     required String staffId,
   }) async {
     try {
+      print('Getting stats for eventId: $eventId'); // Debug log
+      
       final query = await _firestore
           .collection('tickets')
           .where('eventId', isEqualTo: eventId)
@@ -165,24 +181,37 @@ class FirebaseAttendeeManagementDataSource {
 
       for (final doc in query.docs) {
         final data = doc.data();
-        final status = data['attendeeStatus'] as String? ?? 'registered';
+        final status = (data['attendeeStatus'] as String? ??
+                data['status'] as String? ??
+                'registered')
+            .toLowerCase();
         
         totalRegistered++;
         
         switch (status) {
-          case 'checkedIn':
+          case 'checkedin':
+          case 'checked_in':
             checkedIn++;
             break;
-          case 'noShow':
+          case 'noshow':
+          case 'no_show':
             noShow++;
             break;
           case 'cancelled':
             cancelled++;
             break;
+          case 'confirmed':
+          case 'registered':
+          default:
+            // These are registered but not checked in
+            break;
         }
       }
 
       final checkInRate = totalRegistered > 0 ? (checkedIn / totalRegistered) * 100 : 0.0;
+
+      print(
+          'Stats: total=$totalRegistered, checkedIn=$checkedIn, noShow=$noShow, cancelled=$cancelled'); // Debug log
 
       return AttendeeStats(
         totalRegistered: totalRegistered,
@@ -193,6 +222,7 @@ class FirebaseAttendeeManagementDataSource {
         lastUpdated: DateTime.now(),
       );
     } catch (e) {
+      print('Error getting stats: $e'); // Debug log
       throw const NetworkExceptions.unexpectedError();
     }
   }
@@ -233,6 +263,21 @@ class FirebaseAttendeeManagementDataSource {
 
   /// Helper method to map Firestore data to AttendeeEntity
   AttendeeEntity _mapFirestoreToAttendee(String id, Map<String, dynamic> data) {
+    // Handle date parsing for different formats
+    DateTime? parseDateTime(dynamic dateValue) {
+      if (dateValue == null) return null;
+      if (dateValue is Timestamp) return dateValue.toDate();
+      if (dateValue is String) {
+        try {
+          return DateTime.parse(dateValue);
+        } catch (e) {
+          print('Error parsing date: $dateValue'); // Debug log
+          return null;
+        }
+      }
+      return null;
+    }
+
     return AttendeeEntity(
       id: id,
       userId: data['userId'] ?? '',
@@ -242,9 +287,13 @@ class FirebaseAttendeeManagementDataSource {
       phone: data['ticketHolderPhone'],
       ticketId: data['id'] ?? id,
       ticketType: data['ticketTypeName'] ?? 'General',
-      status: _mapFirestoreToStatus(data['attendeeStatus'] as String? ?? 'registered'),
-      registrationDate: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      checkInTime: (data['checkInTime'] as Timestamp?)?.toDate(),
+      status: _mapFirestoreToStatus(data['attendeeStatus'] as String? ??
+          data['status'] as String? ??
+          'registered'),
+      registrationDate: parseDateTime(data['createdAt']) ??
+          parseDateTime(data['purchaseDate']) ??
+          DateTime.now(),
+      checkInTime: parseDateTime(data['checkInTime']),
       checkInStaffId: data['checkInStaffId'],
       notes: data['staffNotes'],
       metadata: data['metadata'] as Map<String, dynamic>?,
@@ -267,13 +316,17 @@ class FirebaseAttendeeManagementDataSource {
 
   /// Helper method to map Firestore string to status enum
   AttendeeStatus _mapFirestoreToStatus(String status) {
-    switch (status) {
-      case 'checkedIn':
+    switch (status.toLowerCase()) {
+      case 'checkedin':
+      case 'checked_in':
         return AttendeeStatus.checkedIn;
-      case 'noShow':
+      case 'noshow':
+      case 'no_show':
         return AttendeeStatus.noShow;
       case 'cancelled':
         return AttendeeStatus.cancelled;
+      case 'confirmed':
+      case 'registered':
       default:
         return AttendeeStatus.registered;
     }

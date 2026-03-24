@@ -35,7 +35,7 @@ class StaffHomeScreen extends StatelessWidget {
               SizedBox(height: 32.h),
               
               // Quick Actions
-              _buildQuickActions(theme),
+              _buildQuickActions(context, theme),
             ],
           ),
         ),
@@ -82,7 +82,6 @@ class StaffHomeScreen extends StatelessWidget {
 
   Widget _buildScannerFrame(ThemeData theme) {
     return Container(
-      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
@@ -226,7 +225,7 @@ class StaffHomeScreen extends StatelessWidget {
   }
 
   Widget _buildStartScanningButton(BuildContext context, ThemeData theme) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () => _startScanning(context),
@@ -259,7 +258,7 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions(ThemeData theme) {
+  Widget _buildQuickActions(BuildContext context, ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -277,8 +276,8 @@ class StaffHomeScreen extends StatelessWidget {
         ),
         _buildQuickActionButton(
           icon: Icons.people_outline,
-          label: 'Stats',
-          onTap: () {},
+          label: 'Attendees',
+          onTap: () => _navigateToAttendees(context),
           theme: theme,
         ),
       ],
@@ -326,10 +325,9 @@ class StaffHomeScreen extends StatelessWidget {
   }
 
   void _startScanning(BuildContext context) {
-    // For now, navigate to QR scanner with sample data
-    // In a real implementation, you would get the eventId and staffId from context/state
-    const eventId = 'sample-event-id';
-    const eventTitle = 'Sample Event';
+    // Use the actual event ID from your database
+    const eventId = '1774346204603_176467';
+    const eventTitle = 'gg'; // Your event title from the database
 
     // Navigate to QR scanner screen
     context.push('/staff/qr-scanner?eventId=$eventId&eventTitle=$eventTitle');
@@ -342,5 +340,20 @@ class StaffHomeScreen extends StatelessWidget {
     } catch (e) {
       print('❌ Error creating test ticket: $e');
     }
+  }
+
+  void _navigateToAttendees(BuildContext context) {
+    // Use the actual event ID and a sample staff ID
+    const eventId = '1774346204603_176467';
+    const staffId =
+        'staff123'; // You can get this from auth state in a real app
+
+    print(
+        'Navigating to attendees with eventId: "$eventId", staffId: "$staffId"'); // Debug log
+
+    // Use path parameters instead of query parameters
+    final path = '/staff/attendees/$eventId/$staffId';
+    print('Navigation path: $path'); // Debug log
+    context.go(path);
   }
 }

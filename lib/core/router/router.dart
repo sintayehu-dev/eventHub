@@ -258,24 +258,7 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Staff Attendees Branch (index 1)
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              name: RouteName.staffAttendees,
-              path: '/staff/attendees',
-              builder: (context, state) {
-                final eventId = state.uri.queryParameters['eventId'] ?? '';
-                final staffId = state.uri.queryParameters['staffId'] ?? '';
-                return AttendeesScreen(
-                  eventId: eventId,
-                  staffId: staffId,
-                );
-              },
-            ),
-          ],
-        ),
-        // Staff Reports Branch (index 2)
+        // Staff Reports Branch (index 1)
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -285,7 +268,7 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Staff Settings Branch (index 3)
+        // Staff Settings Branch (index 2)
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -296,6 +279,22 @@ final router = GoRouter(
           ],
         ),
       ],
+    ),
+
+    // Staff Attendees - Outside shell to allow parameters
+    GoRoute(
+      name: RouteName.staffAttendees,
+      path: '/staff/attendees/:eventId/:staffId',
+      builder: (context, state) {
+        final eventId = state.pathParameters['eventId'] ?? '';
+        final staffId = state.pathParameters['staffId'] ?? '';
+        print(
+            'Router - eventId: "$eventId", staffId: "$staffId"'); // Debug log
+        return AttendeesScreen(
+          eventId: eventId,
+          staffId: staffId,
+        );
+      },
     ),
 
     // QR Scanner Screen (separate from shell navigation)
