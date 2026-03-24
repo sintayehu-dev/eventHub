@@ -21,21 +21,29 @@ class AppBackButton extends StatelessWidget {
     final theme = Theme.of(context);
     
     return IconButton(
-      onPressed: onPressed ?? () => context.pop(),
+      onPressed: onPressed ??
+          () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              // Fallback navigation - go to staff scanner
+              context.go('/staff/scanner');
+            }
+          },
       icon: Container(
         padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
           color: backgroundColor ?? theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12.r),
+          shape: BoxShape.circle,
           border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.8),
             width: 1,
           ),
         ),
         child: Icon(
-          Icons.arrow_back,
+          Icons.chevron_left,
           color: iconColor ?? theme.colorScheme.onSurface,
-          size: size ?? 20.sp,
+          size: size ?? 24.sp,
         ),
       ),
     );
