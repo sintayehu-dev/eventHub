@@ -8,6 +8,8 @@ import 'package:eventhub/core/services/image_picker_service.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/staff_assignment_widget.dart';
+import 'package:eventhub/features/staff/event_assignment/domain/services/staff_assignment_service.dart';
 
 class CreateEventScreen extends StatelessWidget {
   const CreateEventScreen({super.key});
@@ -42,6 +44,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   
   // Ticket Types Management
   final List<TicketTypeData> _ticketTypes = [];
+  
+  // Staff Assignment Management
+  final List<StaffAssignmentData> _staffAssignments = [];
 
   @override
   void initState() {
@@ -77,7 +82,36 @@ class _CreateEventViewState extends State<CreateEventView> {
     return BlocListener<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
         state.whenOrNull(
-          eventCreated: (event) {
+          eventCreated: (event) async {
+            // Create staff assignments after event is created
+            if (_staffAssignments.isNotEmpty) {
+              try {
+                final staffAssignmentService = getIt<StaffAssignmentService>();
+                final userService = getIt<UserService>();
+                final currentUser = userService.getCurrentUser();
+
+                if (currentUser != null) {
+                  await staffAssignmentService.createStaffAssignments(
+                    eventId: event.id,
+                    organizerId: currentUser.uid,
+                    assignments: _staffAssignments,
+                  );
+                }
+              } catch (e) {
+                // Show warning but don't prevent success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('Event created but staff assignment failed: $e'),
+                    backgroundColor: Colors.orange,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r)),
+                  ),
+                );
+              }
+            }
+            
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Event created successfully!'),
@@ -148,6 +182,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser();
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Form(
@@ -231,6 +268,19 @@ class _CreateEventViewState extends State<CreateEventView> {
 
             // Ticket Types Section
             _buildTicketTypesSection(),
+            SizedBox(height: 24.h),
+
+            // Staff Assignment Section
+            StaffAssignmentWidget(
+              initialAssignments: _staffAssignments,
+              organizerId: currentUser?.uid ?? '',
+              onAssignmentsChanged: (assignments) {
+                setState(() {
+                  _staffAssignments.clear();
+                  _staffAssignments.addAll(assignments);
+                });
+              },
+            ),
             SizedBox(height: 24.h),
 
             // Event Capacity
@@ -780,7 +830,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
   }
 
-  void _createEvent(BuildContext context) {
+  void _createEvent(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -836,6 +886,22 @@ class _CreateEventViewState extends State<CreateEventView> {
       }
     }
 
+    // Validate staff assignments
+    for (int i = 0; i < _staffAssignments.length; i++) {
+      final assignment = _staffAssignments[i];
+      if (assignment.staffId.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Please select a staff member for assignment ${i + 1}'),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+    }
+
     final eventDateTime = DateTime(
       _selectedDate!.year,
       _selectedDate!.month,
@@ -864,6 +930,7 @@ class _CreateEventViewState extends State<CreateEventView> {
       maxCapacity: int.tryParse(_capacityController.text) ?? 0,
     );
 
+    // Create the event first
     context.read<EventManagementBloc>().add(
           EventManagementEvent.createEvent(
             organizerId: currentUser.uid,

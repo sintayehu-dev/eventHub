@@ -82,6 +82,8 @@ import '../../features/organizer/event_management/infrastructure/datasources/fir
     as _i912;
 import '../../features/organizer/event_management/infrastructure/repositories/event_repository_impl.dart'
     as _i413;
+import '../../features/organizer/staff_management/infrastructure/datasources/firebase_staff_management_data_source.dart'
+    as _i409;
 import '../../features/staff/attendee_management/application/attendee_management/bloc/attendee_management_bloc.dart'
     as _i1063;
 import '../../features/staff/attendee_management/domain/repositories/attendee_management_repository.dart'
@@ -90,6 +92,24 @@ import '../../features/staff/attendee_management/infrastructure/datasources/fire
     as _i430;
 import '../../features/staff/attendee_management/infrastructure/repositories/attendee_management_repository_impl.dart'
     as _i772;
+import '../../features/staff/event_assignment/application/staff_event_assignment/bloc/staff_event_assignment_bloc.dart'
+    as _i795;
+import '../../features/staff/event_assignment/domain/repositories/staff_event_assignment_repository.dart'
+    as _i170;
+import '../../features/staff/event_assignment/domain/services/staff_assignment_service.dart'
+    as _i935;
+import '../../features/staff/event_assignment/infrastructure/datasources/firebase_staff_event_assignment_data_source.dart'
+    as _i319;
+import '../../features/staff/event_assignment/infrastructure/repositories/staff_event_assignment_repository_impl.dart'
+    as _i576;
+import '../../features/staff/event_assignment/infrastructure/services/firebase_staff_assignment_service.dart'
+    as _i912;
+import '../../features/staff/management/domain/repositories/staff_management_repository.dart'
+    as _i202;
+import '../../features/staff/management/infrastructure/datasources/firebase_staff_management_data_source.dart'
+    as _i414;
+import '../../features/staff/management/infrastructure/repositories/staff_management_repository_impl.dart'
+    as _i279;
 import '../../features/staff/ticket_scanner/application/ticket_scanner/bloc/ticket_scanner_bloc.dart'
     as _i984;
 import '../../features/staff/ticket_scanner/domain/repositories/ticket_scanner_repository.dart'
@@ -123,12 +143,30 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
         _i967.FirebaseTicketScannerDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
-    gh.lazySingleton<_i430.FirebaseAttendeeManagementDataSource>(() =>
-        _i430.FirebaseAttendeeManagementDataSource(
+    gh.lazySingleton<_i319.FirebaseStaffEventAssignmentDataSource>(() =>
+        _i319.FirebaseStaffEventAssignmentDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
+        _i409.FirebaseStaffManagementDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i414.FirebaseStaffManagementDataSource>(() =>
+        _i414.FirebaseStaffManagementDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i202.StaffManagementRepository>(() =>
+        _i279.StaffManagementRepositoryImpl(
+            gh<_i414.FirebaseStaffManagementDataSource>()));
+    gh.lazySingleton<_i430.FirebaseAttendeeManagementDataSource>(
+        () => _i430.FirebaseAttendeeManagementDataSource(
+              firestore: gh<_i974.FirebaseFirestore>(),
+              staffEventDataSource:
+                  gh<_i319.FirebaseStaffEventAssignmentDataSource>(),
+            ));
     gh.lazySingleton<_i531.AttendeeManagementRepository>(() =>
         _i772.AttendeeManagementRepositoryImpl(
             dataSource: gh<_i430.FirebaseAttendeeManagementDataSource>()));
+    gh.lazySingleton<_i935.StaffAssignmentService>(() =>
+        _i912.FirebaseStaffAssignmentService(
+            firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i912.FirebaseEventDataSource>(
@@ -140,6 +178,9 @@ extension GetItInjectableX on _i174.GetIt {
         _i1021.FirebaseTicketDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i516.UserService>(
         () => _i516.UserServiceImpl(gh<_i470.UserFirestoreDataSource>()));
+    gh.lazySingleton<_i170.StaffEventAssignmentRepository>(() =>
+        _i576.StaffEventAssignmentRepositoryImpl(
+            gh<_i319.FirebaseStaffEventAssignmentDataSource>()));
     gh.factory<_i191.FirebaseEventDiscoveryDataSource>(() =>
         _i191.FirebaseEventDiscoveryDataSourceImpl(
             gh<_i974.FirebaseFirestore>()));
@@ -158,6 +199,9 @@ extension GetItInjectableX on _i174.GetIt {
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i41.FirebaseAnalyticsDataSource>(() =>
         _i41.FirebaseAnalyticsDataSourceImpl(gh<_i974.FirebaseFirestore>()));
+    gh.factory<_i795.StaffEventAssignmentBloc>(() =>
+        _i795.StaffEventAssignmentBloc(
+            gh<_i170.StaffEventAssignmentRepository>()));
     gh.lazySingleton<_i253.TicketScannerRepository>(() =>
         _i807.TicketScannerRepositoryImpl(
             dataSource: gh<_i967.FirebaseTicketScannerDataSource>()));

@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:eventhub/features/staff/attendee_management/domain/entities/attendee_entity.dart';
+import 'package:eventhub/features/staff/event_assignment/infrastructure/datasources/firebase_staff_event_assignment_data_source.dart';
 
 @lazySingleton
 class FirebaseAttendeeManagementDataSource {
   final FirebaseFirestore _firestore;
+  final FirebaseStaffEventAssignmentDataSource _staffEventDataSource;
 
   FirebaseAttendeeManagementDataSource({
     FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+    required FirebaseStaffEventAssignmentDataSource staffEventDataSource,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _staffEventDataSource = staffEventDataSource;
 
   /// Get all attendees for an event
   Future<AttendeeSearchResult> getEventAttendees({
@@ -21,6 +25,16 @@ class FirebaseAttendeeManagementDataSource {
     String? cursor,
   }) async {
     try {
+      // First check if staff has access to this event
+      final hasAccess = await _staffEventDataSource.checkStaffEventAccess(
+        staffId: staffId,
+        eventId: eventId,
+      );
+
+      if (!hasAccess) {
+        throw const NetworkExceptions.unauthorisedRequest();
+      }
+
       print('Getting attendees for eventId: $eventId'); // Debug log
       
       Query query = _firestore
@@ -102,6 +116,16 @@ class FirebaseAttendeeManagementDataSource {
     required String staffId,
   }) async {
     try {
+      // First check if staff has access to this event
+      final hasAccess = await _staffEventDataSource.checkStaffEventAccess(
+        staffId: staffId,
+        eventId: eventId,
+      );
+
+      if (!hasAccess) {
+        throw const NetworkExceptions.unauthorisedRequest();
+      }
+
       final doc = await _firestore
           .collection('tickets')
           .doc(attendeeId)
@@ -167,6 +191,16 @@ class FirebaseAttendeeManagementDataSource {
     required String staffId,
   }) async {
     try {
+      // First check if staff has access to this event
+      final hasAccess = await _staffEventDataSource.checkStaffEventAccess(
+        staffId: staffId,
+        eventId: eventId,
+      );
+
+      if (!hasAccess) {
+        throw const NetworkExceptions.unauthorisedRequest();
+      }
+
       print('Getting stats for eventId: $eventId'); // Debug log
       
       final query = await _firestore
