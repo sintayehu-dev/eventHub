@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/debug_ticket_helper.dart';
+import 'package:eventhub/features/staff/event_assignment/application/staff_event_assignment/bloc/staff_event_assignment_bloc.dart';
+import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
 
 class StaffHomeScreen extends StatelessWidget {
   const StaffHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<StaffEventAssignmentBloc>()
+        ..add(const StaffEventAssignmentEvent.loadStaffEvents(
+            staffId: 'staff123')), // TODO: Get from auth
+      child: const StaffHomeView(),
+    );
+  }
+}
+
+class StaffHomeView extends StatelessWidget {
+  const StaffHomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,69 +31,263 @@ class StaffHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            children: [
-              // Header
-              _buildHeader(theme),
-              SizedBox(height: 40.h),
-              
-              // Scanner Frame
-              Expanded(
-                child: _buildScannerFrame(theme),
+        child:
+            BlocConsumer<StaffEventAssignmentBloc, StaffEventAssignmentState>(
+          listener: (context, state) {
+            state.maybeWhen(
+              error: (message) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: theme.colorScheme.error,
+                  ),
+                );
+              },
+              accessDenied: (message) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: theme.colorScheme.error,
+                  ),
+                );
+              },
+              orElse: () {},
+            );
+          },
+          builder: (context, state) {
+            return state.when(
+              initial: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              eventsLoaded: (events, selectedEvent) => _buildContent(
+                context,
+                theme,
+                events,
+                selectedEvent ?? (events.isNotEmpty ? events.first : null),
               ),
-              
-              // Instructions
-              _buildInstructions(theme),
-              SizedBox(height: 24.h),
-              
-              // Start Scanning Button
-              _buildStartScanningButton(context, theme),
-              SizedBox(height: 32.h),
-              
-              // Quick Actions
-              _buildQuickActions(context, theme),
-            ],
-          ),
+              eventSelected: (events, selectedEvent) => _buildContent(
+                context,
+                theme,
+                events,
+                selectedEvent,
+              ),
+              accessGranted: (events, selectedEvent, permissions) =>
+                  _buildContent(
+                context,
+                theme,
+                events,
+                selectedEvent,
+              ),
+              accessDenied: (message) => _buildErrorState(theme, message),
+              assignmentsRefreshed: (events, selectedEvent) => _buildContent(
+                context,
+                theme,
+                events,
+                selectedEvent ?? (events.isNotEmpty ? events.first : null),
+              ),
+              error: (message) => _buildErrorState(theme, message),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildHeader(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Icon(
-          Icons.arrow_back,
-          color: theme.colorScheme.onSurface,
-          size: 24.sp,
-        ),
-        Column(
-          children: [
-            Text(
-              'ENTRY CONTROL',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
+  Widget _buildContent(
+    BuildContext context,
+    ThemeData theme,
+    List<StaffEventAssignmentEntity> events,
+    StaffEventAssignmentEntity? selectedEvent,
+  ) {
+    if (events.isEmpty) {
+      return _buildNoEventsState(theme);
+    }
+
+    return Padding(
+      padding: EdgeInsets.all(20.w),
+      child: Column(
+        children: [
+          // Header with event selector
+          _buildHeader(context, theme, events, selectedEvent),
+          SizedBox(height: 40.h),
+
+          // Scanner Frame
+          Expanded(
+            child: _buildScannerFrame(theme),
+          ),
+
+          // Instructions
+          _buildInstructions(theme),
+          SizedBox(height: 24.h),
+
+          // Start Scanning Button
+          _buildStartScanningButton(context, theme, selectedEvent),
+          SizedBox(height: 32.h),
+
+          // Quick Actions
+          _buildQuickActions(context, theme, selectedEvent),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoEventsState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.event_busy,
+            size: 64.sp,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'No Events Assigned',
+            style: theme.textTheme.titleLarge,
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'Contact your manager to get assigned to events',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              'Event Scanner • Gate A',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w500,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(ThemeData theme, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64.sp,
+            color: theme.colorScheme.error,
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'Error',
+            style: theme.textTheme.titleLarge,
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            message,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    ThemeData theme,
+    List<StaffEventAssignmentEntity> events,
+    StaffEventAssignmentEntity? selectedEvent,
+  ) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.arrow_back,
+              color: theme.colorScheme.onSurface,
+              size: 24.sp,
+            ),
+            Column(
+              children: [
+                Text(
+                  'ENTRY CONTROL',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  selectedEvent != null
+                      ? '${selectedEvent.eventTitle} • Gate A'
+                      : 'Event Scanner • Gate A',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_vert,
+                color: theme.colorScheme.onSurface,
+                size: 24.sp,
               ),
+              onSelected: (eventId) {
+                context.read<StaffEventAssignmentBloc>().add(
+                      StaffEventAssignmentEvent.selectEvent(eventId: eventId),
+                    );
+              },
+              itemBuilder: (context) => events.map((event) {
+                return PopupMenuItem<String>(
+                  value: event.eventId,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.eventTitle,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        event.eventLocation,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
-        Icon(
-          Icons.more_vert,
-          color: theme.colorScheme.onSurface,
-          size: 24.sp,
-        ),
+        if (events.length > 1) ...[
+          SizedBox(height: 16.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.event,
+                  size: 16.sp,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  '${events.length} events assigned',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -224,11 +436,14 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStartScanningButton(BuildContext context, ThemeData theme) {
+  Widget _buildStartScanningButton(BuildContext context, ThemeData theme,
+      StaffEventAssignmentEntity? selectedEvent) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => _startScanning(context),
+        onPressed: selectedEvent != null
+            ? () => _startScanning(context, selectedEvent)
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
@@ -258,14 +473,20 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context, ThemeData theme) {
+  Widget _buildQuickActions(BuildContext context, ThemeData theme,
+      StaffEventAssignmentEntity? selectedEvent) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildQuickActionButton(
           icon: Icons.refresh,
           label: 'Reset',
-          onTap: () {},
+          onTap: () {
+            context.read<StaffEventAssignmentBloc>().add(
+                  const StaffEventAssignmentEvent.loadStaffEvents(
+                      staffId: 'staff123'), // TODO: Get from auth
+                );
+          },
           theme: theme,
         ),
         _buildQuickActionButton(
@@ -277,7 +498,9 @@ class StaffHomeScreen extends StatelessWidget {
         _buildQuickActionButton(
           icon: Icons.people_outline,
           label: 'Attendees',
-          onTap: () => _navigateToAttendees(context),
+          onTap: selectedEvent != null
+              ? () => _navigateToAttendees(context, selectedEvent)
+              : null,
           theme: theme,
         ),
       ],
@@ -287,7 +510,7 @@ class StaffHomeScreen extends StatelessWidget {
   Widget _buildQuickActionButton({
     required IconData icon,
     required String label,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
     required ThemeData theme,
   }) {
     return GestureDetector(
@@ -296,10 +519,13 @@ class StaffHomeScreen extends StatelessWidget {
         width: 80.w,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: onTap != null
+              ? theme.colorScheme.surface
+              : theme.colorScheme.surface.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+            color: theme.colorScheme.primary
+                .withValues(alpha: onTap != null ? 0.3 : 0.1),
             width: 1,
           ),
         ),
@@ -307,14 +533,16 @@ class StaffHomeScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              color: theme.colorScheme.onSurface
+                  .withValues(alpha: onTap != null ? 0.7 : 0.3),
               size: 24.sp,
             ),
             SizedBox(height: 8.h),
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurface
+                    .withValues(alpha: onTap != null ? 0.7 : 0.3),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -324,36 +552,27 @@ class StaffHomeScreen extends StatelessWidget {
     );
   }
 
-  void _startScanning(BuildContext context) {
-    // Use the actual event ID from your database
-    const eventId = '1774346204603_176467';
-    const eventTitle = 'gg'; // Your event title from the database
-
-    // Navigate to QR scanner screen
-    context.push('/staff/qr-scanner?eventId=$eventId&eventTitle=$eventTitle');
+  void _startScanning(
+      BuildContext context, StaffEventAssignmentEntity selectedEvent) {
+    // Navigate to QR scanner screen with selected event
+    context.push(
+        '/staff/qr-scanner?eventId=${selectedEvent.eventId}&eventTitle=${selectedEvent.eventTitle}');
   }
 
   void _createTestTicket() async {
     try {
       await DebugTicketHelper.createTestTicket();
-      print('✅ Test ticket created! You can now scan the QR code.');
     } catch (e) {
-      print('❌ Error creating test ticket: $e');
+      // Handle error silently for now
     }
   }
 
-  void _navigateToAttendees(BuildContext context) {
-    // Use the actual event ID and a sample staff ID
-    const eventId = '1774346204603_176467';
-    const staffId =
-        'staff123'; // You can get this from auth state in a real app
-
-    print(
-        'Navigating to attendees with eventId: "$eventId", staffId: "$staffId"'); // Debug log
+  void _navigateToAttendees(
+      BuildContext context, StaffEventAssignmentEntity selectedEvent) {
+    const staffId = 'staff123'; // TODO: Get from auth
 
     // Use path parameters instead of query parameters
-    final path = '/staff/attendees/$eventId/$staffId';
-    print('Navigation path: $path'); // Debug log
+    final path = '/staff/attendees/${selectedEvent.eventId}/$staffId';
     context.go(path);
   }
 }
