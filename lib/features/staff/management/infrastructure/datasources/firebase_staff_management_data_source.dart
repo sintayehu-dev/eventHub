@@ -16,117 +16,80 @@ class FirebaseStaffManagementDataSource {
     required String organizerId,
   }) async {
     try {
+      // Query users collection for users with 'staff' role
       final query = await _firestore
-          .collection('staff_members')
-          .where('organizerId', isEqualTo: organizerId)
-          .where('status', isEqualTo: 'active')
-          .orderBy('name')
+          .collection('users')
+          .where('role', isEqualTo: 'staff')
           .get();
 
       return query.docs.map((doc) {
         final data = doc.data();
-        return _mapFirestoreToStaff(doc.id, data);
+        return _mapUserToStaff(doc.id, data);
       }).toList();
     } catch (e) {
-      // Return hardcoded staff for development
-      return [
-        StaffEntity(
-          id: 'staff_1',
-          email: 'john.scanner@example.com',
-          name: 'John Scanner',
-          phone: '+1234567890',
-          status: StaffStatus.active,
-          createdAt: DateTime.now(),
-          organizerId: organizerId,
-        ),
-        StaffEntity(
-          id: 'staff_2',
-          email: 'jane.supervisor@example.com',
-          name: 'Jane Supervisor',
-          phone: '+1234567891',
-          status: StaffStatus.active,
-          createdAt: DateTime.now(),
-          organizerId: organizerId,
-        ),
-        StaffEntity(
-          id: 'staff_3',
-          email: 'mike.manager@example.com',
-          name: 'Mike Manager',
-          phone: '+1234567892',
-          status: StaffStatus.active,
-          createdAt: DateTime.now(),
-          organizerId: organizerId,
-        ),
-      ];
+      throw const NetworkExceptions.unexpectedError();
     }
   }
 
-  /// Add a new staff member
+  /// Add a new staff member (Not needed - staff register themselves)
+  /// This method is kept for interface compatibility
   Future<StaffEntity> addStaffMember({
     required String organizerId,
     required String email,
     required String name,
     required String phone,
   }) async {
-    try {
-      final staffRef = _firestore.collection('staff_members').doc();
-      final now = Timestamp.now();
-      
-      final staffData = {
-        'email': email,
-        'name': name,
-        'phone': phone,
-        'status': 'active',
-        'organizerId': organizerId,
-        'createdAt': now,
-        'updatedAt': now,
-      };
-
-      await staffRef.set(staffData);
-
-      return StaffEntity(
-        id: staffRef.id,
-        email: email,
-        name: name,
-        phone: phone,
-        status: StaffStatus.active,
-        createdAt: now.toDate(),
-        organizerId: organizerId,
-      );
-    } catch (e) {
-      throw const NetworkExceptions.unexpectedError();
-    }
+    // Staff members register themselves through the normal registration flow
+    // This method is not used in the current implementation
+    throw const NetworkExceptions.notImplemented();
   }
 
-  /// Update staff member status
+  /// Update staff member status (Updates user profile)
   Future<void> updateStaffStatus({
     required String staffId,
     required StaffStatus status,
   }) async {
     try {
+      // Note: In the user-based system, we don't typically change user status
+      // This could be implemented by adding a 'staffStatus' field to user profiles
+      // For now, we'll just update the user document if needed
+      
+      // Optionally update user profile with staff-specific status
       await _firestore
-          .collection('staff_members')
+          .collection('users')
           .doc(staffId)
           .update({
-        'status': status.value,
-        'updatedAt': Timestamp.now(),
+        'staffStatus': status.value,
+        'updatedAt': DateTime.now().toIso8601String(),
       });
     } catch (e) {
       throw const NetworkExceptions.unexpectedError();
     }
   }
 
-  /// Helper method to map Firestore data to StaffEntity
-  StaffEntity _mapFirestoreToStaff(String id, Map<String, dynamic> data) {
+  /// Helper method to map user profile data to StaffEntity
+  StaffEntity _mapUserToStaff(String id, Map<String, dynamic> data) {
+    final email = data['email'] ?? '';
+    final displayName = data['displayName'] ?? data['name'] ?? '';
+    
+    // Use email prefix as name if no display name is available
+    final name = displayName.isNotEmpty 
+        ? displayName 
+        : email.isNotEmpty 
+            ? email.split('@').first.replaceAll('.', ' ').split(' ')
+                .map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1)}' : '')
+                .join(' ')
+            : 'Staff Member';
+
     return StaffEntity(
       id: id,
-      email: data['email'] ?? '',
-      name: data['name'] ?? '',
-      phone: data['phone'] ?? '',
-      status: _mapStringToStatus(data['status'] ?? 'active'),
+      email: email,
+      name: name,
+      phone: data['phoneNumber'] ?? data['phone'] ?? '',
+      status: StaffStatus.active, // All registered staff users are considered active
       createdAt: _parseDateTime(data['createdAt']) ?? DateTime.now(),
-      profileImageUrl: data['profileImageUrl'],
-      organizerId: data['organizerId'],
+      profileImageUrl: data['photoURL'],
+      organizerId: null, // Staff users are not tied to specific organizers
     );
   }
 
@@ -142,18 +105,5 @@ class FirebaseStaffManagementDataSource {
       }
     }
     return null;
-  }
-
-  /// Helper method to map string to StaffStatus
-  StaffStatus _mapStringToStatus(String status) {
-    switch (status.toLowerCase()) {
-      case 'inactive':
-        return StaffStatus.inactive;
-      case 'pending':
-        return StaffStatus.pending;
-      case 'active':
-      default:
-        return StaffStatus.active;
-    }
   }
 }

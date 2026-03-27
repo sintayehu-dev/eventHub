@@ -22,15 +22,24 @@ class StaffAssignmentWidget extends StatefulWidget {
 }
 
 class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
-  late List<StaffAssignmentData> _assignments;
   List<StaffEntity> _availableStaff = [];
+  List<String> _selectedStaffIds = [];
+  Map<String, StaffRole> _staffRoles = {};
   bool _isLoadingStaff = false;
+  bool _isDropdownOpen = false;
 
   @override
   void initState() {
     super.initState();
-    _assignments = List.from(widget.initialAssignments);
+    _initializeFromExistingAssignments();
     _loadAvailableStaff();
+  }
+
+  void _initializeFromExistingAssignments() {
+    for (final assignment in widget.initialAssignments) {
+      _selectedStaffIds.add(assignment.staffId);
+      _staffRoles[assignment.staffId] = assignment.role;
+    }
   }
 
   Future<void> _loadAvailableStaff() async {
@@ -55,59 +64,41 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
     }
   }
 
-  void _addStaffAssignment() {
-    if (_availableStaff.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('No staff members available. Please add staff members first.'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
-      return;
-    }
-
-    // Find staff not already assigned
-    final assignedStaffIds = _assignments.map((a) => a.staffId).toSet();
-    final availableStaff = _availableStaff.where((staff) => !assignedStaffIds.contains(staff.id)).toList();
-    
-    if (availableStaff.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('All available staff members are already assigned.'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
-      return;
-    }
-
+  void _toggleStaffSelection(String staffId) {
     setState(() {
-      _assignments.add(StaffAssignmentData(
-        staffId: availableStaff.first.id,
-        staffEmail: availableStaff.first.email,
-        staffName: availableStaff.first.name,
-        role: StaffRole.scanner,
-        permissions: StaffRole.scanner.defaultPermissions,
-      ));
+      if (_selectedStaffIds.contains(staffId)) {
+        _selectedStaffIds.remove(staffId);
+        _staffRoles.remove(staffId);
+      } else {
+        _selectedStaffIds.add(staffId);
+        _staffRoles[staffId] = StaffRole.scanner; // Default role
+      }
     });
-    widget.onAssignmentsChanged(_assignments);
+    _updateAssignments();
   }
 
-  void _removeStaffAssignment(int index) {
+  void _updateStaffRole(String staffId, StaffRole role) {
     setState(() {
-      _assignments.removeAt(index);
+      _staffRoles[staffId] = role;
     });
-    widget.onAssignmentsChanged(_assignments);
+    _updateAssignments();
   }
 
-  void _updateStaffAssignment(int index, StaffAssignmentData assignment) {
-    setState(() {
-      _assignments[index] = assignment;
-    });
-    widget.onAssignmentsChanged(_assignments);
+  void _updateAssignments() {
+    final assignments = _selectedStaffIds.map((staffId) {
+      final staff = _availableStaff.firstWhere((s) => s.id == staffId);
+      final role = _staffRoles[staffId] ?? StaffRole.scanner;
+
+      return StaffAssignmentData(
+        staffId: staffId,
+        staffEmail: staff.email,
+        staffName: staff.name,
+        role: role,
+        permissions: role.defaultPermissions,
+      );
+    }).toList();
+
+    widget.onAssignmentsChanged(assignments);
   }
 
   @override
@@ -127,106 +118,285 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            TextButton.icon(
-              onPressed: _addStaffAssignment,
-              icon: Icon(Icons.add, size: 18.sp, color: const Color(0xFF8B5CF6)),
-              label: Text(
-                'Add Staff',
-                style: TextStyle(
-                  color: const Color(0xFF8B5CF6),
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                ),
+            Text(
+              '${_selectedStaffIds.length} selected',
+              style: TextStyle(
+                color: const Color(0xFF8B5CF6),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
         SizedBox(height: 16.h),
 
-        // Staff Assignment Cards
-        if (_isLoadingStaff)
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(24.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.grey[700]!, width: 1),
+        // Staff Selection Dropdown
+        _buildStaffSelectionDropdown(),
+        SizedBox(height: 16.h),
+
+        // Selected Staff List
+        if (_selectedStaffIds.isNotEmpty) ...[
+          Text(
+            'Selected Staff Members',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
             ),
-            child: Column(
-              children: [
-                CircularProgressIndicator(
-                  color: const Color(0xFF8B5CF6),
-                  strokeWidth: 2,
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  'Loading staff members...',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 14.sp,
-                  ),
-                ),
-              ],
-            ),
-          )
-        else if (_assignments.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(24.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.grey[700]!, width: 1),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.people_outline,
-                  size: 48.sp,
-                  color: Colors.grey[400],
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  'No staff assigned yet',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Add staff members who can scan tickets and manage attendees for this event',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 14.sp,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          )
-        else
-          ...List.generate(_assignments.length, (index) {
+          ),
+          SizedBox(height: 12.h),
+          ..._selectedStaffIds.map((staffId) {
+            final staff = _availableStaff.firstWhere((s) => s.id == staffId);
             return Padding(
-              padding: EdgeInsets.only(bottom: 16.h),
-              child: _buildStaffAssignmentCard(
-                context,
-                index,
-                _assignments[index],
-              ),
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: _buildSelectedStaffCard(staff),
             );
           }),
+        ],
       ],
     );
   }
 
-  Widget _buildStaffAssignmentCard(
-    BuildContext context,
-    int index,
-    StaffAssignmentData assignment,
-  ) {
+  Widget _buildStaffSelectionDropdown() {
+    if (_isLoadingStaff) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A1B3D),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[700]!, width: 1),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 20.w,
+              height: 20.h,
+              child: CircularProgressIndicator(
+                color: const Color(0xFF8B5CF6),
+                strokeWidth: 2,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Text(
+              'Loading staff members...',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 14.sp,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_availableStaff.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A1B3D),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.grey[700]!, width: 1),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              Icons.people_outline,
+              size: 32.sp,
+              color: Colors.grey[400],
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'No staff members found',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'Staff members need to register with "Staff" role',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 12.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A1B3D),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey[700]!, width: 1),
+      ),
+      child: Column(
+        children: [
+          // Dropdown Header
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isDropdownOpen = !_isDropdownOpen;
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16.w),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    color: const Color(0xFF8B5CF6),
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      _selectedStaffIds.isEmpty
+                          ? 'Select Staff Members'
+                          : '${_selectedStaffIds.length} staff member${_selectedStaffIds.length == 1 ? '' : 's'} selected',
+                      style: TextStyle(
+                        color: _selectedStaffIds.isEmpty
+                            ? Colors.grey[400]
+                            : Colors.white,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _isDropdownOpen
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    color: Colors.grey[400],
+                    size: 20.sp,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Dropdown Content
+          if (_isDropdownOpen) ...[
+            Divider(
+              color: Colors.grey[700],
+              height: 1,
+              thickness: 1,
+            ),
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: 200.h,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _availableStaff.length,
+                itemBuilder: (context, index) {
+                  final staff = _availableStaff[index];
+                  final isSelected = _selectedStaffIds.contains(staff.id);
+
+                  return _buildStaffCheckboxItem(staff, isSelected);
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStaffCheckboxItem(StaffEntity staff, bool isSelected) {
+    return GestureDetector(
+      onTap: () => _toggleStaffSelection(staff.id),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
+              : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            // Checkbox
+            Container(
+              width: 20.w,
+              height: 20.h,
+              decoration: BoxDecoration(
+                color:
+                    isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
+                border: Border.all(
+                  color:
+                      isSelected ? const Color(0xFF8B5CF6) : Colors.grey[600]!,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(4.r),
+              ),
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 14.sp,
+                    )
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+
+            // Staff Avatar
+            CircleAvatar(
+              radius: 16.r,
+              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundImage: staff.profileImageUrl != null
+                  ? NetworkImage(staff.profileImageUrl!)
+                  : null,
+              child: staff.profileImageUrl == null
+                  ? Text(
+                      staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+
+            // Staff Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    staff.name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    staff.email,
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectedStaffCard(StaffEntity staff) {
+    final role = _staffRoles[staff.id] ?? StaffRole.scanner;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -234,165 +404,55 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: Colors.grey[700]!, width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // Header with remove button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Staff Member ${index + 1}',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              IconButton(
-                onPressed: () => _removeStaffAssignment(index),
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red[400],
-                  size: 20.sp,
-                ),
-                constraints: BoxConstraints(
-                  minWidth: 32.w,
-                  minHeight: 32.h,
-                ),
-                padding: EdgeInsets.zero,
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-
-          // Staff Selection Dropdown
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A0B2E),
-              borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.grey[600]!, width: 1),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: assignment.staffId.isNotEmpty ? assignment.staffId : null,
-                hint: Text(
-                  'Select Staff Member',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
-                ),
-                isExpanded: true,
-                dropdownColor: const Color(0xFF1A0B2E),
-                icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
-                items: _getAvailableStaffForAssignment(index).map((staff) {
-                  return DropdownMenuItem(
-                    value: staff.id,
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 16.r,
-                          backgroundColor: const Color(0xFF8B5CF6),
-                          child: Text(
-                            staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                staff.name,
-                                style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                              ),
-                              Text(
-                                staff.email,
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+          // Staff Avatar
+          CircleAvatar(
+            radius: 20.r,
+            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundImage: staff.profileImageUrl != null
+                ? NetworkImage(staff.profileImageUrl!)
+                : null,
+            child: staff.profileImageUrl == null
+                ? Text(
+                    staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                }).toList(),
-                onChanged: (staffId) {
-                  if (staffId != null) {
-                    final selectedStaff = _availableStaff.firstWhere((s) => s.id == staffId);
-                    _updateStaffAssignment(
-                      index,
-                      assignment.copyWith(
-                        staffId: selectedStaff.id,
-                        staffEmail: selectedStaff.email,
-                        staffName: selectedStaff.name,
-                      ),
-                    );
-                  }
-                },
-              ),
+                  )
+                : null,
+          ),
+          SizedBox(width: 16.w),
+
+          // Staff Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  staff.name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  staff.email,
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 16.h),
 
-          // Display selected staff info
-          if (assignment.staffId.isNotEmpty) ...[
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.person,
-                    color: const Color(0xFF8B5CF6),
-                    size: 20.sp,
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          assignment.staffName,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          assignment.staffEmail,
-                          style: TextStyle(
-                            color: Colors.grey[300],
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.h),
-          ],
-
-          // Role Selection
+          // Role Selector
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
             decoration: BoxDecoration(
               color: const Color(0xFF1A0B2E),
               borderRadius: BorderRadius.circular(8.r),
@@ -400,95 +460,49 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<StaffRole>(
-                value: assignment.role,
-                hint: Text(
-                  'Select Role',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
-                ),
-                isExpanded: true,
+                value: role,
+                isDense: true,
                 dropdownColor: const Color(0xFF1A0B2E),
-                icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
-                items: StaffRole.values.map((role) {
+                icon: Icon(Icons.keyboard_arrow_down,
+                    color: Colors.grey[400], size: 16.sp),
+                items: StaffRole.values.map((r) {
                   return DropdownMenuItem(
-                    value: role,
-                    child: Row(
-                      children: [
-                        Icon(Icons.badge_outlined, color: Colors.grey[400], size: 18.sp),
-                        SizedBox(width: 8.w),
-                        Text(
-                          role.displayName,
-                          style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                        ),
-                      ],
+                    value: r,
+                    child: Text(
+                      r.displayName,
+                      style: TextStyle(color: Colors.white, fontSize: 12.sp),
                     ),
                   );
                 }).toList(),
-                onChanged: (role) {
-                  if (role != null) {
-                    _updateStaffAssignment(
-                      index,
-                      assignment.copyWith(
-                        role: role,
-                        permissions: role.defaultPermissions,
-                      ),
-                    );
+                onChanged: (newRole) {
+                  if (newRole != null) {
+                    _updateStaffRole(staff.id, newRole);
                   }
                 },
               ),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(width: 8.w),
 
-          // Permissions Display
-          Text(
-            'Permissions:',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
+          // Remove Button
+          GestureDetector(
+            onTap: () => _toggleStaffSelection(staff.id),
+            child: Container(
+              padding: EdgeInsets.all(4.w),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(6.r),
+              ),
+              child: Icon(
+                Icons.close,
+                color: Colors.red[400],
+                size: 16.sp,
+              ),
             ),
-          ),
-          SizedBox(height: 8.h),
-          Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
-            children: assignment.permissions.map((permission) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Text(
-                  permission.displayName,
-                  style: TextStyle(
-                    color: const Color(0xFF8B5CF6),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            }).toList(),
           ),
         ],
       ),
     );
-  }
-
-  List<StaffEntity> _getAvailableStaffForAssignment(int assignmentIndex) {
-    // Get all assigned staff IDs except for the current assignment
-    final assignedStaffIds = _assignments
-        .asMap()
-        .entries
-        .where((entry) => entry.key != assignmentIndex)
-        .map((entry) => entry.value.staffId)
-        .toSet();
-
-    // Return staff that are not assigned to other assignments
-    return _availableStaff.where((staff) => !assignedStaffIds.contains(staff.id)).toList();
   }
 }
 

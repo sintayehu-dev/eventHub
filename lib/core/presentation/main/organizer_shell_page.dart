@@ -20,7 +20,6 @@ class OrganizerShellPage extends StatelessWidget {
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return Container(
-      height: 80.h,
       decoration: BoxDecoration(
         color: const Color(0xFF1A0B2E),
         border: Border(
@@ -30,38 +29,43 @@ class OrganizerShellPage extends StatelessWidget {
           ),
         ),
       ),
-      child: BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) => _onTap(index, context),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        selectedItemColor: const Color(0xFF8B5CF6),
-        unselectedItemColor: Colors.grey[600],
-        selectedFontSize: 12.sp,
-        unselectedFontSize: 12.sp,
-        items: [
-          BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.home_outlined, 0),
-            activeIcon: _buildNavIcon(Icons.home, 0),
-            label: 'HOME',
+      child: SafeArea(
+        child: SizedBox(
+          height: 60.h,
+          child: BottomNavigationBar(
+            currentIndex: navigationShell.currentIndex,
+            onTap: (index) => _onTap(index, context),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedItemColor: const Color(0xFF8B5CF6),
+            unselectedItemColor: Colors.grey[600],
+            selectedFontSize: 9.sp,
+            unselectedFontSize: 9.sp,
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.home_outlined, 0),
+                activeIcon: _buildNavIcon(Icons.home, 0),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.event_outlined, 1),
+                activeIcon: _buildNavIcon(Icons.event, 1),
+                label: 'Events',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.analytics_outlined, 2),
+                activeIcon: _buildNavIcon(Icons.analytics, 2),
+                label: 'Analytics',
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.person_outline, 3),
+                activeIcon: _buildNavIcon(Icons.person, 3),
+                label: 'Profile',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.event_outlined, 1),
-            activeIcon: _buildNavIcon(Icons.event, 1),
-            label: 'MY EVENTS',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.analytics_outlined, 2),
-            activeIcon: _buildNavIcon(Icons.analytics, 2),
-            label: 'ANALYTICS',
-          ),
-          BottomNavigationBarItem(
-            icon: _buildNavIcon(Icons.person_outline, 3),
-            activeIcon: _buildNavIcon(Icons.person, 3),
-            label: 'PROFILE',
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -69,16 +73,16 @@ class OrganizerShellPage extends StatelessWidget {
   Widget _buildNavIcon(IconData icon, int index) {
     final isSelected = navigationShell.currentIndex == index;
     return Container(
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         color: isSelected 
             ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Icon(
         icon,
-        size: 24.sp,
+        size: 20.sp,
         color: isSelected 
             ? const Color(0xFF8B5CF6)
             : Colors.grey[600],
