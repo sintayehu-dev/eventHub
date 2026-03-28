@@ -6,14 +6,14 @@ import 'package:eventhub/features/shared/profile/domain/entities/user_profile_en
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 
-class OrganizerProfileScreen extends StatelessWidget {
-  const OrganizerProfileScreen({super.key});
+class StaffProfileScreen extends StatelessWidget {
+  const StaffProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final userService = getIt<UserService>();
     final currentUser = userService.getCurrentUser();
-
+    
     if (currentUser == null) {
       return const Scaffold(
         backgroundColor: Color(0xFF1A0B2E),
@@ -29,19 +29,19 @@ class OrganizerProfileScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<UserProfileBloc>()
         ..add(UserProfileEvent.loadUserProfile(userId: currentUser.uid)),
-      child: const OrganizerProfileView(),
+      child: const StaffProfileView(),
     );
   }
 }
 
-class OrganizerProfileView extends StatefulWidget {
-  const OrganizerProfileView({super.key});
+class StaffProfileView extends StatefulWidget {
+  const StaffProfileView({super.key});
 
   @override
-  State<OrganizerProfileView> createState() => _OrganizerProfileViewState();
+  State<StaffProfileView> createState() => _StaffProfileViewState();
 }
 
-class _OrganizerProfileViewState extends State<OrganizerProfileView> {
+class _StaffProfileViewState extends State<StaffProfileView> {
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +110,8 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
                   SizedBox(height: 24.h),
                   ElevatedButton(
                     onPressed: () => context.read<UserProfileBloc>().add(
-                          const UserProfileEvent.loadUserProfile(
-                              userId: 'current_user_id'),
-                        ),
+                      const UserProfileEvent.loadUserProfile(userId: 'current_user_id'),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B5CF6),
                       shape: RoundedRectangleBorder(
@@ -131,19 +130,13 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
                 ],
               ),
             ),
-            preferencesUpdated: (preferences) =>
-                const Center(child: Text('Preferences updated')),
-            profileImageUpdated: (imageUrl) =>
-                const Center(child: Text('Image updated')),
+            preferencesUpdated: (preferences) => const Center(child: Text('Preferences updated')),
+            profileImageUpdated: (imageUrl) => const Center(child: Text('Image updated')),
             statusUpdated: () => const Center(child: Text('Status updated')),
-            eventAssignmentLoaded: (assignment) =>
-                const Center(child: Text('Assignment loaded')),
-            staffDataUpdated: (staffData) =>
-                const Center(child: Text('Staff data updated')),
-            organizerDataUpdated: (organizerData) =>
-                const Center(child: Text('Organizer data updated')),
-            attendeeDataUpdated: (attendeeData) =>
-                const Center(child: Text('Attendee data updated')),
+            eventAssignmentLoaded: (assignment) => const Center(child: Text('Assignment loaded')),
+            staffDataUpdated: (staffData) => const Center(child: Text('Staff data updated')),
+            organizerDataUpdated: (organizerData) => const Center(child: Text('Organizer data updated')),
+            attendeeDataUpdated: (attendeeData) => const Center(child: Text('Attendee data updated')),
             profileRefreshed: (profile) => _buildProfileContent(profile),
           );
         },
@@ -158,11 +151,11 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         children: [
           _buildProfileHeader(profile),
           SizedBox(height: 32.h),
-          _buildOrganizerStats(profile),
+          _buildCurrentEventInfo(profile),
           SizedBox(height: 32.h),
-          _buildRecentEvents(profile),
+          _buildStaffStats(profile),
           SizedBox(height: 32.h),
-          _buildBusinessInfo(profile),
+          _buildPersonalInfo(profile),
         ],
       ),
     );
@@ -177,11 +170,11 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
           height: 100.h,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFFEF4444), Color(0xFFF97316)],
+              colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
               width: 3,
             ),
           ),
@@ -191,14 +184,14 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
                     profile.profileImageUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.business,
+                      Icons.badge,
                       color: Colors.white,
                       size: 40.sp,
                     ),
                   ),
                 )
               : Icon(
-                  Icons.business,
+                  Icons.badge,
                   color: Colors.white,
                   size: 40.sp,
                 ),
@@ -218,13 +211,13 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+            color: const Color(0xFF06B6D4).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Text(
-            'Event Organizer',
+            'Staff Member',
             style: TextStyle(
-              color: const Color(0xFFEF4444),
+              color: const Color(0xFF06B6D4),
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -252,9 +245,100 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
     );
   }
 
-  Widget _buildOrganizerStats(UserProfileEntity profile) {
-    final organizerData = profile.organizerData;
+  Widget _buildCurrentEventInfo(UserProfileEntity profile) {
+    final assignment = profile.staffData?.currentEvent;
+    
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A1B3D),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12.w,
+                height: 12.h,
+                decoration: BoxDecoration(
+                  color: assignment != null ? const Color(0xFF4ADE80) : Colors.grey,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                assignment != null ? 'Currently Active' : 'No Active Assignment',
+                style: TextStyle(
+                  color: assignment != null ? const Color(0xFF4ADE80) : Colors.grey,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            assignment?.eventTitle ?? 'No event assigned',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          if (assignment != null) ...[
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  color: Colors.grey[400],
+                  size: 14.sp,
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: Text(
+                    '${assignment.eventLocation} • ${assignment.assignedGate ?? 'General'}',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4.h),
+            Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  color: Colors.grey[400],
+                  size: 14.sp,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  'Role: ${assignment.assignedRole}',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
+  Widget _buildStaffStats(UserProfileEntity profile) {
+    final staffData = profile.staffData;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -269,7 +353,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Organizer Statistics',
+            'Performance Stats',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18.sp,
@@ -281,19 +365,17 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
             children: [
               Expanded(
                 child: _buildStatItem(
-                  'Events Created',
-                  '${organizerData?.totalEventsCreated ?? 0}',
+                  'Events Worked',
+                  '${staffData?.totalEventsWorked ?? 0}',
                   Icons.event,
-                  const Color(0xFFEF4444),
                 ),
               ),
               SizedBox(width: 16.w),
               Expanded(
                 child: _buildStatItem(
-                  'Total Attendees',
-                  '${organizerData?.totalAttendeesServed ?? 0}',
-                  Icons.people,
-                  const Color(0xFF10B981),
+                  'Check-ins',
+                  '${staffData?.totalCheckIns ?? 0}',
+                  Icons.qr_code_scanner,
                 ),
               ),
             ],
@@ -303,19 +385,17 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
             children: [
               Expanded(
                 child: _buildStatItem(
-                  'Avg Rating',
-                  '${organizerData?.averageEventRating?.toStringAsFixed(1) ?? 'N/A'}',
+                  'Rating',
+                  '${staffData?.averageRating?.toStringAsFixed(1) ?? 'N/A'}',
                   Icons.star,
-                  const Color(0xFFF59E0B),
                 ),
               ),
               SizedBox(width: 16.w),
               Expanded(
                 child: _buildStatItem(
-                  'Revenue',
-                  'N/A',
-                  Icons.attach_money,
-                  const Color(0xFF8B5CF6),
+                  'Hours Worked',
+                  '${staffData?.totalHoursWorked ?? 0}h',
+                  Icons.schedule,
                 ),
               ),
             ],
@@ -325,8 +405,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
     );
   }
 
-  Widget _buildStatItem(
-      String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(String label, String value, IconData icon) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -337,7 +416,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         children: [
           Icon(
             icon,
-            color: color,
+            color: const Color(0xFF8B5CF6),
             size: 24.sp,
           ),
           SizedBox(height: 8.h),
@@ -363,9 +442,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
     );
   }
 
-  Widget _buildRecentEvents(UserProfileEntity profile) {
-    // Since topEvents is not available in the entity, we'll show a placeholder
-
+  Widget _buildPersonalInfo(UserProfileEntity profile) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -380,7 +457,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Top Events',
+            'Personal Information',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18.sp,
@@ -388,62 +465,8 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
             ),
           ),
           SizedBox(height: 16.h),
-          Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.event_busy,
-                  color: Colors.grey[400],
-                  size: 48.sp,
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'No recent events to display',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 14.sp,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBusinessInfo(UserProfileEntity profile) {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Business Information',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoRow(
-              'Company', profile.organizerData?.organizationName ?? 'Not set'),
-          _buildInfoRow('Website', profile.organizerData?.website ?? 'Not set'),
-          _buildInfoRow(
-              'Description', profile.organizerData?.description ?? 'Not set'),
-          _buildInfoRow('Verified',
-              profile.organizerData?.isVerified == true ? 'Yes' : 'No'),
+          _buildInfoRow('Specializations', profile.staffData?.specializations.join(', ') ?? 'Not set'),
           _buildInfoRow('Status', profile.status.displayName),
-          _buildInfoRow('Status', profile.status.toString().split('.').last),
         ],
       ),
     );
@@ -485,7 +508,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Edit profile functionality coming soon'),
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: const Color(0xFF8B5CF6),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),

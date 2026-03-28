@@ -156,20 +156,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
     gh.lazySingleton<_i350.HttpService>(() => _i350.HttpService());
     gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
-    gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
-        _i967.FirebaseTicketScannerDataSource(
+    gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
+        _i409.FirebaseStaffManagementDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i319.FirebaseStaffEventAssignmentDataSource>(() =>
         _i319.FirebaseStaffEventAssignmentDataSource(
-            firestore: gh<_i974.FirebaseFirestore>()));
-    gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
-        _i409.FirebaseStaffManagementDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i414.FirebaseStaffManagementDataSource>(() =>
         _i414.FirebaseStaffManagementDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i964.FirebaseStaffReportsDataSource>(() =>
         _i964.FirebaseStaffReportsDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
+        _i967.FirebaseTicketScannerDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i202.StaffManagementRepository>(() =>
         _i279.StaffManagementRepositoryImpl(
