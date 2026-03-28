@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
+import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
 
@@ -9,217 +12,411 @@ class AttendeeProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser();
     
+    if (currentUser == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1A0B2E),
+        body: Center(
+          child: Text(
+            'Please log in to view your profile',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    return BlocProvider(
+      create: (_) => getIt<UserProfileBloc>()
+        ..add(UserProfileEvent.loadUserProfile(userId: currentUser.uid)),
+      child: AttendeeProfileView(currentUser: currentUser),
+    );
+  }
+}
+
+class AttendeeProfileView extends StatefulWidget {
+  final dynamic currentUser;
+
+  const AttendeeProfileView({super.key, required this.currentUser});
+
+  @override
+  State<AttendeeProfileView> createState() => _AttendeeProfileViewState();
+}
+
+class _AttendeeProfileViewState extends State<AttendeeProfileView> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: const Color(0xFF1A0B2E),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.w),
-          child: Column(
-            children: [
-              // Profile Header
-              _buildProfileHeader(context),
-              SizedBox(height: 32.h),
-              
-              // Stats Cards
-              _buildStatsSection(context),
-              SizedBox(height: 32.h),
-              
-              // Menu Items
-              _buildMenuSection(context),
-            ],
+          child: BlocBuilder<UserProfileBloc, UserProfileState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  // Profile Header with real data
+                  _buildProfileHeader(state),
+                  SizedBox(height: 32.h),
+                  
+                  // Interests Info
+                  _buildInterestsInfo(state),
+                  SizedBox(height: 32.h),
+                  
+                  // Profile Menu
+                  _buildProfileMenu(context),
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+  Widget _buildProfileHeader(UserProfileState state) {
     return Column(
       children: [
         // Profile Avatar
         Container(
-          width: 100.w,
-          height: 100.h,
+          width: 80.w,
+          height: 80.h,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorScheme.primary, colorScheme.secondary],
+            gradient: const LinearGradient(
+              colors: [Color(0xFF10B981), Color(0xFF059669)],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.3),
-              width: 3,
+              color: const Color(0xFF10B981).withValues(alpha: 0.3),
+              width: 2,
             ),
           ),
-          child: Icon(
-            Icons.person,
-            color: colorScheme.onPrimary,
-            size: 48.sp,
+          child: state.maybeWhen(
+            loaded: (profile) => profile.profileImageUrl != null
+                ? ClipOval(
+                    child: Image.network(
+                      profile.profileImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 32.sp,
+                      ),
+                    ),
+                  )
+                : Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 32.sp,
+                  ),
+            orElse: () => Icon(
+              Icons.person,
+              color: Colors.white,
+              size: 32.sp,
+            ),
           ),
         ),
         SizedBox(height: 16.h),
         
         // Name and Role
-        Text(
-          'John Doe',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
+        state.maybeWhen(
+          loaded: (profile) => Column(
+            children: [
+              Text(
+                profile.name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  profile.role.displayName,
+                  style: TextStyle(
+                    color: const Color(0xFF10B981),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                profile.email,
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 14.sp,
+                ),
+              ),
+              if (profile.phone != null) ...[
+                SizedBox(height: 4.h),
+                Text(
+                  profile.phone!,
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          loading: () => Column(
+            children: [
+              Text(
+                widget.currentUser.displayName ?? 'Loading...',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  'Attendee',
+                  style: TextStyle(
+                    color: const Color(0xFF10B981),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                widget.currentUser.email ?? 'Loading...',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 14.sp,
+                ),
+              ),
+            ],
+          ),
+          orElse: () => Column(
+            children: [
+              Text(
+                widget.currentUser.displayName ?? 'Event Attendee',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  'Attendee',
+                  style: TextStyle(
+                    color: const Color(0xFF10B981),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                widget.currentUser.email ?? 'No email',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 14.sp,
+                ),
+              ),
+            ],
           ),
         ),
-        SizedBox(height: 4.h),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      ],
+    );
+  }
+
+  Widget _buildInterestsInfo(UserProfileState state) {
+    return state.maybeWhen(
+      loaded: (profile) {
+        final attendeeData = profile.attendeeData;
+        final interests = attendeeData?.interests ?? [];
+        return Container(
+          padding: EdgeInsets.all(20.w),
           decoration: BoxDecoration(
-            color: colorScheme.tertiary.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-          child: Text(
-            'Event Attendee',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: colorScheme.tertiary,
-              fontWeight: FontWeight.w600,
+            color: const Color(0xFF2A1B3D),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+              width: 1,
             ),
           ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          'test@gmail.com',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.7),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.favorite,
+                    color: const Color(0xFF10B981),
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Your Interests',
+                    style: TextStyle(
+                      color: const Color(0xFF10B981),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.h),
+              if (interests.isEmpty)
+                Text(
+                  'No interests set yet',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              else ...[
+                Text(
+                  'Events you love',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 8.h,
+                  children: interests
+                      .take(3)
+                      .map((interest) => Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.h),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Text(
+                              interest,
+                              style: TextStyle(
+                                color: const Color(0xFF10B981),
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+      orElse: () => Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A1B3D),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            width: 1,
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildStatsSection(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            context: context,
-            title: 'Events Attended',
-            value: '12',
-            color: colorScheme.tertiary,
-            icon: Icons.event_available,
-          ),
-        ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: _buildStatCard(
-            context: context,
-            title: 'Upcoming Events',
-            value: '3',
-            color: colorScheme.primary,
-            icon: Icons.upcoming,
-          ),
-        ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: _buildStatCard(
-            context: context,
-            title: 'Favorites',
-            value: '8',
-            color: colorScheme.error,
-            icon: Icons.favorite,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard({
-    required BuildContext context,
-    required String title,
-    required String value,
-    required Color color,
-    required IconData icon,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.favorite,
+                  color: Colors.grey,
+                  size: 16.sp,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Loading interests...',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              'Loading...',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: 40.w,
-            height: 40.h,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20.sp,
-            ),
-          ),
-          SizedBox(height: 12.h),
-          Text(
-            value,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            title,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildMenuSection(BuildContext context) {
+  Widget _buildProfileMenu(BuildContext context) {
     return Column(
       children: [
         _buildMenuItem(
           icon: Icons.person_outline,
-          title: 'Edit Profile',
-          subtitle: 'Update your personal information',
+          title: 'Personal Information',
+          subtitle: 'View your profile details',
           onTap: () {},
         ),
         SizedBox(height: 16.h),
         _buildMenuItem(
           icon: Icons.favorite_outline,
-          title: 'Favorite Events',
-          subtitle: 'View your saved events',
+          title: 'Interests & Preferences',
+          subtitle: 'Manage your event preferences',
+          onTap: () {},
+        ),
+        SizedBox(height: 16.h),
+        _buildMenuItem(
+          icon: Icons.confirmation_number_outlined,
+          title: 'My Tickets',
+          subtitle: 'View your purchased tickets',
           onTap: () {},
         ),
         SizedBox(height: 16.h),
         _buildMenuItem(
           icon: Icons.history,
           title: 'Event History',
-          subtitle: 'See all your past events',
+          subtitle: 'View events you attended',
           onTap: () {},
         ),
         SizedBox(height: 16.h),
         _buildMenuItem(
           icon: Icons.notifications_outlined,
           title: 'Notifications',
-          subtitle: 'Manage your notification preferences',
+          subtitle: 'Manage alert preferences',
+          onTap: () {},
+        ),
+        SizedBox(height: 16.h),
+        _buildMenuItem(
+          icon: Icons.security,
+          title: 'Security',
+          subtitle: 'Access control and permissions',
           onTap: () {},
         ),
         SizedBox(height: 16.h),
@@ -231,9 +428,9 @@ class AttendeeProfileScreen extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         _buildMenuItem(
-          icon: Icons.settings_outlined,
-          title: 'Settings',
-          subtitle: 'App preferences and privacy',
+          icon: Icons.info_outline,
+          title: 'About',
+          subtitle: 'App version and information',
           onTap: () {},
         ),
         SizedBox(height: 24.h),
@@ -255,102 +452,97 @@ class AttendeeProfileScreen extends StatelessWidget {
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A1B3D),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isDestructive 
+                ? const Color(0xFFEF4444).withValues(alpha: 0.3)
+                : const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48.w,
+              height: 48.h,
+              decoration: BoxDecoration(
                 color: isDestructive 
-                    ? colorScheme.error.withValues(alpha: 0.3)
-                    : colorScheme.primary.withValues(alpha: 0.3),
-                width: 1,
+                    ? const Color(0xFFEF4444).withValues(alpha: 0.2)
+                    : const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                icon,
+                color: isDestructive
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFF8B5CF6),
+                size: 24.sp,
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48.w,
-                  height: 48.h,
-                  decoration: BoxDecoration(
-                    color: isDestructive 
-                        ? colorScheme.error.withValues(alpha: 0.2)
-                        : colorScheme.primary.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12.r),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: isDestructive 
+                          ? const Color(0xFFEF4444)
+                          : Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  child: Icon(
-                    icon,
-                    color:
-                        isDestructive ? colorScheme.error : colorScheme.primary,
-                    size: 24.sp,
+                  SizedBox(height: 4.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 12.sp,
+                    ),
                   ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: isDestructive 
-                              ? colorScheme.error
-                              : colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        subtitle,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: colorScheme.onSurface.withValues(alpha: 0.5),
-                  size: 16.sp,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey[600],
+              size: 16.sp,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   void _showSignOutDialog(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: colorScheme.primaryContainer,
+        backgroundColor: const Color(0xFF2A1B3D),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
         title: Text(
           'Sign Out',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colorScheme.onSurface,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           'Are you sure you want to sign out of your account?',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.7),
+          style: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 14.sp,
           ),
         ),
         actions: [
@@ -358,8 +550,9 @@ class AttendeeProfileScreen extends StatelessWidget {
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -373,8 +566,9 @@ class AttendeeProfileScreen extends StatelessWidget {
               },
               child: Text(
                 'Sign Out',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.error,
+                style: TextStyle(
+                  color: const Color(0xFFEF4444),
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),

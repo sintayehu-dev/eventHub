@@ -34,9 +34,6 @@ import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/tick
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/ticket_qr_screen.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
 
-// Auth
-import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
-
 // Event discovery
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
@@ -56,8 +53,8 @@ import 'package:eventhub/features/organizer/profile/presentation/pages/organizer
 import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/staff_home_screen.dart';
 import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/qr_scanner_screen.dart';
 import 'package:eventhub/features/staff/attendee_management/presentation/pages/attendees_screen.dart';
-import 'package:eventhub/features/staff/checkin_management/presentation/pages/staff_reports_screen.dart';
-import 'package:eventhub/features/staff/profile/presentation/pages/staff_settings_screen.dart';
+import 'package:eventhub/features/staff/reports/presentation/pages/staff_reports_screen.dart';
+import 'package:eventhub/features/staff/profile/presentation/pages/staff_profile_screen.dart';
 
 // Shared screens
 import 'package:eventhub/features/shared/event_details/presentation/pages/event_detail_screen.dart';
@@ -268,13 +265,13 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Staff Settings Branch (index 2)
+        // Staff Profile Branch (index 2)
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: RouteName.staffSettings,
-              path: '/staff/settings',
-              builder: (context, state) => const StaffSettingsScreen(),
+              name: RouteName.staffProfile,
+              path: '/staff/profile',
+              builder: (context, state) => const StaffProfileScreen(),
             ),
           ],
         ),

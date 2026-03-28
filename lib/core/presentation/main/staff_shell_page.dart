@@ -54,9 +54,9 @@ class StaffShellPage extends StatelessWidget {
                 label: 'Reports',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.settings_outlined, 2),
-                activeIcon: _buildNavIcon(Icons.settings, 2),
-                label: 'Settings',
+                icon: _buildNavIcon(Icons.person_outline, 2),
+                activeIcon: _buildNavIcon(Icons.person, 2),
+                label: 'Profile',
               ),
             ],
           ),

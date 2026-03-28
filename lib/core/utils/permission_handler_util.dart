@@ -6,7 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 /// A utility class to handle permissions throughout the app
 class PermissionHandlerUtil {
-  /// Check and request camera permission
+
   static Future<bool> requestCameraPermission(BuildContext context) async {
     if (!context.mounted) return false;
     
@@ -15,7 +15,6 @@ class PermissionHandlerUtil {
     if (status.isGranted) {
       return true;
     }
-    
     if (status.isDenied) {
       status = await Permission.camera.request();
       return status.isGranted;

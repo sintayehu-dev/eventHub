@@ -53,7 +53,7 @@ class RouteName {
   static const staffScanner = 'staff_scanner';
   static const staffAttendees = 'staff_attendees';
   static const staffReports = 'staff_reports';
-  static const staffSettings = 'staff_settings';
+  static const staffProfile = 'staff_profile';
   static const qrScanner = 'qr_scanner';
 
   // Shared routes

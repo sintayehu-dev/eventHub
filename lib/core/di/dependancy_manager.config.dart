@@ -84,6 +84,14 @@ import '../../features/organizer/event_management/infrastructure/repositories/ev
     as _i413;
 import '../../features/organizer/staff_management/infrastructure/datasources/firebase_staff_management_data_source.dart'
     as _i409;
+import '../../features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart'
+    as _i237;
+import '../../features/shared/profile/domain/repositories/user_profile_repository.dart'
+    as _i75;
+import '../../features/shared/profile/infrastructure/datasources/firebase_user_profile_data_source.dart'
+    as _i607;
+import '../../features/shared/profile/infrastructure/repositories/user_profile_repository_impl.dart'
+    as _i920;
 import '../../features/staff/attendee_management/application/attendee_management/bloc/attendee_management_bloc.dart'
     as _i1063;
 import '../../features/staff/attendee_management/domain/repositories/attendee_management_repository.dart'
@@ -110,6 +118,14 @@ import '../../features/staff/management/infrastructure/datasources/firebase_staf
     as _i414;
 import '../../features/staff/management/infrastructure/repositories/staff_management_repository_impl.dart'
     as _i279;
+import '../../features/staff/reports/application/staff_reports/bloc/staff_reports_bloc.dart'
+    as _i271;
+import '../../features/staff/reports/domain/repositories/staff_reports_repository.dart'
+    as _i1043;
+import '../../features/staff/reports/infrastructure/datasources/firebase_staff_reports_data_source.dart'
+    as _i964;
+import '../../features/staff/reports/infrastructure/repositories/staff_reports_repository_impl.dart'
+    as _i926;
 import '../../features/staff/ticket_scanner/application/ticket_scanner/bloc/ticket_scanner_bloc.dart'
     as _i984;
 import '../../features/staff/ticket_scanner/domain/repositories/ticket_scanner_repository.dart'
@@ -152,6 +168,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i414.FirebaseStaffManagementDataSource>(() =>
         _i414.FirebaseStaffManagementDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i964.FirebaseStaffReportsDataSource>(() =>
+        _i964.FirebaseStaffReportsDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i202.StaffManagementRepository>(() =>
         _i279.StaffManagementRepositoryImpl(
             gh<_i414.FirebaseStaffManagementDataSource>()));
@@ -167,6 +186,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i935.StaffAssignmentService>(() =>
         _i912.FirebaseStaffAssignmentService(
             firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i1043.StaffReportsRepository>(() =>
+        _i926.StaffReportsRepositoryImpl(
+            gh<_i964.FirebaseStaffReportsDataSource>()));
+    gh.lazySingleton<_i607.FirebaseUserProfileDataSource>(
+        () => _i607.FirebaseUserProfileDataSource(
+              firestore: gh<_i974.FirebaseFirestore>(),
+              auth: gh<_i59.FirebaseAuth>(),
+            ));
+    gh.factory<_i271.StaffReportsBloc>(
+        () => _i271.StaffReportsBloc(gh<_i1043.StaffReportsRepository>()));
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i912.FirebaseEventDataSource>(
@@ -231,6 +260,11 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i915.SignOutUseCase>(
         () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
+    gh.lazySingleton<_i75.UserProfileRepository>(() =>
+        _i920.UserProfileRepositoryImpl(
+            gh<_i607.FirebaseUserProfileDataSource>()));
+    gh.factory<_i237.UserProfileBloc>(
+        () => _i237.UserProfileBloc(gh<_i75.UserProfileRepository>()));
     gh.factory<_i743.TicketWalletRepository>(() =>
         _i820.TicketWalletRepositoryImpl(
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));
