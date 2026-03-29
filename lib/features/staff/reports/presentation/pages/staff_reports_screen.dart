@@ -38,8 +38,11 @@ class _StaffReportsViewState extends State<StaffReportsView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: BlocConsumer<StaffReportsBloc, StaffReportsState>(
           listener: (context, state) {
@@ -48,7 +51,7 @@ class _StaffReportsViewState extends State<StaffReportsView> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Error loading reports: $message'),
-                    backgroundColor: const Color(0xFFEF4444),
+                    backgroundColor: colorScheme.error,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -62,8 +65,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
                       const StaffReportsEvent.refreshReport(),
                     );
               },
-              color: const Color(0xFF8B5CF6),
-              backgroundColor: const Color(0xFF2A1B3D),
+              color: colorScheme.primary,
+              backgroundColor: colorScheme.surfaceContainerHighest,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.all(20.w),
@@ -103,14 +106,15 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           'Reports',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -122,7 +126,7 @@ class _StaffReportsViewState extends State<StaffReportsView> {
           },
           icon: Icon(
             Icons.refresh,
-            color: const Color(0xFF8B5CF6),
+            color: colorScheme.primary,
             size: 24.sp,
           ),
         ),
@@ -131,10 +135,13 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildTimePeriodSelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -153,15 +160,15 @@ class _StaffReportsViewState extends State<StaffReportsView> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
+                  color: isSelected ? colorScheme.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
                   period.displayName,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -175,18 +182,20 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildLoadingState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       children: [
         SizedBox(height: 100.h),
-        const CircularProgressIndicator(
-          color: Color(0xFF8B5CF6),
+        CircularProgressIndicator(
+          color: colorScheme.primary,
         ),
         SizedBox(height: 16.h),
         Text(
           'Loading reports...',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14.sp,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -194,29 +203,29 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildErrorState(String message) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       children: [
         SizedBox(height: 100.h),
         Icon(
           Icons.error_outline,
-          color: const Color(0xFFEF4444),
+          color: colorScheme.error,
           size: 48.sp,
         ),
         SizedBox(height: 16.h),
         Text(
           'Failed to load reports',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.sp,
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         SizedBox(height: 8.h),
         Text(
           message,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12.sp,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -228,16 +237,15 @@ class _StaffReportsViewState extends State<StaffReportsView> {
                 );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.r),
             ),
           ),
           child: Text(
             'Retry',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.sp,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.onPrimary,
             ),
           ),
         ),

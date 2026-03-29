@@ -15,12 +15,12 @@ class StaffProfileScreen extends StatelessWidget {
     final currentUser = userService.getCurrentUser();
     
     if (currentUser == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF1A0B2E),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Text(
             'Please log in to view your profile',
-            style: TextStyle(color: Colors.white),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
       );
@@ -45,16 +45,17 @@ class _StaffProfileViewState extends State<StaffProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -63,7 +64,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
             onPressed: () => _showEditProfileDialog(),
             icon: Icon(
               Icons.edit,
-              color: const Color(0xFF8B5CF6),
+              color: colorScheme.primary,
               size: 24.sp,
             ),
           ),
@@ -72,10 +73,15 @@ class _StaffProfileViewState extends State<StaffProfileView> {
       body: BlocBuilder<UserProfileBloc, UserProfileState>(
         builder: (context, state) {
           return state.when(
-            initial: () => const Center(child: Text('Welcome')),
-            loading: () => const Center(
+            initial: () => Center(
+              child: Text(
+                'Welcome',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            loading: () => Center(
               child: CircularProgressIndicator(
-                color: Color(0xFF8B5CF6),
+                color: colorScheme.primary,
               ),
             ),
             loaded: (profile) => _buildProfileContent(profile),
@@ -86,24 +92,21 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                 children: [
                   Icon(
                     Icons.error_outline,
-                    color: const Color(0xFFEF4444),
+                    color: colorScheme.error,
                     size: 48.sp,
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     'Error loading profile',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     message,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -113,16 +116,15 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                       const UserProfileEvent.loadUserProfile(userId: 'current_user_id'),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B5CF6),
+                      backgroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
                     child: Text(
                       'Retry',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -130,13 +132,48 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                 ],
               ),
             ),
-            preferencesUpdated: (preferences) => const Center(child: Text('Preferences updated')),
-            profileImageUpdated: (imageUrl) => const Center(child: Text('Image updated')),
-            statusUpdated: () => const Center(child: Text('Status updated')),
-            eventAssignmentLoaded: (assignment) => const Center(child: Text('Assignment loaded')),
-            staffDataUpdated: (staffData) => const Center(child: Text('Staff data updated')),
-            organizerDataUpdated: (organizerData) => const Center(child: Text('Organizer data updated')),
-            attendeeDataUpdated: (attendeeData) => const Center(child: Text('Attendee data updated')),
+            preferencesUpdated: (preferences) => Center(
+              child: Text(
+                'Preferences updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            profileImageUpdated: (imageUrl) => Center(
+              child: Text(
+                'Image updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            statusUpdated: () => Center(
+              child: Text(
+                'Status updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            eventAssignmentLoaded: (assignment) => Center(
+              child: Text(
+                'Assignment loaded',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            staffDataUpdated: (staffData) => Center(
+              child: Text(
+                'Staff data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            organizerDataUpdated: (organizerData) => Center(
+              child: Text(
+                'Organizer data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            attendeeDataUpdated: (attendeeData) => Center(
+              child: Text(
+                'Attendee data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
             profileRefreshed: (profile) => _buildProfileContent(profile),
           );
         },
@@ -145,23 +182,26 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   }
 
   Widget _buildProfileContent(UserProfileEntity profile) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
         children: [
-          _buildProfileHeader(profile),
+          _buildProfileHeader(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildCurrentEventInfo(profile),
+          _buildCurrentEventInfo(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildStaffStats(profile),
+          _buildStaffStats(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildPersonalInfo(profile),
+          _buildPersonalInfo(profile, theme, colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildProfileHeader(UserProfileEntity profile) {
+  Widget _buildProfileHeader(UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     return Column(
       children: [
         // Profile Avatar
@@ -169,12 +209,12 @@ class _StaffProfileViewState extends State<StaffProfileView> {
           width: 100.w,
           height: 100.h,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
+            gradient: LinearGradient(
+              colors: [colorScheme.primary, colorScheme.secondary],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               width: 3,
             ),
           ),
@@ -185,14 +225,14 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Icon(
                       Icons.badge,
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       size: 40.sp,
                     ),
                   ),
                 )
               : Icon(
                   Icons.badge,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   size: 40.sp,
                 ),
         ),
@@ -201,9 +241,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         // Name and Role
         Text(
           profile.name,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -211,14 +249,13 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF06B6D4).withValues(alpha: 0.2),
+            color: colorScheme.tertiary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Text(
             'Staff Member',
-            style: TextStyle(
-              color: const Color(0xFF06B6D4),
-              fontSize: 14.sp,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.tertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -226,18 +263,16 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         SizedBox(height: 8.h),
         Text(
           profile.email,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 16.sp,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         if (profile.phone != null) ...[
           SizedBox(height: 4.h),
           Text(
             profile.phone!,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -245,16 +280,16 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     );
   }
 
-  Widget _buildCurrentEventInfo(UserProfileEntity profile) {
+  Widget _buildCurrentEventInfo(UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     final assignment = profile.staffData?.currentEvent;
     
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -267,16 +302,15 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                 width: 12.w,
                 height: 12.h,
                 decoration: BoxDecoration(
-                  color: assignment != null ? const Color(0xFF4ADE80) : Colors.grey,
+                  color: assignment != null ? Colors.green : colorScheme.onSurface.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
               ),
               SizedBox(width: 8.w),
               Text(
                 assignment != null ? 'Currently Active' : 'No Active Assignment',
-                style: TextStyle(
-                  color: assignment != null ? const Color(0xFF4ADE80) : Colors.grey,
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: assignment != null ? Colors.green : colorScheme.onSurface.withValues(alpha: 0.5),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -285,9 +319,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
           SizedBox(height: 12.h),
           Text(
             assignment?.eventTitle ?? 'No event assigned',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -297,16 +329,15 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               children: [
                 Icon(
                   Icons.location_on,
-                  color: Colors.grey[400],
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                   size: 14.sp,
                 ),
                 SizedBox(width: 4.w),
                 Expanded(
                   child: Text(
                     '${assignment.eventLocation} • ${assignment.assignedGate ?? 'General'}',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 12.sp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -317,15 +348,14 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               children: [
                 Icon(
                   Icons.access_time,
-                  color: Colors.grey[400],
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                   size: 14.sp,
                 ),
                 SizedBox(width: 4.w),
                 Text(
                   'Role: ${assignment.assignedRole}',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -336,16 +366,16 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     );
   }
 
-  Widget _buildStaffStats(UserProfileEntity profile) {
+  Widget _buildStaffStats(UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     final staffData = profile.staffData;
     
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -354,9 +384,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         children: [
           Text(
             'Performance Stats',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -368,6 +396,8 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                   'Events Worked',
                   '${staffData?.totalEventsWorked ?? 0}',
                   Icons.event,
+                  theme,
+                  colorScheme,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -376,6 +406,8 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                   'Check-ins',
                   '${staffData?.totalCheckIns ?? 0}',
                   Icons.qr_code_scanner,
+                  theme,
+                  colorScheme,
                 ),
               ),
             ],
@@ -386,8 +418,10 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               Expanded(
                 child: _buildStatItem(
                   'Rating',
-                  '${staffData?.averageRating?.toStringAsFixed(1) ?? 'N/A'}',
+                  staffData?.averageRating?.toStringAsFixed(1) ?? 'N/A',
                   Icons.star,
+                  theme,
+                  colorScheme,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -396,6 +430,8 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                   'Hours Worked',
                   '${staffData?.totalHoursWorked ?? 0}h',
                   Icons.schedule,
+                  theme,
+                  colorScheme,
                 ),
               ),
             ],
@@ -405,35 +441,32 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  Widget _buildStatItem(String label, String value, IconData icon, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A0B2E),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         children: [
           Icon(
             icon,
-            color: const Color(0xFF8B5CF6),
+            color: colorScheme.primary,
             size: 24.sp,
           ),
           SizedBox(height: 8.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             label,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 12.sp,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -442,14 +475,14 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     );
   }
 
-  Widget _buildPersonalInfo(UserProfileEntity profile) {
+  Widget _buildPersonalInfo(UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -458,21 +491,19 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         children: [
           Text(
             'Personal Information',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 16.h),
-          _buildInfoRow('Specializations', profile.staffData?.specializations.join(', ') ?? 'Not set'),
-          _buildInfoRow('Status', profile.status.displayName),
+          _buildInfoRow('Specializations', profile.staffData?.specializations.join(', ') ?? 'Not set', theme, colorScheme),
+          _buildInfoRow('Status', profile.status.displayName, theme, colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, ThemeData theme, ColorScheme colorScheme) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
@@ -482,18 +513,15 @@ class _StaffProfileViewState extends State<StaffProfileView> {
             width: 120.w,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -504,11 +532,13 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   }
 
   void _showEditProfileDialog() {
-    // TODO: Implement edit profile functionality
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Edit profile functionality coming soon'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
