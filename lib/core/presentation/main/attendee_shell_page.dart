@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:ui';
 
 class AttendeeShellPage extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -13,70 +14,95 @@ class AttendeeShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: navigationShell,
       bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A0B2E),
-        border: Border(
-          top: BorderSide(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 60.h,
-          child: BottomNavigationBar(
-            currentIndex: navigationShell.currentIndex,
-            onTap: (index) => _onTap(index, context),
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            selectedItemColor: const Color(0xFF8B5CF6),
-            unselectedItemColor: Colors.grey[600],
-            selectedFontSize: 9.sp,
-            unselectedFontSize: 9.sp,
-            items: [
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.home_outlined, 0),
-                activeIcon: _buildNavIcon(Icons.home, 0),
-                label: 'Home',
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.r),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.2),
+                width: 1,
               ),
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.search_outlined, 1),
-                activeIcon: _buildNavIcon(Icons.search, 1),
-                label: 'Search',
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.15),
+                  blurRadius: 25,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            child: SizedBox(
+              height: 70.h,
+              child: BottomNavigationBar(
+                currentIndex: navigationShell.currentIndex,
+                onTap: (index) => _onTap(index, context),
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                selectedItemColor: colorScheme.primary,
+                unselectedItemColor:
+                    colorScheme.onSurface.withValues(alpha: 0.6),
+                selectedLabelStyle: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+                items: [
+                  BottomNavigationBarItem(
+                    icon: _buildNavIcon(Icons.home_outlined, 0, context),
+                    activeIcon: _buildNavIcon(Icons.home, 0, context),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildNavIcon(Icons.search_outlined, 1, context),
+                    activeIcon: _buildNavIcon(Icons.search, 1, context),
+                    label: 'Search',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildTicketsIcon(2, context),
+                    activeIcon: _buildTicketsIcon(2, context),
+                    label: 'Tickets',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildNavIcon(Icons.person_outline, 3, context),
+                    activeIcon: _buildNavIcon(Icons.person, 3, context),
+                    label: 'Profile',
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: _buildTicketsIcon(2),
-                activeIcon: _buildTicketsIcon(2),
-                label: 'Tickets',
-              ),
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.person_outline, 3),
-                activeIcon: _buildNavIcon(Icons.person, 3),
-                label: 'Profile',
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNavIcon(IconData icon, int index) {
+  Widget _buildNavIcon(IconData icon, int index, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = navigationShell.currentIndex == index;
+    
     return Container(
       padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         color: isSelected 
-            ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
+            ? colorScheme.primary.withValues(alpha: 0.2)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(10.r),
       ),
@@ -84,14 +110,17 @@ class AttendeeShellPage extends StatelessWidget {
         icon,
         size: 20.sp,
         color: isSelected 
-            ? const Color(0xFF8B5CF6)
-            : Colors.grey[600],
+            ? colorScheme.primary
+            : colorScheme.onSurface.withValues(alpha: 0.6),
       ),
     );
   }
 
-  Widget _buildTicketsIcon(int index) {
+  Widget _buildTicketsIcon(int index, BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = navigationShell.currentIndex == index;
+    
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -99,7 +128,7 @@ class AttendeeShellPage extends StatelessWidget {
           padding: EdgeInsets.all(6.w),
           decoration: BoxDecoration(
             color: isSelected 
-                ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
+                ? colorScheme.primary.withValues(alpha: 0.2)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10.r),
           ),
@@ -107,8 +136,8 @@ class AttendeeShellPage extends StatelessWidget {
             isSelected ? Icons.confirmation_number : Icons.confirmation_number_outlined,
             size: 20.sp,
             color: isSelected 
-                ? const Color(0xFF8B5CF6)
-                : Colors.grey[600],
+                ? colorScheme.primary
+                : colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         // Notification badge
@@ -119,19 +148,18 @@ class AttendeeShellPage extends StatelessWidget {
             width: 16.w,
             height: 16.h,
             decoration: BoxDecoration(
-              color: const Color(0xFFEF4444),
+              color: colorScheme.error,
               borderRadius: BorderRadius.circular(8.r),
               border: Border.all(
-                color: const Color(0xFF1A0B2E),
+                color: colorScheme.surface,
                 width: 2,
               ),
             ),
             child: Center(
               child: Text(
                 '2',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 9.sp,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onError,
                   fontWeight: FontWeight.bold,
                 ),
               ),

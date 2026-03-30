@@ -207,7 +207,8 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     final colorScheme = theme.colorScheme;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.fromLTRB(
+          20.w, 20.w, 20.w, 100.h), // Added bottom padding for nav bar
       child: Column(
         children: [
           _buildProfileHeader(profile, theme, colorScheme),

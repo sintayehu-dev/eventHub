@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -369,16 +370,11 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Widget _buildLoadingState() {
-    return Builder(
-      builder: (context) {
-        final colorScheme = Theme.of(context).colorScheme;
-
-        return Center(
-          child: CircularProgressIndicator(
-            color: colorScheme.primary,
-          ),
-        );
-      },
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      itemCount: 5, // Show 5 shimmer cards
+      separatorBuilder: (context, index) => SizedBox(height: 16.h),
+      itemBuilder: (context, index) => _buildShimmerEventCard(),
     );
   }
 
@@ -785,5 +781,122 @@ class _DiscoverViewState extends State<DiscoverView> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Widget _buildShimmerEventCard() {
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
+        return Container(
+          margin: EdgeInsets.only(bottom: 20.h),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.r),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorScheme.primaryContainer,
+                colorScheme.surface,
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Shimmer Image
+              ShimmerBox(
+                width: double.infinity,
+                height: 280.h,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              ),
+
+              // Shimmer Content
+              Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Shimmer Date and Location with bookmark
+                    Row(
+                      children: [
+                        ShimmerText(
+                          width: 200.w,
+                          height: 14.h,
+                        ),
+                        const Spacer(),
+                        ShimmerBox(
+                          width: 24.w,
+                          height: 24.h,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+
+                    // Shimmer Title
+                    ShimmerText(
+                      width: double.infinity,
+                      height: 22.h,
+                    ),
+                    SizedBox(height: 12.h),
+
+                    // Shimmer Description (3 lines)
+                    ShimmerText(
+                      width: double.infinity,
+                      height: 16.h,
+                    ),
+                    SizedBox(height: 6.h),
+                    ShimmerText(
+                      width: double.infinity,
+                      height: 16.h,
+                    ),
+                    SizedBox(height: 6.h),
+                    ShimmerText(
+                      width: 250.w,
+                      height: 16.h,
+                    ),
+                    SizedBox(height: 16.h),
+
+                    // Shimmer Attendees section
+                    Row(
+                      children: [
+                        // Shimmer profile pictures
+                        SizedBox(
+                          width: 80.w,
+                          height: 32.h,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 0,
+                                child: ShimmerCircle(size: 32.w),
+                              ),
+                              Positioned(
+                                left: 20.w,
+                                child: ShimmerCircle(size: 32.w),
+                              ),
+                              Positioned(
+                                left: 40.w,
+                                child: ShimmerCircle(size: 32.w),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        ShimmerText(
+                          width: 120.w,
+                          height: 16.h,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

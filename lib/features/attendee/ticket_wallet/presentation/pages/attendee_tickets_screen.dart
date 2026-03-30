@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/domain/repositories/ticket_wallet_repository.dart';
@@ -110,22 +111,28 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
 
                   // Tickets List
                   Expanded(
-                    child: BlocBuilder<TicketWalletBloc, TicketWalletState>(
-                      builder: (context, state) {
-                        return state.when(
-                          initial: () => _buildLoadingState(),
-                          loading: () => _buildLoadingState(),
-                          searching: () => _buildLoadingState(),
-                          loaded: (walletData) =>
-                              _buildTicketsContent(walletData),
-                          ticketsLoaded:
-                              (tickets, filterType, selectedStatus) =>
-                                  _buildTicketsListFromData(tickets),
-                          searchResults: (tickets, query) =>
-                              _buildTicketsListFromData(tickets),
-                          error: (message) => _buildErrorState(message),
-                        );
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _refreshTickets();
                       },
+                      color: Theme.of(context).colorScheme.primary,
+                      child: BlocBuilder<TicketWalletBloc, TicketWalletState>(
+                        builder: (context, state) {
+                          return state.when(
+                            initial: () => _buildLoadingState(),
+                            loading: () => _buildLoadingState(),
+                            searching: () => _buildLoadingState(),
+                            loaded: (walletData) =>
+                                _buildTicketsContent(walletData),
+                            ticketsLoaded:
+                                (tickets, filterType, selectedStatus) =>
+                                    _buildTicketsListFromData(tickets),
+                            searchResults: (tickets, query) =>
+                                _buildTicketsListFromData(tickets),
+                            error: (message) => _buildErrorState(message),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -147,21 +154,6 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: colorScheme.primary,
-                    size: 20.sp,
-                  ),
-                ),
-              ),
               Expanded(
                 child: Text(
                   'My Tickets',
@@ -260,16 +252,18 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
   }
 
   Widget _buildLoadingState() {
-    return Builder(
-      builder: (context) {
-        final colorScheme = Theme.of(context).colorScheme;
-
-        return Center(
-          child: CircularProgressIndicator(
-            color: colorScheme.primary,
-          ),
-        );
-      },
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        child: Column(
+          children: [
+            _buildShimmerTicketCard(),
+            SizedBox(height: 20.h),
+            _buildShimmerTicketCard(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -334,34 +328,40 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
           final theme = Theme.of(context);
           final colorScheme = theme.colorScheme;
           
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.confirmation_number_outlined,
-                  color: colorScheme.primary,
-                  size: 48.sp,
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: 400.h, // Minimum height to enable pull-to-refresh
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.confirmation_number_outlined,
+                      color: colorScheme.primary,
+                      size: 48.sp,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      selectedTab == 0 ? 'No upcoming tickets' : 'No past tickets',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      selectedTab == 0
+                          ? 'Your upcoming event tickets will appear here'
+                          : 'Your past event tickets will appear here',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16.h),
-                Text(
-                  selectedTab == 0 ? 'No upcoming tickets' : 'No past tickets',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  selectedTab == 0
-                      ? 'Your upcoming event tickets will appear here'
-                      : 'Your past event tickets will appear here',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         },
@@ -369,6 +369,7 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
     }
 
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       itemCount: tickets.length,
       separatorBuilder: (context, index) => SizedBox(height: 20.h),
@@ -717,5 +718,170 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
             TicketWalletEvent.refreshWallet(userId: _userId!),
           );
     }
+  }
+
+  Widget _buildShimmerTicketCard() {
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.r),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorScheme.primaryContainer,
+                colorScheme.surface,
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Shimmer Event Image with QR code area
+              Container(
+                height: 160.h,
+                decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.r)),
+                ),
+                child: Stack(
+                  children: [
+                    // Shimmer background
+                    ShimmerBox(
+                      width: double.infinity,
+                      height: 160.h,
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20.r)),
+                    ),
+
+                    // Shimmer QR code in center
+                    Positioned(
+                      top: 50.h,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: ShimmerBox(
+                          width: 60.w,
+                          height: 60.h,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                    ),
+
+                    // Shimmer status badge
+                    Positioned(
+                      top: 16.h,
+                      right: 16.w,
+                      child: ShimmerBox(
+                        width: 80.w,
+                        height: 24.h,
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Shimmer Event Details
+              Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Shimmer Event Title
+                    ShimmerText(
+                      width: double.infinity,
+                      height: 22.h,
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Shimmer Date and Time
+                    Row(
+                      children: [
+                        ShimmerBox(
+                          width: 16.w,
+                          height: 16.h,
+                          borderRadius: BorderRadius.circular(2.r),
+                        ),
+                        SizedBox(width: 8.w),
+                        ShimmerText(
+                          width: 180.w,
+                          height: 14.h,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Shimmer Location
+                    Row(
+                      children: [
+                        ShimmerBox(
+                          width: 16.w,
+                          height: 16.h,
+                          borderRadius: BorderRadius.circular(2.r),
+                        ),
+                        SizedBox(width: 8.w),
+                        ShimmerText(
+                          width: 200.w,
+                          height: 14.h,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+
+                    // Shimmer Ticket Type and Price
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ShimmerText(
+                              width: 80.w,
+                              height: 11.h,
+                            ),
+                            SizedBox(height: 4.h),
+                            ShimmerText(
+                              width: 100.w,
+                              height: 14.h,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            ShimmerText(
+                              width: 40.w,
+                              height: 11.h,
+                            ),
+                            SizedBox(height: 4.h),
+                            ShimmerText(
+                              width: 60.w,
+                              height: 14.h,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    // Shimmer QR Code Button
+                    ShimmerBox(
+                      width: double.infinity,
+                      height: 48.h,
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
