@@ -76,7 +76,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
         
         return Scaffold(
           backgroundColor: colorScheme.surface,
-          body: SafeArea(
+          body: Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: state.when(
               initial: () => Center(
                 child: CircularProgressIndicator(color: colorScheme.primary),
@@ -108,7 +109,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
       color: colorScheme.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -32,37 +32,36 @@ class AttendeeHomeView extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            context.read<EventDiscoveryBloc>().add(
-                  const EventDiscoveryEvent.refreshEvents(),
-                );
-          },
-          color: colorScheme.primary,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  _buildHeader(),
-                  SizedBox(height: 24.h),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          context.read<EventDiscoveryBloc>().add(
+                const EventDiscoveryEvent.refreshEvents(),
+              );
+        },
+        color: colorScheme.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+                20.w, MediaQuery.of(context).padding.top + 20.h, 20.w, 100.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                _buildHeader(),
+                SizedBox(height: 24.h),
 
-                  // Search Bar
-                  _buildSearchBar(context),
-                  SizedBox(height: 24.h),
-                  
-                  // Categories
-                  _buildCategories(context),
-                  SizedBox(height: 32.h),
-                  
-                  // Upcoming Events Section
-                  _buildUpcomingEventsSection(),
-                ],
-              ),
+                // Search Bar
+                _buildSearchBar(context),
+                SizedBox(height: 24.h),
+
+                // Categories
+                _buildCategories(context),
+                SizedBox(height: 32.h),
+
+                // Upcoming Events Section
+                _buildUpcomingEventsSection(),
+              ],
             ),
           ),
         ),

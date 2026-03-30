@@ -385,67 +385,90 @@ class OrganizerHomeView extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
         border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
+          color: color.withValues(alpha: 0.15),
+          width: 1.5,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
               Container(
-                width: 32.w,
-                height: 32.h,
+                width: 36.w,
+                height: 36.w,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Icon(
                   icon,
                   color: color,
-                  size: 16.sp,
+                  size: 18.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
           Text(
             value,
-            style: theme.textTheme.headlineMedium?.copyWith(
+            style: theme.textTheme.headlineSmall?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
             ),
           ),
           SizedBox(height: 8.h),
-          Row(
-            children: [
-              Icon(
-                isPositive ? Icons.trending_up : Icons.trending_down,
-                color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                size: 14.sp,
-              ),
-              SizedBox(width: 4.w),
-              Text(
-                change,
-                style: theme.textTheme.labelMedium?.copyWith(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: isPositive 
+                  ? colorScheme.tertiary.withValues(alpha: 0.1) 
+                  : colorScheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isPositive ? Icons.trending_up : Icons.trending_down,
                   color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                  fontWeight: FontWeight.w500,
+                  size: 14.sp,
                 ),
-              ),
-            ],
+                SizedBox(width: 4.w),
+                Text(
+                  change,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isPositive ? colorScheme.tertiary : colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -56,7 +56,9 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
           if (authState.status == AuthStatus.unknown || authState.isLoading) {
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              body: SafeArea(
+              body: Padding(
+                padding:
+                    EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                 child: Column(
                   children: [
                     _buildHeader(),
@@ -75,7 +77,9 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
               authState.user == null) {
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              body: SafeArea(
+              body: Padding(
+                padding:
+                    EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                 child: Column(
                   children: [
                     _buildHeader(),
@@ -100,7 +104,8 @@ class _AttendeeTicketsScreenState extends State<AttendeeTicketsScreen> {
 
           return Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
-            body: SafeArea(
+            body: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Column(
                 children: [
                   // Header

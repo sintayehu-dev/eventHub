@@ -45,7 +45,8 @@ class _DiscoverViewState extends State<DiscoverView> {
     
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: SafeArea(
+      body: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         child: Column(
           children: [
             // Header
@@ -371,7 +372,8 @@ class _DiscoverViewState extends State<DiscoverView> {
 
   Widget _buildLoadingState() {
     return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding:
+          EdgeInsets.fromLTRB(20.w, 0, 20.w, 100.h), // Added bottom padding
       itemCount: 5, // Show 5 shimmer cards
       separatorBuilder: (context, index) => SizedBox(height: 16.h),
       itemBuilder: (context, index) => _buildShimmerEventCard(),
@@ -467,7 +469,8 @@ class _DiscoverViewState extends State<DiscoverView> {
         }
 
         return ListView.separated(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          padding:
+              EdgeInsets.fromLTRB(20.w, 0, 20.w, 100.h), // Added bottom padding
           itemCount: events.length,
           separatorBuilder: (context, index) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
