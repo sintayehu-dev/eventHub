@@ -100,8 +100,11 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
         );
       },
       builder: (context, state) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
         return Scaffold(
-          backgroundColor: const Color(0xFF1A0B2E),
+          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: Padding(
               padding: EdgeInsets.all(20.w),
@@ -114,9 +117,8 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
                     children: [
                       Text(
                         'My Events',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.sp,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -125,12 +127,12 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
                         child: Container(
                           padding: EdgeInsets.all(8.w),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF8B5CF6),
+                            color: colorScheme.primary,
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Icon(
                             Icons.add,
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                             size: 20.sp,
                           ),
                         ),
@@ -152,9 +154,9 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
-                      loading: () => const Center(
+                      loading: () => Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFF8B5CF6),
+                          color: colorScheme.primary,
                         ),
                       ),
                       eventLoaded: (event) =>
@@ -257,10 +259,13 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
   }
 
   Widget _buildFilterTabs() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -274,6 +279,8 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
   }
 
   Widget _buildFilterTab(String title, EventStatus status) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isSelected = _selectedStatus == status;
 
     return Expanded(
@@ -287,14 +294,15 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 12.h),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
+            color: isSelected ? colorScheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(8.r),
           ),
           child: Text(
             title,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey[400],
-              fontSize: 14.sp,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
             textAlign: TextAlign.center,

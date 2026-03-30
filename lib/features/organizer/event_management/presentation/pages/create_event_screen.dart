@@ -79,6 +79,9 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return BlocListener<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
         state.whenOrNull(
@@ -99,35 +102,39 @@ class _CreateEventViewState extends State<CreateEventView> {
                 }
               } catch (e) {
                 // Show warning but don't prevent success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Event created but staff assignment failed: $e'),
-                    backgroundColor: Colors.orange,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r)),
-                  ),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Event created but staff assignment failed: $e'),
+                      backgroundColor: colorScheme.secondary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r)),
+                    ),
+                  );
+                }
               }
             }
             
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Event created successfully!'),
-                backgroundColor: const Color(0xFF4ADE80),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-            );
-            context.pop();
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Event created successfully!'),
+                  backgroundColor: colorScheme.primary,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r)),
+                ),
+              );
+              context.pop();
+            }
           },
           error: (message) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error: $message'),
-                backgroundColor: const Color(0xFFEF4444),
+                backgroundColor: colorScheme.error,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.r)),
@@ -137,19 +144,18 @@ class _CreateEventViewState extends State<CreateEventView> {
         );
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF1A0B2E),
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
             onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           ),
           title: Text(
             'Create Event',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -166,10 +172,10 @@ class _CreateEventViewState extends State<CreateEventView> {
                 _buildForm(context),
                 if (isLoading)
                   Container(
-                    color: Colors.black54,
-                    child: const Center(
+                    color: colorScheme.surface.withValues(alpha: 0.8),
+                    child: Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF8B5CF6),
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -182,6 +188,8 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
     final currentUser = userService.getCurrentUser();
     
@@ -309,7 +317,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               child: ElevatedButton(
                 onPressed: () => _createEvent(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: colorScheme.primary,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
@@ -317,10 +325,9 @@ class _CreateEventViewState extends State<CreateEventView> {
                 ),
                 child: Text(
                   'Create Event',
-                  style: TextStyle(
-                    fontSize: 16.sp,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -332,11 +339,13 @@ class _CreateEventViewState extends State<CreateEventView> {
     );
   }
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Text(
       title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16.sp,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -349,32 +358,36 @@ class _CreateEventViewState extends State<CreateEventView> {
     TextInputType? keyboardType,
     int maxLines = 1,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return TextFormField(
       controller: controller,
       validator: validator,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+      style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+        hintStyle: theme.textTheme.bodyMedium
+            ?.copyWith(color: colorScheme.onSurfaceVariant),
         filled: true,
-        fillColor: const Color(0xFF2A1B3D),
+        fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+          borderSide: BorderSide(color: colorScheme.outline, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFF8B5CF6), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1),
+          borderSide: BorderSide(color: colorScheme.error, width: 1),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),
@@ -382,23 +395,28 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildCategorySelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(color: colorScheme.outline, width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<EventCategory>(
           value: _selectedCategory,
           hint: Text(
             'Select event category',
-            style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
           isExpanded: true,
-          dropdownColor: const Color(0xFF2A1B3D),
-          icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey[400]),
+          dropdownColor: colorScheme.surfaceContainerHighest,
+          icon: Icon(Icons.keyboard_arrow_down,
+              color: colorScheme.onSurfaceVariant),
           items: EventCategory.values.map((category) {
             return DropdownMenuItem<EventCategory>(
               value: category,
@@ -412,7 +430,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                   Expanded(
                     child: Text(
                       category.displayName,
-                      style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurface),
                     ),
                   ),
                 ],
@@ -430,15 +449,18 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildImagePicker() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: _pickImage,
       child: Container(
         height: 160.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: colorScheme.outline, width: 1),
         ),
         child: _selectedImagePath != null
             ? ClipRRect(
@@ -453,23 +475,21 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Icon(
                     Icons.add_photo_alternate_outlined,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurfaceVariant,
                     size: 48.sp,
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'Add Event Banner',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     'Tap to select image',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 12.sp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -479,28 +499,32 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildDateSelector(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () => _selectDate(context),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: colorScheme.outline, width: 1),
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today, color: Colors.grey[400], size: 20.sp),
+            Icon(Icons.calendar_today,
+                color: colorScheme.onSurfaceVariant, size: 20.sp),
             SizedBox(width: 12.w),
             Expanded(
               child: Text(
                 _selectedDate != null
                     ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
                     : 'Select Date',
-                style: TextStyle(
-                  color:
-                      _selectedDate != null ? Colors.white : Colors.grey[400],
-                  fontSize: 14.sp,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: _selectedDate != null
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -511,28 +535,32 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Widget _buildTimeSelector(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () => _selectTime(context),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: colorScheme.outline, width: 1),
         ),
         child: Row(
           children: [
-            Icon(Icons.access_time, color: Colors.grey[400], size: 20.sp),
+            Icon(Icons.access_time,
+                color: colorScheme.onSurfaceVariant, size: 20.sp),
             SizedBox(width: 12.w),
             Expanded(
               child: Text(
                 _selectedTime != null
                     ? _selectedTime!.format(context)
                     : 'Select Time',
-                style: TextStyle(
-                  color:
-                      _selectedTime != null ? Colors.white : Colors.grey[400],
-                  fontSize: 14.sp,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: _selectedTime != null
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

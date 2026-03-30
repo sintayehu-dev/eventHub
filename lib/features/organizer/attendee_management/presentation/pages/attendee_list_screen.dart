@@ -83,23 +83,24 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final totalTickets = _attendees.length;
     final checkedInCount = _attendees.where((a) => a['isCheckedIn'] == true).length;
     
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
         ),
         title: Text(
           'Attendee List',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -109,7 +110,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             child: ElevatedButton.icon(
               onPressed: _exportList,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B5CF6),
+                backgroundColor: colorScheme.primary,
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
@@ -117,14 +118,13 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
               ),
               icon: Icon(
                 Icons.download_outlined,
-                color: Colors.white,
+                color: colorScheme.onPrimary,
                 size: 16.sp,
               ),
               label: Text(
                 'Export List',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -143,31 +143,36 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
   }
 
   Widget _buildSearchBar() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       margin: EdgeInsets.all(20.w),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search,
-            color: Colors.grey[400],
+            color: colorScheme.onSurfaceVariant,
             size: 20.sp,
           ),
           SizedBox(width: 12.w),
           Expanded(
             child: TextField(
               controller: _searchController,
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: 'Search by name or email...',
-                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                hintStyle: theme.textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
                 border: InputBorder.none,
               ),
               onChanged: (value) => setState(() {}),
@@ -179,14 +184,17 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
   }
 
   Widget _buildStatsHeader(int totalTickets, int checkedInCount) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -197,9 +205,8 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
               children: [
                 Text(
                   'TOTAL TICKETS',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
                   ),
@@ -207,9 +214,8 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                 SizedBox(height: 8.h),
                 Text(
                   '1,248',
-                  style: TextStyle(
-                    color: const Color(0xFF8B5CF6),
-                    fontSize: 32.sp,
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -219,7 +225,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
           Container(
             width: 1.w,
             height: 60.h,
-            color: Colors.grey[700],
+            color: colorScheme.outline,
           ),
           SizedBox(width: 20.w),
           Expanded(
@@ -228,9 +234,8 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
               children: [
                 Text(
                   'CHECKED IN',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
                   ),
@@ -238,9 +243,8 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                 SizedBox(height: 8.h),
                 Text(
                   '842',
-                  style: TextStyle(
-                    color: const Color(0xFF4ADE80),
-                    fontSize: 32.sp,
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    color: colorScheme.tertiary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -272,16 +276,18 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
   }
 
   Widget _buildAttendeeCard(Map<String, dynamic> attendee) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final ticketTypeColor = _getTicketTypeColor(attendee['ticketType']);
     
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+          color: colorScheme.primary.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -320,10 +326,10 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                     width: 16.w,
                     height: 16.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4ADE80),
+                      color: colorScheme.tertiary,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFF2A1B3D),
+                        color: colorScheme.surfaceContainerHighest,
                         width: 2,
                       ),
                     ),
@@ -340,18 +346,16 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
               children: [
                 Text(
                   attendee['name'],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   'Purchased: ${attendee['purchaseDate']}',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 SizedBox(height: 8.h),

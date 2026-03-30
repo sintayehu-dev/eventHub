@@ -108,7 +108,7 @@ class AppColors {
         'chartGreen': Color(0xFF4CAF50), // Green for charts
         'chartOrange': Color(0xFFFF9800), // Orange for charts
         'chartYellow': Color(0xFFEAB308), // EventHub gold/yellow
-        'error': Color(0xFFFFDAD6), // Light error for dark theme
+        'error': Color.fromARGB(255, 248, 25, 0), // Light error for dark theme
         'grey100': Color(0xFF2A1B3D), // Use surface for greys
         'grey200': Color(0xFF2A1B3D),
         'grey300': Color(0xFF2A1B3D),

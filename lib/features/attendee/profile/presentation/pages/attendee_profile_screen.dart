@@ -5,6 +5,9 @@ import 'package:eventhub/features/shared/profile/application/user_profile/bloc/u
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
+import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
 
 class AttendeeProfileScreen extends StatelessWidget {
   const AttendeeProfileScreen({super.key});
@@ -15,12 +18,12 @@ class AttendeeProfileScreen extends StatelessWidget {
     final currentUser = userService.getCurrentUser();
     
     if (currentUser == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF1A0B2E),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Text(
             'Please log in to view your profile',
-            style: TextStyle(color: Colors.white),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
       );
@@ -44,16 +47,17 @@ class AttendeeProfileView extends StatefulWidget {
 class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -62,19 +66,39 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             onPressed: () => _showEditProfileDialog(),
             icon: Icon(
               Icons.edit,
-              color: const Color(0xFF8B5CF6),
+              color: colorScheme.primary,
               size: 24.sp,
             ),
+          ),
+          BlocBuilder<AppBloc, AppState>(
+            builder: (context, appState) {
+              return IconButton(
+                onPressed: () {
+                  context.read<AppBloc>().add(
+                      AppEvent.changeTheme(isDarkMode: !appState.isDarkMode));
+                },
+                icon: Icon(
+                  appState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: colorScheme.primary,
+                  size: 24.sp,
+                ),
+              );
+            },
           ),
         ],
       ),
       body: BlocBuilder<UserProfileBloc, UserProfileState>(
         builder: (context, state) {
           return state.when(
-            initial: () => const Center(child: Text('Welcome')),
-            loading: () => const Center(
+            initial: () => Center(
+              child: Text(
+                'Welcome',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            loading: () => Center(
               child: CircularProgressIndicator(
-                color: Color(0xFF8B5CF6),
+                color: colorScheme.primary,
               ),
             ),
             loaded: (profile) => _buildProfileContent(profile),
@@ -85,44 +109,42 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                 children: [
                   Icon(
                     Icons.error_outline,
-                    color: const Color(0xFFEF4444),
+                    color: colorScheme.error,
                     size: 48.sp,
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     'Error loading profile',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     message,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 24.h),
                   ElevatedButton(
-                    onPressed: () => context.read<UserProfileBloc>().add(
-                          const UserProfileEvent.loadUserProfile(
-                              userId: 'current_user_id'),
-                        ),
+                    onPressed: () {
+                      final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
+                      context.read<UserProfileBloc>().add(
+                        UserProfileEvent.loadUserProfile(userId: uid),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B5CF6),
+                      backgroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
                     child: Text(
                       'Retry',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.sp,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -130,19 +152,48 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                 ],
               ),
             ),
-            preferencesUpdated: (preferences) =>
-                const Center(child: Text('Preferences updated')),
-            profileImageUpdated: (imageUrl) =>
-                const Center(child: Text('Image updated')),
-            statusUpdated: () => const Center(child: Text('Status updated')),
-            eventAssignmentLoaded: (assignment) =>
-                const Center(child: Text('Assignment loaded')),
-            staffDataUpdated: (staffData) =>
-                const Center(child: Text('Staff data updated')),
-            organizerDataUpdated: (organizerData) =>
-                const Center(child: Text('Organizer data updated')),
-            attendeeDataUpdated: (attendeeData) =>
-                const Center(child: Text('Attendee data updated')),
+            preferencesUpdated: (preferences) => Center(
+              child: Text(
+                'Preferences updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            profileImageUpdated: (imageUrl) => Center(
+              child: Text(
+                'Image updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            statusUpdated: () => Center(
+              child: Text(
+                'Status updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            eventAssignmentLoaded: (assignment) => Center(
+              child: Text(
+                'Assignment loaded',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            staffDataUpdated: (staffData) => Center(
+              child: Text(
+                'Staff data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            organizerDataUpdated: (organizerData) => Center(
+              child: Text(
+                'Organizer data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            attendeeDataUpdated: (attendeeData) => Center(
+              child: Text(
+                'Attendee data updated',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
             profileRefreshed: (profile) => _buildProfileContent(profile),
           );
         },
@@ -151,25 +202,31 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   }
 
   Widget _buildProfileContent(UserProfileEntity profile) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
         children: [
-          _buildProfileHeader(profile),
+          _buildProfileHeader(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildAttendeeStats(profile),
+          _buildAttendeeStats(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildFavoriteCategories(profile),
+          _buildFavoriteCategories(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildRecentEvents(profile),
+          _buildRecentEvents(profile, theme, colorScheme),
           SizedBox(height: 32.h),
-          _buildPersonalInfo(profile),
+          _buildPersonalInfo(profile, theme, colorScheme),
+          SizedBox(height: 32.h),
+          _buildLogoutCard(),
         ],
       ),
     );
   }
 
-  Widget _buildProfileHeader(UserProfileEntity profile) {
+  Widget _buildProfileHeader(
+      UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     return Column(
       children: [
         // Profile Avatar
@@ -177,12 +234,12 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           width: 100.w,
           height: 100.h,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF10B981), Color(0xFF059669)],
+            gradient: LinearGradient(
+              colors: [colorScheme.tertiary, colorScheme.secondary],
             ),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF10B981).withValues(alpha: 0.3),
+              color: colorScheme.tertiary.withValues(alpha: 0.3),
               width: 3,
             ),
           ),
@@ -193,14 +250,14 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Icon(
                       Icons.person,
-                      color: Colors.white,
+                      color: colorScheme.onTertiary,
                       size: 40.sp,
                     ),
                   ),
                 )
               : Icon(
                   Icons.person,
-                  color: Colors.white,
+                  color: colorScheme.onTertiary,
                   size: 40.sp,
                 ),
         ),
@@ -209,9 +266,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         // Name and Role
         Text(
           profile.name,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -219,14 +274,13 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF10B981).withValues(alpha: 0.2),
+            color: colorScheme.tertiary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Text(
             'Event Attendee',
-            style: TextStyle(
-              color: const Color(0xFF10B981),
-              fontSize: 14.sp,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.tertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -234,18 +288,16 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         SizedBox(height: 8.h),
         Text(
           profile.email,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 16.sp,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         if (profile.phone != null) ...[
           SizedBox(height: 4.h),
           Text(
             profile.phone!,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -253,16 +305,17 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
-  Widget _buildAttendeeStats(UserProfileEntity profile) {
+  Widget _buildAttendeeStats(
+      UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     final attendeeData = profile.attendeeData;
 
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -271,9 +324,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         children: [
           Text(
             'Event Statistics',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -285,7 +336,9 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                   'Events Attended',
                   '${attendeeData?.totalEventsAttended ?? 0}',
                   Icons.event,
-                  const Color(0xFF10B981),
+                  colorScheme.tertiary,
+                  theme,
+                  colorScheme,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -294,7 +347,9 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                   'Tickets Purchased',
                   'N/A',
                   Icons.confirmation_number,
-                  const Color(0xFF8B5CF6),
+                  colorScheme.primary,
+                  theme,
+                  colorScheme,
                 ),
               ),
             ],
@@ -307,7 +362,9 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                   'Total Spent',
                   'N/A',
                   Icons.attach_money,
-                  const Color(0xFFF59E0B),
+                  colorScheme.secondary,
+                  theme,
+                  colorScheme,
                 ),
               ),
               SizedBox(width: 16.w),
@@ -316,7 +373,9 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                   'Member Since',
                   profile.createdAt?.year.toString() ?? 'N/A',
                   Icons.calendar_today,
-                  const Color(0xFF06B6D4),
+                  Colors.blue,
+                  theme,
+                  colorScheme,
                 ),
               ),
             ],
@@ -326,12 +385,12 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
-  Widget _buildStatItem(
-      String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(String label, String value, IconData icon, Color color,
+      ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A0B2E),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -344,18 +403,15 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           SizedBox(height: 8.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             label,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 12.sp,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -364,16 +420,17 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
-  Widget _buildFavoriteCategories(UserProfileEntity profile) {
+  Widget _buildFavoriteCategories(
+      UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     final interests = profile.attendeeData?.interests ?? [];
 
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -382,9 +439,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         children: [
           Text(
             'Interests',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -395,15 +450,14 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                 children: [
                   Icon(
                     Icons.category,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     size: 48.sp,
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'No interests set yet',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -414,7 +468,8 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
               spacing: 8.w,
               runSpacing: 8.h,
               children: interests
-                  .map((interest) => _buildCategoryChip(interest))
+                  .map((interest) =>
+                      _buildCategoryChip(interest, theme, colorScheme))
                   .toList(),
             ),
         ],
@@ -422,38 +477,39 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
-  Widget _buildCategoryChip(String category) {
+  Widget _buildCategoryChip(
+      String category, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withValues(alpha: 0.2),
+        color: colorScheme.tertiary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: const Color(0xFF10B981).withValues(alpha: 0.3),
+          color: colorScheme.tertiary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
       child: Text(
         category,
-        style: TextStyle(
-          color: const Color(0xFF10B981),
-          fontSize: 12.sp,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: colorScheme.tertiary,
           fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
-  Widget _buildRecentEvents(UserProfileEntity profile) {
+  Widget _buildRecentEvents(
+      UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     final favoriteEventTypes = profile.attendeeData?.favoriteEventTypes ?? [];
 
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -462,9 +518,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         children: [
           Text(
             'Favorite Event Types',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -475,15 +529,14 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
                 children: [
                   Icon(
                     Icons.event_busy,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     size: 48.sp,
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'No favorite event types',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -492,18 +545,20 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           else
             ...favoriteEventTypes
                 .take(3)
-                .map((eventType) => _buildEventItem(eventType)),
+                .map(
+                (eventType) => _buildEventItem(eventType, theme, colorScheme)),
         ],
       ),
     );
   }
 
-  Widget _buildEventItem(String eventName) {
+  Widget _buildEventItem(
+      String eventName, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A0B2E),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -512,12 +567,12 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             width: 40.w,
             height: 40.h,
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withValues(alpha: 0.2),
+              color: colorScheme.tertiary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
               Icons.event,
-              color: const Color(0xFF10B981),
+              color: colorScheme.tertiary,
               size: 20.sp,
             ),
           ),
@@ -525,16 +580,14 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           Expanded(
             child: Text(
               eventName,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
           Icon(
             Icons.arrow_forward_ios,
-            color: Colors.grey[600],
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
             size: 16.sp,
           ),
         ],
@@ -542,14 +595,15 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
-  Widget _buildPersonalInfo(UserProfileEntity profile) {
+  Widget _buildPersonalInfo(
+      UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -558,26 +612,33 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         children: [
           Text(
             'Personal Information',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 16.h),
           _buildInfoRow(
-              'Date of Birth', profile.attendeeData?.dateOfBirth ?? 'Not set'),
+              'Date of Birth',
+              profile.attendeeData?.dateOfBirth ?? 'Not set',
+              theme,
+              colorScheme),
           _buildInfoRow('Emergency Contact',
-              profile.attendeeData?.emergencyContact ?? 'Not set'),
+              profile.attendeeData?.emergencyContact ?? 'Not set',
+              theme,
+              colorScheme),
           _buildInfoRow('Emergency Phone',
-              profile.attendeeData?.emergencyContactPhone ?? 'Not set'),
-          _buildInfoRow('Status', profile.status.displayName),
+              profile.attendeeData?.emergencyContactPhone ?? 'Not set',
+              theme,
+              colorScheme),
+          _buildInfoRow(
+              'Status', profile.status.displayName, theme, colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(
+      String label, String value, ThemeData theme, ColorScheme colorScheme) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
@@ -587,18 +648,15 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             width: 120.w,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -608,17 +666,144 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     );
   }
 
+  Widget _buildLogoutCard() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: colorScheme.error.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.logout,
+            color: colorScheme.error,
+            size: 32.sp,
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'Sign Out',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.error,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'Sign out of your account',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onErrorContainer,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showLogoutDialog(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              child: Text(
+                'Sign Out',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onError,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showEditProfileDialog() {
-    // TODO: Implement edit profile functionality
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Edit profile functionality coming soon'),
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: colorScheme.tertiary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'Logout',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                'Cancel',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context
+                    .read<AuthStatusBloc>()
+                    .add(const AuthStatusEvent.signOut());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Logout',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onError,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

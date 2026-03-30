@@ -11,16 +11,19 @@ class OrganizerAnalyticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
     final currentUser = userService.getCurrentUser();
 
     if (currentUser == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF1A0B2E),
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
         body: Center(
           child: Text(
             'Please log in to view analytics',
-            style: TextStyle(color: Colors.white),
+            style: theme.textTheme.bodyLarge
+                ?.copyWith(color: colorScheme.onSurface),
           ),
         ),
       );
@@ -53,10 +56,11 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
       listener: (context, state) {
         state.whenOrNull(
           error: (message) {
+            final colorScheme = Theme.of(context).colorScheme;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error: $message'),
-                backgroundColor: const Color(0xFFEF4444),
+                backgroundColor: colorScheme.error,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -67,15 +71,18 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
         );
       },
       builder: (context, state) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        
         return Scaffold(
-          backgroundColor: const Color(0xFF1A0B2E),
+          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: state.when(
-              initial: () => const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B5CF6)),
+              initial: () => Center(
+                child: CircularProgressIndicator(color: colorScheme.primary),
               ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Color(0xFF8B5CF6)),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: colorScheme.primary),
               ),
               loaded: (analytics, comparison) =>
                   _buildLoadedContent(analytics, comparison),
@@ -89,13 +96,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
 
   Widget _buildLoadedContent(
       OrganizerAnalyticsEntity analytics, AnalyticsComparison? comparison) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return RefreshIndicator(
       onRefresh: () async {
         context
             .read<AnalyticsBloc>()
             .add(const AnalyticsEvent.refreshAnalytics());
       },
-      color: const Color(0xFF8B5CF6),
+      color: colorScheme.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(20.w),
@@ -105,9 +115,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             // Header
             Text(
               'Analytics',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24.sp,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -138,30 +147,31 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildErrorContent(String message) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.error_outline,
-            color: Colors.red,
+            color: colorScheme.error,
             size: 48.sp,
           ),
           SizedBox(height: 16.h),
           Text(
             'Error loading analytics',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.sp,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 8.h),
           Text(
             message,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -173,7 +183,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                   .add(const AnalyticsEvent.refreshAnalytics());
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: colorScheme.primary,
             ),
             child: const Text('Retry'),
           ),
@@ -183,10 +193,13 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildTimePeriodSelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -205,15 +218,15 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10.h),
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
+                  color: isSelected ? colorScheme.primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
                   period.displayName,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: isSelected
+                        ? colorScheme.onPrimary
+                        : colorScheme.onSurfaceVariant,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
@@ -228,6 +241,9 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
 
   Widget _buildKeyMetrics(
       OrganizerAnalyticsEntity analytics, AnalyticsComparison? comparison) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       children: [
         Row(
@@ -238,7 +254,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                 value: '\$${analytics.totalRevenue.toStringAsFixed(0)}',
                 change: comparison?.changes.revenueChangeFormatted ?? '+0.0%',
                 isPositive: comparison?.changes.isRevenuePositive ?? true,
-                color: const Color(0xFF8B5CF6),
+                color: colorScheme.primary,
               ),
             ),
             SizedBox(width: 16.w),
@@ -249,7 +265,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                 change:
                     comparison?.changes.ticketsSoldChangeFormatted ?? '+0.0%',
                 isPositive: comparison?.changes.isTicketsSoldPositive ?? true,
-                color: const Color(0xFF4ADE80),
+                color: colorScheme.tertiary,
               ),
             ),
           ],
@@ -265,7 +281,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                     '+0.0%',
                 isPositive:
                     comparison?.changes.isAverageTicketPricePositive ?? true,
-                color: const Color(0xFF06B6D4),
+                color: colorScheme.secondary,
               ),
             ),
             SizedBox(width: 16.w),
@@ -277,7 +293,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                     '+0.0%',
                 isPositive:
                     comparison?.changes.isConversionRatePositive ?? true,
-                color: const Color(0xFFF59E0B),
+                color: colorScheme.tertiary,
               ),
             ),
           ],
@@ -293,10 +309,13 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
     required bool isPositive,
     required Color color,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -308,17 +327,15 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
         children: [
           Text(
             title,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 12.sp,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: 8.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.sp,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -327,15 +344,14 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             children: [
               Icon(
                 isPositive ? Icons.trending_up : Icons.trending_down,
-                color: isPositive ? const Color(0xFF4ADE80) : const Color(0xFFEF4444),
+                color: isPositive ? colorScheme.tertiary : colorScheme.error,
                 size: 14.sp,
               ),
               SizedBox(width: 4.w),
               Text(
                 change,
-                style: TextStyle(
-                  color: isPositive ? const Color(0xFF4ADE80) : const Color(0xFFEF4444),
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: isPositive ? colorScheme.tertiary : colorScheme.error,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -347,13 +363,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildRevenueChart(OrganizerAnalyticsEntity analytics) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -362,9 +381,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
         children: [
           Text(
             'Revenue Overview',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -376,8 +394,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                  const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                  colorScheme.primary.withValues(alpha: 0.3),
+                  colorScheme.primary.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(12.r),
@@ -389,15 +407,14 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                       children: [
                         Icon(
                           Icons.trending_up,
-                          color: const Color(0xFF8B5CF6),
+                          color: colorScheme.primary,
                           size: 32.sp,
                         ),
                         SizedBox(height: 8.h),
                         Text(
                           'No revenue data yet',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 14.sp,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -411,6 +428,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildSimpleChart(List<RevenueDataPoint> dataPoints) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     if (dataPoints.isEmpty) return const SizedBox.shrink();
 
     final maxRevenue =
@@ -428,7 +447,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             width: 8.w,
             height: height.clamp(2.h, 80.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6),
+              color: colorScheme.primary,
               borderRadius: BorderRadius.circular(4.r),
             ),
           );
@@ -438,14 +457,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildTopEvents(OrganizerAnalyticsEntity analytics) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Top Performing Events',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -454,7 +475,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
           Container(
             padding: EdgeInsets.all(32.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Center(
@@ -462,23 +483,21 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                 children: [
                   Icon(
                     Icons.event_note,
-                    color: Colors.grey[600],
+                    color: colorScheme.onSurfaceVariant,
                     size: 48.sp,
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     'No events yet',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 16.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     'Create your first event to see analytics',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 14.sp,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -518,6 +537,9 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
   }
 
   Widget _buildCategoryBreakdown(OrganizerAnalyticsEntity analytics) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     if (analytics.revenueByCategory.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -525,9 +547,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
       children: [
         Text(
           'Revenue by Category',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -542,7 +563,7 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             child: Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: const Color(0xFF2A1B3D),
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Row(
@@ -554,18 +575,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                       children: [
                         Text(
                           entry.key,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         SizedBox(height: 4.h),
                         Text(
                           '${percentage.toStringAsFixed(1)}% of total',
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 12.sp,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -573,9 +592,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
                   ),
                   Text(
                     '\$${entry.value.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      color: const Color(0xFF8B5CF6),
-                      fontSize: 16.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -595,13 +613,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
     required String tickets,
     required Color color,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -617,9 +638,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             child: Center(
               child: Text(
                 '$rank',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -632,18 +652,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   tickets,
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -651,9 +669,8 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
           ),
           Text(
             revenue,
-            style: TextStyle(
+            style: theme.textTheme.titleMedium?.copyWith(
               color: color,
-              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
             ),
           ),

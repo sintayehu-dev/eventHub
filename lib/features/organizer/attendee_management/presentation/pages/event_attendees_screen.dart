@@ -80,31 +80,33 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
         ),
         title: Text(
           'Event Attendees',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         actions: [
           IconButton(
             onPressed: _exportAttendeeList,
-            icon: const Icon(Icons.download_outlined, color: Colors.white),
+            icon: Icon(Icons.download_outlined, color: colorScheme.onSurface),
           ),
           IconButton(
             onPressed: _showMoreOptions,
-            icon: const Icon(Icons.more_vert, color: Colors.white),
+            icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
           ),
         ],
       ),
@@ -119,6 +121,8 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final confirmedCount = _attendees.where((a) => a['status'] == 'Confirmed').length;
     final pendingCount = _attendees.where((a) => a['status'] == 'Pending').length;
     
@@ -128,13 +132,13 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-            const Color(0xFF06B6D4).withValues(alpha: 0.1),
+            colorScheme.primary.withValues(alpha: 0.2),
+            colorScheme.tertiary.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -174,7 +178,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                 child: _buildStatCard(
                   title: 'Total Tickets',
                   value: '${_attendees.length}',
-                  color: const Color(0xFF8B5CF6),
+                  color: colorScheme.primary,
                 ),
               ),
               SizedBox(width: 12.w),
@@ -182,7 +186,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                 child: _buildStatCard(
                   title: 'Confirmed',
                   value: '$confirmedCount',
-                  color: const Color(0xFF4ADE80),
+                  color: colorScheme.tertiary,
                 ),
               ),
               SizedBox(width: 12.w),
@@ -190,7 +194,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                 child: _buildStatCard(
                   title: 'Pending',
                   value: '$pendingCount',
-                  color: const Color(0xFFF59E0B),
+                  color: colorScheme.secondary,
                 ),
               ),
             ],
@@ -205,10 +209,13 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     required String value,
     required Color color,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -218,18 +225,16 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
         children: [
           Text(
             value,
-            style: TextStyle(
+            style: theme.textTheme.headlineSmall?.copyWith(
               color: color,
-              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             title,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 10.sp,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -239,6 +244,9 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
   }
 
   Widget _buildSearchAndFilter() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
@@ -247,27 +255,29 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                color: colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.search,
-                  color: Colors.grey[400],
+                  color: colorScheme.onSurfaceVariant,
                   size: 20.sp,
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: 'Search attendees...',
-                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+                      hintStyle: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
                       border: InputBorder.none,
                     ),
                     onChanged: (value) => setState(() {}),

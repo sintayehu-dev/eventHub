@@ -13,16 +13,19 @@ class OrganizerHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
     final currentUser = userService.getCurrentUser();
 
     if (currentUser == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF1A0B2E),
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
         body: Center(
           child: Text(
             'Please log in to view your dashboard',
-            style: TextStyle(color: Colors.white),
+            style: theme.textTheme.bodyLarge
+                ?.copyWith(color: colorScheme.onSurface),
           ),
         ),
       );
@@ -44,8 +47,11 @@ class OrganizerHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: BlocBuilder<EventManagementBloc, EventManagementState>(
           builder: (context, state) {
@@ -55,29 +61,37 @@ class OrganizerHomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  _buildHeader(),
+                  _buildHeader(context),
                   SizedBox(height: 32.h),
                   
                   // Welcome Section
-                  _buildWelcomeSection(),
+                  _buildWelcomeSection(context),
                   SizedBox(height: 32.h),
                   
                   // Stats Cards
                   state.when(
-                    initial: () => _buildLoadingStats(),
-                    loading: () => _buildLoadingStats(),
-                    eventsLoaded: (events) => _buildStatsSection(events),
-                    eventLoaded: (event) => _buildStatsSection([event]),
-                    error: (message) => _buildErrorSection(message),
-                    eventCreated: (event) => _buildStatsSection([event]),
-                    eventUpdated: (event) => _buildStatsSection([event]),
-                    eventDeleted: () => _buildLoadingStats(),
-                    eventCancelled: (event) => _buildStatsSection([event]),
-                    eventDuplicated: (event) => _buildStatsSection([event]),
-                    eventsSearched: (events) => _buildStatsSection(events),
-                    statisticsLoaded: (statistics) => _buildLoadingStats(),
-                    bannerUploaded: (bannerUrl) => _buildLoadingStats(),
-                    bannerDeleted: () => _buildLoadingStats(),
+                    initial: () => _buildLoadingStats(context),
+                    loading: () => _buildLoadingStats(context),
+                    eventsLoaded: (events) =>
+                        _buildStatsSection(context, events),
+                    eventLoaded: (event) =>
+                        _buildStatsSection(context, [event]),
+                    error: (message) => _buildErrorSection(context, message),
+                    eventCreated: (event) =>
+                        _buildStatsSection(context, [event]),
+                    eventUpdated: (event) =>
+                        _buildStatsSection(context, [event]),
+                    eventDeleted: () => _buildLoadingStats(context),
+                    eventCancelled: (event) =>
+                        _buildStatsSection(context, [event]),
+                    eventDuplicated: (event) =>
+                        _buildStatsSection(context, [event]),
+                    eventsSearched: (events) =>
+                        _buildStatsSection(context, events),
+                    statisticsLoaded: (statistics) =>
+                        _buildLoadingStats(context),
+                    bannerUploaded: (bannerUrl) => _buildLoadingStats(context),
+                    bannerDeleted: () => _buildLoadingStats(context),
                   ),
                   SizedBox(height: 32.h),
                   
@@ -87,20 +101,21 @@ class OrganizerHomeView extends StatelessWidget {
                   
                   // Active Events
                   state.when(
-                    initial: () => _buildLoadingEvents(),
-                    loading: () => _buildLoadingEvents(),
+                    initial: () => _buildLoadingEvents(context),
+                    loading: () => _buildLoadingEvents(context),
                     eventsLoaded: (events) => _buildActiveEventsSection(context, events),
                     eventLoaded: (event) => _buildActiveEventsSection(context, [event]),
-                    error: (message) => _buildErrorSection(message),
+                    error: (message) => _buildErrorSection(context, message),
                     eventCreated: (event) => _buildActiveEventsSection(context, [event]),
                     eventUpdated: (event) => _buildActiveEventsSection(context, [event]),
-                    eventDeleted: () => _buildLoadingEvents(),
+                    eventDeleted: () => _buildLoadingEvents(context),
                     eventCancelled: (event) => _buildActiveEventsSection(context, [event]),
                     eventDuplicated: (event) => _buildActiveEventsSection(context, [event]),
                     eventsSearched: (events) => _buildActiveEventsSection(context, events),
-                    statisticsLoaded: (statistics) => _buildLoadingEvents(),
-                    bannerUploaded: (bannerUrl) => _buildLoadingEvents(),
-                    bannerDeleted: () => _buildLoadingEvents(),
+                    statisticsLoaded: (statistics) =>
+                        _buildLoadingEvents(context),
+                    bannerUploaded: (bannerUrl) => _buildLoadingEvents(context),
+                    bannerDeleted: () => _buildLoadingEvents(context),
                   ),
                 ],
               ),
@@ -111,7 +126,10 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -121,23 +139,22 @@ class OrganizerHomeView extends StatelessWidget {
               width: 32.w,
               height: 32.h,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF8B5CF6), Color(0xFFA855F7)],
+                gradient: LinearGradient(
+                  colors: [colorScheme.primary, colorScheme.secondary],
                 ),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 Icons.star,
-                color: Colors.white,
+                color: colorScheme.onPrimary,
                 size: 20.sp,
               ),
             ),
             SizedBox(width: 12.w),
             Text(
               'Event Hub',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.sp,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -147,12 +164,12 @@ class OrganizerHomeView extends StatelessWidget {
           width: 40.w,
           height: 40.h,
           decoration: BoxDecoration(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+            color: colorScheme.primary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Icon(
             Icons.notifications_outlined,
-            color: const Color(0xFF8B5CF6),
+            color: colorScheme.primary,
             size: 20.sp,
           ),
         ),
@@ -160,31 +177,35 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildWelcomeSection() {
+  Widget _buildWelcomeSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Organizer Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 28.sp,
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(height: 8.h),
         Text(
           'Welcome back, Alex. Here\'s what\'s happening today.',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14.sp,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatsSection(List<EventEntity> events) {
+  Widget _buildStatsSection(BuildContext context, List<EventEntity> events) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     // Calculate stats from real events
     final totalRevenue = events.fold<double>(0.0, (sum, event) {
       return sum + event.ticketTypes.fold<double>(0.0, (ticketSum, ticket) {
@@ -208,22 +229,24 @@ class OrganizerHomeView extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatCard(
+                context: context,
                 title: 'Total Revenue',
                 value: totalRevenue > 0 ? '\$${totalRevenue.toStringAsFixed(0)}' : '\$0',
                 change: '+12%',
                 isPositive: true,
-                color: const Color(0xFF8B5CF6),
+                color: colorScheme.primary,
                 icon: Icons.attach_money,
               ),
             ),
             SizedBox(width: 16.w),
             Expanded(
               child: _buildStatCard(
+                context: context,
                 title: 'Active Events',
                 value: '${events.length}',
                 change: '+3 new',
                 isPositive: true,
-                color: const Color(0xFF06B6D4),
+                color: colorScheme.tertiary,
                 icon: Icons.event,
               ),
             ),
@@ -234,22 +257,24 @@ class OrganizerHomeView extends StatelessWidget {
           children: [
             Expanded(
               child: _buildStatCard(
+                context: context,
                 title: 'Tickets Sold',
                 value: '$totalTicketsSold',
                 change: '+8%',
                 isPositive: true,
-                color: const Color(0xFF4ADE80),
+                color: colorScheme.secondary,
                 icon: Icons.confirmation_number,
               ),
             ),
             SizedBox(width: 16.w),
             Expanded(
               child: _buildStatCard(
+                context: context,
                 title: 'Avg. Attendance',
                 value: '${avgAttendance.toInt()}%',
                 change: '+2.5%',
                 isPositive: true,
-                color: const Color(0xFFF59E0B),
+                color: colorScheme.tertiary,
                 icon: Icons.people,
               ),
             ),
@@ -259,33 +284,36 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingStats() {
+  Widget _buildLoadingStats(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildLoadingStatCard()),
+            Expanded(child: _buildLoadingStatCard(context)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLoadingStatCard()),
+            Expanded(child: _buildLoadingStatCard(context)),
           ],
         ),
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLoadingStatCard()),
+            Expanded(child: _buildLoadingStatCard(context)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLoadingStatCard()),
+            Expanded(child: _buildLoadingStatCard(context)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildLoadingStatCard() {
+  Widget _buildLoadingStatCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
@@ -295,7 +323,7 @@ class OrganizerHomeView extends StatelessWidget {
             width: 80.w,
             height: 12.h,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: colorScheme.outline,
               borderRadius: BorderRadius.circular(6.r),
             ),
           ),
@@ -304,7 +332,7 @@ class OrganizerHomeView extends StatelessWidget {
             width: 60.w,
             height: 24.h,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: colorScheme.outline,
               borderRadius: BorderRadius.circular(6.r),
             ),
           ),
@@ -313,26 +341,31 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorSection(String message) {
+  Widget _buildErrorSection(BuildContext context, String message) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 32.sp),
+          Icon(Icons.error_outline, color: colorScheme.error, size: 32.sp),
           SizedBox(height: 8.h),
           Text(
             'Error loading data',
-            style: TextStyle(color: Colors.white, fontSize: 16.sp),
+            style: theme.textTheme.titleMedium
+                ?.copyWith(color: colorScheme.onSurface),
           ),
           SizedBox(height: 4.h),
           Text(
             message,
-            style: TextStyle(color: Colors.grey[400], fontSize: 12.sp),
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
         ],
@@ -340,6 +373,7 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
   Widget _buildStatCard({
+    required BuildContext context,
     required String title,
     required String value,
     required String change,
@@ -347,10 +381,13 @@ class OrganizerHomeView extends StatelessWidget {
     required Color color,
     required IconData icon,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -365,9 +402,8 @@ class OrganizerHomeView extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12.sp,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
               Container(
@@ -388,9 +424,8 @@ class OrganizerHomeView extends StatelessWidget {
           SizedBox(height: 12.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24.sp,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -399,15 +434,14 @@ class OrganizerHomeView extends StatelessWidget {
             children: [
               Icon(
                 isPositive ? Icons.trending_up : Icons.trending_down,
-                color: isPositive ? const Color(0xFF4ADE80) : const Color(0xFFEF4444),
+                color: isPositive ? colorScheme.tertiary : colorScheme.error,
                 size: 14.sp,
               ),
               SizedBox(width: 4.w),
               Text(
                 change,
-                style: TextStyle(
-                  color: isPositive ? const Color(0xFF4ADE80) : const Color(0xFFEF4444),
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: isPositive ? colorScheme.tertiary : colorScheme.error,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -419,14 +453,16 @@ class OrganizerHomeView extends StatelessWidget {
   }
 
   Widget _buildQuickActionsSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Quick Actions',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -435,27 +471,30 @@ class OrganizerHomeView extends StatelessWidget {
           children: [
             Expanded(
               child: _buildQuickActionCard(
+                context: context,
                 title: 'New Event',
                 icon: Icons.add_circle,
-                color: const Color(0xFF8B5CF6),
+                color: colorScheme.primary,
                 onTap: () => context.pushNamed(RouteName.createEventScreen),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildQuickActionCard(
+                context: context,
                 title: 'View Events',
                 icon: Icons.event_note,
-                color: const Color(0xFF06B6D4),
+                color: colorScheme.tertiary,
                 onTap: () => context.pushNamed(RouteName.organizerEvents),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: _buildQuickActionCard(
+                context: context,
                 title: 'Analytics',
                 icon: Icons.analytics,
-                color: const Color(0xFF4ADE80),
+                color: colorScheme.secondary,
                 onTap: () {},
               ),
             ),
@@ -466,11 +505,15 @@ class OrganizerHomeView extends StatelessWidget {
   }
 
   Widget _buildQuickActionCard({
+    required BuildContext context,
     required String title,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -494,16 +537,15 @@ class OrganizerHomeView extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                color: Colors.white,
+                color: colorScheme.onPrimary,
                 size: 24.sp,
               ),
             ),
             SizedBox(height: 12.h),
             Text(
               title,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12.sp,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -515,6 +557,9 @@ class OrganizerHomeView extends StatelessWidget {
   }
 
   Widget _buildActiveEventsSection(BuildContext context, List<EventEntity> events) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     if (events.isEmpty) {
       return _buildEmptyEventsSection(context);
     }
@@ -527,9 +572,8 @@ class OrganizerHomeView extends StatelessWidget {
           children: [
             Text(
               'Active Events',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -537,9 +581,8 @@ class OrganizerHomeView extends StatelessWidget {
               onTap: () => context.pushNamed(RouteName.organizerEvents),
               child: Text(
                 'View All',
-                style: TextStyle(
-                  color: const Color(0xFF8B5CF6),
-                  fontSize: 14.sp,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -556,14 +599,16 @@ class OrganizerHomeView extends StatelessWidget {
   }
 
   Widget _buildEmptyEventsSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Active Events',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -572,31 +617,29 @@ class OrganizerHomeView extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(32.w),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A1B3D),
+            color: colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(16.r),
           ),
           child: Column(
             children: [
               Icon(
                 Icons.event_note,
-                color: Colors.grey[600],
+                color: colorScheme.onSurfaceVariant,
                 size: 48.sp,
               ),
               SizedBox(height: 16.h),
               Text(
                 'No Active Events',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(height: 8.h),
               Text(
                 'Create your first event to get started',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 14.sp,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -604,12 +647,14 @@ class OrganizerHomeView extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => context.pushNamed(RouteName.createEventScreen),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B5CF6),
+                  backgroundColor: colorScheme.primary,
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 ),
                 child: Text(
                   'Create Event',
-                  style: TextStyle(fontSize: 14.sp),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: colorScheme.onPrimary,
+                  ),
                 ),
               ),
             ],
@@ -619,32 +664,37 @@ class OrganizerHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingEvents() {
+  Widget _buildLoadingEvents(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Active Events',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
         SizedBox(height: 16.h),
         ...List.generate(3, (index) => Padding(
           padding: EdgeInsets.only(bottom: 16.h),
-          child: _buildLoadingEventCard(),
+                  child: _buildLoadingEventCard(context),
         )),
       ],
     );
   }
 
-  Widget _buildLoadingEventCard() {
+  Widget _buildLoadingEventCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Row(
@@ -653,7 +703,7 @@ class OrganizerHomeView extends StatelessWidget {
             width: 60.w,
             height: 60.h,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: colorScheme.outline,
               borderRadius: BorderRadius.circular(12.r),
             ),
           ),
@@ -666,7 +716,7 @@ class OrganizerHomeView extends StatelessWidget {
                   width: double.infinity,
                   height: 16.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: colorScheme.outline,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
@@ -675,7 +725,7 @@ class OrganizerHomeView extends StatelessWidget {
                   width: 120.w,
                   height: 12.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: colorScheme.outline,
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                 ),
@@ -684,7 +734,7 @@ class OrganizerHomeView extends StatelessWidget {
                   width: 80.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: colorScheme.outline,
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
@@ -697,6 +747,9 @@ class OrganizerHomeView extends StatelessWidget {
   }
 
   Widget _buildActiveEventCard(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final soldTickets = event.ticketTypes.fold<int>(
       0,
       (sum, ticket) => sum + (ticket.quantity - ticket.availableQuantity),
@@ -726,7 +779,7 @@ class OrganizerHomeView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: statusColor.withValues(alpha: 0.3),
@@ -751,13 +804,13 @@ class OrganizerHomeView extends StatelessWidget {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: const Color(0xFF1A0B2E),
+                            color: colorScheme.surface,
                             child: Center(
                               child: SizedBox(
                                 width: 20.w,
                                 height: 20.h,
                                 child: CircularProgressIndicator(
-                                  color: const Color(0xFF8B5CF6),
+                                  color: colorScheme.primary,
                                   strokeWidth: 2,
                                   value: loadingProgress.expectedTotalBytes != null
                                       ? loadingProgress.cumulativeBytesLoaded /
@@ -784,9 +837,8 @@ class OrganizerHomeView extends StatelessWidget {
                 children: [
                   Text(
                     event.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
@@ -795,17 +847,15 @@ class OrganizerHomeView extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     _formatDateTime(event.dateTime),
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 12.sp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     event.location,
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 11.sp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -821,16 +871,14 @@ class OrganizerHomeView extends StatelessWidget {
                         children: [
                           Text(
                             '$soldTickets / $totalTickets sold',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 10.sp,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                           Text(
                             revenue > 0 ? '\$${revenue.toStringAsFixed(0)}' : 'Free',
-                            style: TextStyle(
+                            style: theme.textTheme.labelMedium?.copyWith(
                               color: statusColor,
-                              fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -840,7 +888,7 @@ class OrganizerHomeView extends StatelessWidget {
                       Container(
                         height: 4.h,
                         decoration: BoxDecoration(
-                          color: Colors.grey[700],
+                          color: colorScheme.outline,
                           borderRadius: BorderRadius.circular(2.r),
                         ),
                         child: FractionallySizedBox(
@@ -863,7 +911,7 @@ class OrganizerHomeView extends StatelessWidget {
             // More Options
             Icon(
               Icons.more_vert,
-              color: Colors.grey[600],
+              color: colorScheme.onSurfaceVariant,
               size: 20.sp,
             ),
           ],

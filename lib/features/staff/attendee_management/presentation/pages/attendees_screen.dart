@@ -131,7 +131,7 @@ class _AttendeesViewState extends State<AttendeesView> {
               // Header
               Row(
                 children: [
-                  AppBackButton(),
+                  const AppBackButton(),
                   SizedBox(width: 16.w),
                   Expanded(
                     child: Text(
@@ -250,8 +250,16 @@ class _AttendeesViewState extends State<AttendeesView> {
                   },
                   builder: (context, state) {
                     return state.when(
-                      initial: () => const Center(child: CircularProgressIndicator()),
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      initial: () => Center(
+                        child: CircularProgressIndicator(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      loading: () => Center(
+                        child: CircularProgressIndicator(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
                       attendeesLoaded: (result) {
                         _currentResult = result;
                         return _buildAttendeesList(result, theme);
@@ -296,6 +304,10 @@ class _AttendeesViewState extends State<AttendeesView> {
                                   ),
                                 );
                               },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                              ),
                               child: const Text('Retry'),
                             ),
                           ],
@@ -303,16 +315,32 @@ class _AttendeesViewState extends State<AttendeesView> {
                       ),
                       attendeeLoaded: (_) => _currentResult != null 
                           ? _buildAttendeesList(_currentResult!, theme)
-                          : const Center(child: CircularProgressIndicator()),
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                       attendeeStatusUpdated: (_) => _currentResult != null 
                           ? _buildAttendeesList(_currentResult!, theme)
-                          : const Center(child: CircularProgressIndicator()),
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                       attendeeStatsLoaded: (_) => _currentResult != null 
                           ? _buildAttendeesList(_currentResult!, theme)
-                          : const Center(child: CircularProgressIndicator()),
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                       attendeeCheckedIn: (_) => _currentResult != null 
                           ? _buildAttendeesList(_currentResult!, theme)
-                          : const Center(child: CircularProgressIndicator()),
+                          : Center(
+                              child: CircularProgressIndicator(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                     );
                   },
                 ),
@@ -324,6 +352,8 @@ class _AttendeesViewState extends State<AttendeesView> {
     );
   }
   Widget _buildStatsSection(AttendeeStats stats, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    
     return Row(
       children: [
         Expanded(
@@ -350,7 +380,7 @@ class _AttendeesViewState extends State<AttendeesView> {
           child: _buildStatCard(
             title: 'Total',
             value: stats.totalRegistered.toString(),
-            color: theme.colorScheme.primary,
+            color: colorScheme.primary,
             icon: Icons.people,
             theme: theme,
           ),
@@ -360,6 +390,8 @@ class _AttendeesViewState extends State<AttendeesView> {
   }
 
   Widget _buildLoadingStats(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    
     return Row(
       children: [
         Expanded(
@@ -386,7 +418,7 @@ class _AttendeesViewState extends State<AttendeesView> {
           child: _buildStatCard(
             title: 'Total',
             value: '...',
-            color: theme.colorScheme.primary,
+            color: colorScheme.primary,
             icon: Icons.people,
             theme: theme,
           ),
@@ -592,9 +624,8 @@ class _AttendeesViewState extends State<AttendeesView> {
             child: Center(
               child: Text(
                 _getInitials(attendee.name),
-                style: TextStyle(
+                style: theme.textTheme.titleMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -702,7 +733,10 @@ class _AttendeesViewState extends State<AttendeesView> {
                   ),
                   child: Text(
                     'Check In',
-                    style: TextStyle(fontSize: 10.sp),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],

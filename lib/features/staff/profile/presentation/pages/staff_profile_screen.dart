@@ -5,6 +5,9 @@ import 'package:eventhub/features/shared/profile/application/user_profile/bloc/u
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
+import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
+import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
 
 class StaffProfileScreen extends StatelessWidget {
   const StaffProfileScreen({super.key});
@@ -68,6 +71,21 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               size: 24.sp,
             ),
           ),
+          BlocBuilder<AppBloc, AppState>(
+            builder: (context, appState) {
+              return IconButton(
+                onPressed: () {
+                  context.read<AppBloc>().add(
+                      AppEvent.changeTheme(isDarkMode: !appState.isDarkMode));
+                },
+                icon: Icon(
+                  appState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: colorScheme.primary,
+                  size: 24.sp,
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: BlocBuilder<UserProfileBloc, UserProfileState>(
@@ -112,9 +130,12 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                   ),
                   SizedBox(height: 24.h),
                   ElevatedButton(
-                    onPressed: () => context.read<UserProfileBloc>().add(
-                      const UserProfileEvent.loadUserProfile(userId: 'current_user_id'),
-                    ),
+                    onPressed: () {
+                      final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
+                      context.read<UserProfileBloc>().add(
+                        UserProfileEvent.loadUserProfile(userId: uid),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
@@ -196,6 +217,8 @@ class _StaffProfileViewState extends State<StaffProfileView> {
           _buildStaffStats(profile, theme, colorScheme),
           SizedBox(height: 32.h),
           _buildPersonalInfo(profile, theme, colorScheme),
+          SizedBox(height: 32.h),
+          _buildLogoutCard(),
         ],
       ),
     );
@@ -418,7 +441,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               Expanded(
                 child: _buildStatItem(
                   'Rating',
-                  staffData?.averageRating?.toStringAsFixed(1) ?? 'N/A',
+                  staffData?.averageRating.toStringAsFixed(1) ?? 'N/A',
                   Icons.star,
                   theme,
                   colorScheme,
@@ -531,6 +554,69 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     );
   }
 
+  Widget _buildLogoutCard() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: colorScheme.error.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.logout,
+            color: colorScheme.error,
+            size: 32.sp,
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'Sign Out',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.error,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'Sign out of your account',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onErrorContainer,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showLogoutDialog(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              child: Text(
+                'Sign Out',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onError,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showEditProfileDialog() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -544,6 +630,68 @@ class _StaffProfileViewState extends State<StaffProfileView> {
           borderRadius: BorderRadius.circular(12.r),
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'Logout',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                'Cancel',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context
+                    .read<AuthStatusBloc>()
+                    .add(const AuthStatusEvent.signOut());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Logout',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onError,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
