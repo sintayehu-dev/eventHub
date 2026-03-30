@@ -56,6 +56,12 @@ class AppColors {
   static const Color vitalsDivider = Color(0x337986CB); // lightIndigo 20%
   static const Color darkIndigo = Color(0xFF303F9F);
   static const Color primaryContainer = Color(0xFFE9DDFF);
+  
+  // Shimmer effect colors
+  static const Color shimmerBase = Color.fromARGB(255, 201, 202, 211);
+  static const Color shimmerHighlight = Color(0xFFFFFFFF);
+  static const Color shimmerBaseDark = Color.fromARGB(255, 62, 2, 131);
+  static const Color shimmerHighlightDark = Color(0xFF1A0B2E);
 
   /// Returns a map of all colors used in the light theme for easy reference.
   static Map<String, dynamic> light() => {
@@ -91,8 +97,8 @@ class AppColors {
         'vitalsDivider': Color(0x337986CB), // 20% indigo
         'darkIndigo': Color(0xFF303F9F),
         'primaryContainer': Color(0xFFE9DDFF),
-        'shimmerBase': Color(0xFFE1E2E8),
-        'shimmerHighlight': Color(0xFFFFFFFF),
+        'shimmerBase': shimmerBase,
+        'shimmerHighlight': shimmerHighlight,
       };
 
   /// Returns a map of all colors used in the dark theme for easy reference.
@@ -129,7 +135,7 @@ class AppColors {
         'vitalsDivider': Color(0x337986CB), // 20% indigo
         'darkIndigo': Color(0xFF7986CB),
         'primaryContainer': Color(0xFF2A1B3D),
-        'shimmerBase': Color(0xFF2A1B3D),
-        'shimmerHighlight': Color(0xFF3A2B4D),
+        'shimmerBase': shimmerBaseDark,
+        'shimmerHighlight': shimmerHighlightDark,
       };
 }

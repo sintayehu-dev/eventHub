@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -275,19 +276,8 @@ class AttendeeHomeView extends StatelessWidget {
   }
 
   Widget _buildLoadingState() {
-    return Builder(
-      builder: (context) {
-        final colorScheme = Theme.of(context).colorScheme;
-        
-        return SizedBox(
-          height: 200.h,
-          child: Center(
-            child: CircularProgressIndicator(
-              color: colorScheme.primary,
-            ),
-          ),
-        );
-      },
+    return Column(
+      children: List.generate(3, (index) => _buildShimmerEventCard()),
     );
   }
 
@@ -599,6 +589,75 @@ class AttendeeHomeView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildShimmerEventCard() {
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
+        return Container(
+          margin: EdgeInsets.only(bottom: 16.h),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.r),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorScheme.primaryContainer,
+                colorScheme.surface,
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Shimmer Image
+              ShimmerBox(
+                width: double.infinity,
+                height: 160.h,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+              ),
+
+              // Shimmer Content
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Shimmer Date and Location
+                    ShimmerText(
+                      width: 180.w,
+                      height: 14.h,
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Shimmer Title (2 lines)
+                    ShimmerText(
+                      width: double.infinity,
+                      height: 18.h,
+                    ),
+                    SizedBox(height: 6.h),
+                    ShimmerText(
+                      width: 200.w,
+                      height: 18.h,
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Shimmer Organizer
+                    ShimmerText(
+                      width: 120.w,
+                      height: 14.h,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

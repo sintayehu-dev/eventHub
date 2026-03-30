@@ -130,10 +130,12 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
                   ),
                   SizedBox(height: 24.h),
                   ElevatedButton(
-                    onPressed: () => context.read<UserProfileBloc>().add(
-                          const UserProfileEvent.loadUserProfile(
-                              userId: 'current_user_id'),
-                        ),
+                    onPressed: () {
+                      final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
+                      context.read<UserProfileBloc>().add(
+                        UserProfileEvent.loadUserProfile(userId: uid),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
@@ -178,11 +180,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         children: [
           _buildProfileHeader(profile),
           SizedBox(height: 32.h),
-          _buildOrganizerStats(profile),
-          SizedBox(height: 32.h),
-          _buildRecentEvents(profile),
-          SizedBox(height: 32.h),
-          _buildBusinessInfo(profile),
+          _buildMenuCards(),
           SizedBox(height: 32.h),
           _buildLogoutCard(),
         ],
@@ -193,315 +191,246 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
   Widget _buildProfileHeader(UserProfileEntity profile) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Column(
-      children: [
-        // Profile Avatar
-        Container(
-          width: 100.w,
-          height: 100.h,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorScheme.secondary, colorScheme.tertiary],
-            ),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: colorScheme.secondary.withValues(alpha: 0.3),
-              width: 3,
-            ),
-          ),
-          child: profile.profileImageUrl != null
-              ? ClipOval(
-                  child: Image.network(
-                    profile.profileImageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.business,
-                      color: colorScheme.onPrimary,
-                      size: 40.sp,
-                    ),
-                  ),
-                )
-              : Icon(
-                  Icons.business,
-                  color: colorScheme.onPrimary,
-                  size: 40.sp,
-                ),
-        ),
-        SizedBox(height: 16.h),
-        
-        // Name and Role
-        Text(
-          profile.name,
-          style: theme.textTheme.headlineMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          decoration: BoxDecoration(
-            color: colorScheme.secondary.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Text(
-            'Event Organizer',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: colorScheme.secondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          profile.email,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        if (profile.phone != null) ...[
-          SizedBox(height: 4.h),
-          Text(
-            profile.phone!,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildOrganizerStats(UserProfileEntity profile) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final organizerData = profile.organizerData;
 
     return Container(
-      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(24.r),
         border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Organizer Statistics',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
+          // Gradient banner
+          ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24.r),
+              topRight: Radius.circular(24.r),
+            ),
+            child: Container(
+              height: 90.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [colorScheme.secondary, colorScheme.tertiary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
             ),
           ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatItem(
-                  'Events Created',
-                  '${organizerData?.totalEventsCreated ?? 0}',
-                  Icons.event,
-                  colorScheme.secondary,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: _buildStatItem(
-                  'Total Attendees',
-                  '${organizerData?.totalAttendeesServed ?? 0}',
-                  Icons.people,
-                  colorScheme.tertiary,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatItem(
-                  'Avg Rating',
-                  '${organizerData?.averageEventRating.toStringAsFixed(1) ?? 'N/A'}',
-                  Icons.star,
-                  colorScheme.secondary,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: _buildStatItem(
-                  'Revenue',
-                  'N/A',
-                  Icons.attach_money,
-                  colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildStatItem(
-      String label, String value, IconData icon, Color color) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24.sp,
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentEvents(UserProfileEntity profile) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    // Since topEvents is not available in the entity, we'll show a placeholder
-
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Top Events',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          Center(
+          // Avatar overlapping the banner
+          Transform.translate(
+            offset: Offset(0, -40.h),
             child: Column(
               children: [
-                Icon(
-                  Icons.event_busy,
-                  color: colorScheme.onSurfaceVariant,
-                  size: 48.sp,
+                Container(
+                  width: 88.w,
+                  height: 88.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [colorScheme.secondary, colorScheme.tertiary],
+                    ),
+                    border: Border.all(
+                      color: colorScheme.surface,
+                      width: 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.secondary.withValues(alpha: 0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: profile.profileImageUrl != null
+                      ? ClipOval(
+                          child: Image.network(
+                            profile.profileImageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.business,
+                              color: colorScheme.onSecondary,
+                              size: 36.sp,
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          Icons.business,
+                          color: colorScheme.onSecondary,
+                          size: 36.sp,
+                        ),
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'No recent events to display',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                  profile.name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: colorScheme.secondary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: colorScheme.secondary.withValues(alpha: 0.35),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    'Event Organizer',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.secondary,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.4,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+
+          // Info rows
+          Transform.translate(
+            offset: Offset(0, -28.h),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Column(
+                children: [
+                  _buildHeaderInfoRow(
+                      Icons.email_outlined, profile.email, theme, colorScheme),
+                  if (profile.phone != null) ...[
+                    SizedBox(height: 8.h),
+                    _buildHeaderInfoRow(Icons.phone_outlined, profile.phone!,
+                        theme, colorScheme),
+                  ],
+                  SizedBox(height: 16.h),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBusinessInfo(UserProfileEntity profile) {
+  Widget _buildHeaderInfoRow(
+      IconData icon, String text, ThemeData theme, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon,
+            size: 14.sp,
+            color: colorScheme.onSurface.withValues(alpha: 0.5)),
+        SizedBox(width: 6.w),
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.65),
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildMenuCards() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.3),
-          width: 1,
+
+    return Column(
+      children: [
+        _buildMenuCard('My Events', Icons.event_outlined, theme, colorScheme),
+        SizedBox(height: 16.h),
+        _buildMenuCard('Create Event', Icons.add_circle_outline, theme, colorScheme),
+        SizedBox(height: 16.h),
+        _buildMenuCard('Revenue & Analytics', Icons.bar_chart_outlined, theme, colorScheme),
+        SizedBox(height: 16.h),
+        _buildMenuCard('Staff Management', Icons.people_outline, theme, colorScheme),
+        SizedBox(height: 16.h),
+        _buildMenuCard('Promotion Tools', Icons.campaign_outlined, theme, colorScheme),
+        SizedBox(height: 16.h),
+        _buildMenuCard('Help & Support', Icons.help_outline, theme, colorScheme),
+      ],
+    );
+  }
+
+  Widget _buildMenuCard(
+      String title, IconData icon, ThemeData theme, ColorScheme colorScheme) {
+    return InkWell(
+      onTap: () => _showToBeImplemented(context),
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                icon,
+                color: colorScheme.secondary,
+                size: 20.sp,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: colorScheme.onSurfaceVariant,
+              size: 20.sp,
+            ),
+          ],
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Business Information',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoRow(
-              'Company', profile.organizerData?.organizationName ?? 'Not set'),
-          _buildInfoRow('Website', profile.organizerData?.website ?? 'Not set'),
-          _buildInfoRow(
-              'Description', profile.organizerData?.description ?? 'Not set'),
-          _buildInfoRow('Verified',
-              profile.organizerData?.isVerified == true ? 'Yes' : 'No'),
-          _buildInfoRow('Status', profile.status.displayName),
-          _buildInfoRow('Status', profile.status.toString().split('.').last),
-        ],
-      ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  void _showToBeImplemented(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120.w,
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Feature to be implemented',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSecondary,
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
+        ),
+        backgroundColor: colorScheme.secondary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

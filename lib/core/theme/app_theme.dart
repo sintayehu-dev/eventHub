@@ -310,3 +310,26 @@ class AppTheme {
     );
   }
 }
+
+// Extension to add shimmer colors to ThemeData
+extension ShimmerTheme on ThemeData {
+  Color get shimmerBaseColor {
+    return brightness == Brightness.light
+        ? AppColors.shimmerBase
+        : AppColors.shimmerBaseDark;
+  }
+
+  Color get shimmerHighlightColor {
+    return brightness == Brightness.light
+        ? AppColors.shimmerHighlight
+        : AppColors.shimmerHighlightDark;
+  }
+
+  List<Color> get shimmerGradientColors {
+    return [
+      shimmerBaseColor,
+      shimmerHighlightColor,
+      shimmerBaseColor,
+    ];
+  }
+}
