@@ -7,6 +7,10 @@ import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticke
 import 'package:eventhub/features/attendee/ticket_purchase/application/ticket_purchase/bloc/ticket_purchase_bloc.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../widgets/ticket_purchase_event_header.dart';
+import '../widgets/ticket_order_summary_card.dart';
+import '../widgets/payment_method_selector.dart';
 
 class PurchaseConfirmationScreen extends StatefulWidget {
   final EventDiscoveryEntity event;
@@ -39,11 +43,13 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
           'Confirm Purchase',
           style: theme.textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
+        centerTitle: true,
       ),
       body: BlocListener<TicketPurchaseBloc, TicketPurchaseState>(
         listener: (context, state) {
@@ -59,6 +65,8 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
                 SnackBar(
                   content: Text('Purchase failed: ${NetworkExceptions.getRawErrorMessage(message)}'),
                   backgroundColor: Theme.of(context).colorScheme.error,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                 ),
               );
             },
@@ -69,21 +77,28 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Event Summary
-                    _buildEventSummary(),
-                    const SizedBox(height: 24),
+                    TicketPurchaseEventHeader(event: widget.event),
+                    SizedBox(height: 24.h),
 
                     // Ticket Summary
-                    _buildTicketSummary(),
-                    const SizedBox(height: 24),
+                    TicketOrderSummaryCard(selectedTickets: widget.selectedTickets),
+                    SizedBox(height: 24.h),
 
                     // Payment Method
-                    _buildPaymentMethodSection(),
-                    const SizedBox(height: 24),
+                    PaymentMethodSelector(
+                      selectedMethod: _selectedPaymentMethod,
+                      onMethodChanged: (method) {
+                        setState(() {
+                          _selectedPaymentMethod = method;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 24.h),
 
                     // Total
                     _buildTotalSection(),
@@ -100,298 +115,100 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
     );
   }
 
-  Widget _buildEventSummary() {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return Card(
-          color: colorScheme.primaryContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Event Details',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: widget.event.bannerUrl != null
-                          ? Image.network(
-                              widget.event.bannerUrl!,
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                width: 60,
-                                height: 60,
-                                color: colorScheme.outline,
-                                child: Icon(
-                                  Icons.event,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              width: 60,
-                              height: 60,
-                              color: colorScheme.outline,
-                              child: Icon(
-                                Icons.event,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.event.title,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${widget.event.dateTime.day}/${widget.event.dateTime.month}/${widget.event.dateTime.year}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  colorScheme.onSurface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          Text(
-                            widget.event.location,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  colorScheme.onSurface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTicketSummary() {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return Card(
-          color: colorScheme.primaryContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Ticket Summary',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ...widget.selectedTickets.map((ticket) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${ticket['quantity']}x ${ticket['ticketTypeName']}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '\$${(ticket['price'] * ticket['quantity']).toStringAsFixed(2)}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPaymentMethodSection() {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return Card(
-          color: colorScheme.primaryContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Payment Method',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ...PaymentMethod.values.map((method) {
-                  return RadioListTile<PaymentMethod>(
-                    title: Text(
-                      method.displayName,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    value: method,
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value!;
-                      });
-                    },
-                    activeColor: colorScheme.primary,
-                    contentPadding: EdgeInsets.zero,
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildTotalSection() {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return Card(
-          color: colorScheme.primaryContainer,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Amount',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '\$${widget.totalAmount.toStringAsFixed(2)}',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Card(
+      color: colorScheme.primaryContainer,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Total Amount',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        );
-      },
+            Text(
+              '\$${widget.totalAmount.toStringAsFixed(2)}',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildPurchaseButton() {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.shadow.withValues(alpha: 0.2),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, -2),
-              ),
-            ],
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Container(
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, MediaQuery.of(context).padding.bottom + 16.h),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-          child: SafeArea(
-            child: BlocBuilder<TicketPurchaseBloc, TicketPurchaseState>(
-              builder: (context, state) {
-                final isLoading = state.maybeWhen(
-                  purchasing: () => true,
-                  orElse: () => false,
-                );
+        ],
+      ),
+      child: BlocBuilder<TicketPurchaseBloc, TicketPurchaseState>(
+        builder: (context, state) {
+          final isLoading = state.maybeWhen(
+            purchasing: () => true,
+            orElse: () => false,
+          );
 
-                return SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _purchaseTickets,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+          return SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isLoading ? null : _purchaseTickets,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                elevation: 0,
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      height: 24.h,
+                      width: 24.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            colorScheme.onPrimary),
+                      ),
+                    )
+                  : Text(
+                      'Complete Purchase - \$${widget.totalAmount.toStringAsFixed(2)}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    child: isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  colorScheme.onPrimary),
-                            ),
-                          )
-                        : Text(
-                            'Purchase Tickets - \$${widget.totalAmount.toStringAsFixed(2)}',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                );
-              },
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -404,6 +221,7 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
         SnackBar(
           content: const Text('Please log in to purchase tickets'),
           backgroundColor: Theme.of(context).colorScheme.error,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;

@@ -105,7 +105,8 @@ class AppColors {
   static Map<String, dynamic> dark() => {
         'white': Color(0xFF1A0B2E), // EventHub dark background
         'black': Color(0xFFFFFFFF), // White for contrast
-        'surface': Color(0xFF2A1B3D), // EventHub card/surface dark
+        'surface':
+            Color.fromARGB(255, 27, 10, 49), // EventHub card/surface dark
         'brown': Color(0xFFFFFFFF), // White text for dark theme
         'darkBrown': Color(0xFFE1E2E8), // Light grey for emphasis
         'lightBrown': Color(0xFFBDBDBD), // Grey for secondary text

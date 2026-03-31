@@ -177,7 +177,7 @@ class AppTheme {
         // Surface colors
         surface: darkColors['surface'], // Dark surface
         onSurface: darkColors['brown'], // Light text
-        surfaceContainerHighest: darkColors['grey400'],
+        surfaceContainerHighest: darkColors['surface'],
         onSurfaceVariant: darkColors['grey600'],
 
         // Error colors
