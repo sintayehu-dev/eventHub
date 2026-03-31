@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:io';
 import 'package:eventhub/core/di/dependancy_manager.dart';
-import 'package:eventhub/core/services/image_picker_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_status_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_basic_info_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_banner_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_location_date_time_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_ticket_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_capacity_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_header.dart';
 
 class EditEventScreen extends StatelessWidget {
   final EventEntity event;
@@ -145,20 +150,22 @@ class _EditEventViewState extends State<EditEventView> {
           },
         );
       },
-      child: WillPopScope(
-        onWillPop: () async {
-          if (_hasChanges) {
-            return await _showDiscardChangesDialog(context);
+      child: PopScope(
+        canPop: !_hasChanges,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          final shouldPop = await _showDiscardChangesDialog(context);
+          if (shouldPop && context.mounted) {
+            context.pop();
           }
-          return true;
         },
         child: Scaffold(
           backgroundColor: const Color(0xFF1A0B2E),
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () async {
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: EditEventHeader(
+              hasChanges: _hasChanges,
+              onBack: () async {
                 if (_hasChanges) {
                   final shouldPop = await _showDiscardChangesDialog(context);
                   if (shouldPop) {
@@ -168,30 +175,8 @@ class _EditEventViewState extends State<EditEventView> {
                   context.pop();
                 }
               },
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onSave: () => _updateEvent(context),
             ),
-            title: Text(
-              'Edit Event',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            actions: [
-              if (_hasChanges)
-                TextButton(
-                  onPressed: () => _updateEvent(context),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: const Color(0xFF8B5CF6),
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
           ),
           body: BlocBuilder<EventManagementBloc, EventManagementState>(
             builder: (context, state) {
@@ -263,190 +248,57 @@ class _EditEventViewState extends State<EditEventView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Event Status Info
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A1B3D),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: _getStatusColor(widget.event.status).withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(widget.event.status).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Text(
-                      widget.event.status.displayName.toUpperCase(),
-                      style: TextStyle(
-                        color: _getStatusColor(widget.event.status),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Text(
-                      widget.event.status.isEditable 
-                          ? 'This event can be edited'
-                          : 'Limited editing available for this status',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12.sp,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            EditEventStatusSection(status: widget.event.status),
+            SizedBox(height: 24.h),
+
+            EditEventBasicInfoSection(
+              titleController: _titleController,
+              descriptionController: _descriptionController,
+              enabled: widget.event.status.isEditable,
             ),
             SizedBox(height: 24.h),
 
-            // Event Title
-            _buildSectionTitle('Event Title'),
-            SizedBox(height: 8.h),
-            _buildTextField(
-              controller: _titleController,
-              hintText: 'Enter event title',
-              enabled: widget.event.status.isEditable,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Event title is required';
-                }
-                return null;
+            EditEventBannerSection(
+              selectedImagePath: _selectedImagePath,
+              editable: widget.event.status.isEditable,
+              onImageSelected: (imagePath) {
+                setState(() {
+                  _selectedImagePath = imagePath;
+                  _hasChanges = true;
+                });
               },
             ),
             SizedBox(height: 24.h),
 
-            // Event Description
-            _buildSectionTitle('Description'),
-            SizedBox(height: 8.h),
-            _buildTextField(
-              controller: _descriptionController,
-              hintText: 'Describe your event',
-              maxLines: 4,
+            EditEventLocationDateTimeSection(
+              locationController: _locationController,
+              selectedDate: _selectedDate,
+              selectedTime: _selectedTime,
               enabled: widget.event.status.isEditable,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Event description is required';
-                }
-                return null;
+              onSelectDate: () => _selectDate(context),
+              onSelectTime: () => _selectTime(context),
+            ),
+            SizedBox(height: 24.h),
+
+            EditTicketSection(
+              selectedTicketType: _selectedTicketType,
+              priceController: _priceController,
+              canEditType: _canEditTicketType(),
+              canEditPrice: _canEditTicketPrice(),
+              onTypeChanged: (type) {
+                setState(() {
+                  _selectedTicketType = type;
+                  _hasChanges = true;
+                });
               },
             ),
             SizedBox(height: 24.h),
 
-            // Event Banner Image
-            _buildSectionTitle('Event Banner'),
-            SizedBox(height: 8.h),
-            _buildImagePicker(),
-            SizedBox(height: 24.h),
-
-            // Location
-            _buildSectionTitle('Location'),
-            SizedBox(height: 8.h),
-            _buildTextField(
-              controller: _locationController,
-              hintText: 'Event venue or address',
-              enabled: widget.event.status.isEditable,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Event location is required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 24.h),
-
-            // Date & Time
-            _buildSectionTitle('Date & Time'),
-            SizedBox(height: 8.h),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDateSelector(context),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: _buildTimeSelector(context),
-                ),
-              ],
-            ),
-            SizedBox(height: 24.h),
-
-            // Ticket Type (limited editing if tickets are sold)
-            _buildSectionTitle('Ticket Type'),
-            SizedBox(height: 8.h),
-            _buildTicketTypeSelector(),
-            SizedBox(height: 16.h),
-
-            // Price (if paid)
-            if (_selectedTicketType == 'Paid') ...[
-              _buildTextField(
-                controller: _priceController,
-                hintText: 'Ticket price (\$)',
-                keyboardType: TextInputType.number,
-                enabled: _canEditTicketPrice(),
-                validator: (value) {
-                  if (_selectedTicketType == 'Paid' &&
-                      (value == null || value.trim().isEmpty)) {
-                    return 'Ticket price is required';
-                  }
-                  return null;
-                },
-              ),
-              if (!_canEditTicketPrice())
-                Padding(
-                  padding: EdgeInsets.only(top: 4.h),
-                  child: Text(
-                    'Price cannot be changed after tickets are sold',
-                    style: TextStyle(
-                      color: Colors.orange[400],
-                      fontSize: 11.sp,
-                    ),
-                  ),
-                ),
-              SizedBox(height: 24.h),
-            ],
-
-            // Capacity
-            _buildSectionTitle('Event Capacity'),
-            SizedBox(height: 8.h),
-            _buildTextField(
-              controller: _capacityController,
-              hintText: 'Maximum number of attendees',
-              keyboardType: TextInputType.number,
+            EditEventCapacitySection(
+              capacityController: _capacityController,
               enabled: _canEditCapacity(),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Event capacity is required';
-                }
-                final capacity = int.tryParse(value);
-                if (capacity == null || capacity <= 0) {
-                  return 'Please enter a valid capacity';
-                }
-                final soldTickets = _getSoldTicketsCount();
-                if (capacity < soldTickets) {
-                  return 'Capacity cannot be less than sold tickets ($soldTickets)';
-                }
-                return null;
-              },
+              soldTickets: _getSoldTicketsCount(),
             ),
-            if (!_canEditCapacity())
-              Padding(
-                padding: EdgeInsets.only(top: 4.h),
-                child: Text(
-                  'Capacity can only be increased after tickets are sold',
-                  style: TextStyle(
-                    color: Colors.orange[400],
-                    fontSize: 11.sp,
-                  ),
-                ),
-              ),
             SizedBox(height: 40.h),
 
             // Update Button
@@ -479,359 +331,6 @@ class _EditEventViewState extends State<EditEventView> {
       ),
     );
   }
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16.sp,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    bool enabled = true,
-  }) {
-    return TextFormField(
-      controller: controller,
-      style: TextStyle(
-        color: enabled ? Colors.white : Colors.grey[500],
-      ),
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      validator: validator,
-      enabled: enabled,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        filled: true,
-        fillColor: enabled ? const Color(0xFF2A1B3D) : const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFF8B5CF6), width: 2),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[800]!, width: 1),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      ),
-    );
-  }
-
-  Widget _buildImagePicker() {
-    return GestureDetector(
-      onTap: widget.event.status.isEditable ? () => _selectImage(context) : null,
-      child: Container(
-        width: double.infinity,
-        height: 200.h,
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
-        ),
-        child: _selectedImagePath != null
-            ? Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: _selectedImagePath!.startsWith('http')
-                        ? Image.network(
-                            _selectedImagePath!,
-                            width: double.infinity,
-                            height: 200.h,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return _buildImagePlaceholder();
-                            },
-                          )
-                        : Image.file(
-                            File(_selectedImagePath!),
-                            width: double.infinity,
-                            height: 200.h,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return _buildImagePlaceholder();
-                            },
-                          ),
-                  ),
-                  if (widget.event.status.isEditable)
-                    Positioned(
-                      top: 8.h,
-                      right: 8.w,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImagePath = null;
-                            _hasChanges = true;
-                          });
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(4.w),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 16.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              )
-            : _buildImagePlaceholder(),
-      ),
-    );
-  }
-
-  Widget _buildImagePlaceholder() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          widget.event.status.isEditable 
-              ? Icons.add_photo_alternate_outlined
-              : Icons.image_outlined,
-          color: Colors.grey[400],
-          size: 48.sp,
-        ),
-        SizedBox(height: 12.h),
-        Text(
-          widget.event.status.isEditable 
-              ? 'Add Event Banner'
-              : 'No Banner Image',
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        if (widget.event.status.isEditable) ...[
-          SizedBox(height: 4.h),
-          Text(
-            'Tap to select an image',
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 12.sp,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Future<void> _selectImage(BuildContext context) async {
-    final imagePickerService = getIt<ImagePickerService>();
-    final imagePath = await imagePickerService.showImageSourceSelectionDialog(
-      context,
-      currentImagePath: _selectedImagePath?.startsWith('http') == true ? null : _selectedImagePath,
-      maxWidth: 1200,
-      maxHeight: 800,
-      imageQuality: 90,
-    );
-    
-    if (imagePath != null) {
-      setState(() {
-        _selectedImagePath = imagePath;
-        _hasChanges = true;
-      });
-    } else if (_selectedImagePath != null) {
-      // User selected remove photo
-      setState(() {
-        _selectedImagePath = null;
-        _hasChanges = true;
-      });
-    }
-  }
-
-  Widget _buildDateSelector(BuildContext context) {
-    final canEdit = widget.event.status.isEditable;
-    
-    return GestureDetector(
-      onTap: canEdit ? () => _selectDate(context) : null,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: canEdit ? const Color(0xFF2A1B3D) : const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: canEdit ? Colors.grey[700]! : Colors.grey[800]!, 
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today,
-              color: canEdit ? Colors.grey[400] : Colors.grey[600],
-              size: 20.sp,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                _selectedDate != null
-                    ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                    : 'Select date',
-                style: TextStyle(
-                  color: _selectedDate != null 
-                      ? (canEdit ? Colors.white : Colors.grey[500])
-                      : Colors.grey[400],
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimeSelector(BuildContext context) {
-    final canEdit = widget.event.status.isEditable;
-    
-    return GestureDetector(
-      onTap: canEdit ? () => _selectTime(context) : null,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: canEdit ? const Color(0xFF2A1B3D) : const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: canEdit ? Colors.grey[700]! : Colors.grey[800]!, 
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              color: canEdit ? Colors.grey[400] : Colors.grey[600],
-              size: 20.sp,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                _selectedTime != null
-                    ? _selectedTime!.format(context)
-                    : 'Select time',
-                style: TextStyle(
-                  color: _selectedTime != null 
-                      ? (canEdit ? Colors.white : Colors.grey[500])
-                      : Colors.grey[400],
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTicketTypeSelector() {
-    final canEdit = _canEditTicketType();
-    
-    return Container(
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        color: canEdit ? const Color(0xFF2A1B3D) : const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: canEdit ? Colors.grey[700]! : Colors.grey[800]!, 
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: canEdit ? () {
-                setState(() {
-                  _selectedTicketType = 'Free';
-                  _hasChanges = true;
-                });
-              } : null,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: _selectedTicketType == 'Free' 
-                      ? const Color(0xFF8B5CF6) 
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  'Free',
-                  style: TextStyle(
-                    color: _selectedTicketType == 'Free' 
-                        ? Colors.white
-                        : (canEdit ? Colors.grey[400] : Colors.grey[600]),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: canEdit ? () {
-                setState(() {
-                  _selectedTicketType = 'Paid';
-                  _hasChanges = true;
-                });
-              } : null,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: _selectedTicketType == 'Paid' 
-                      ? const Color(0xFF8B5CF6) 
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  'Paid',
-                  style: TextStyle(
-                    color: _selectedTicketType == 'Paid' 
-                        ? Colors.white
-                        : (canEdit ? Colors.grey[400] : Colors.grey[600]),
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> _selectDate(BuildContext context) async {
     final date = await showDatePicker(
@@ -851,7 +350,7 @@ class _EditEventViewState extends State<EditEventView> {
         );
       },
     );
-    
+
     if (date != null) {
       setState(() {
         _selectedDate = date;
@@ -876,7 +375,7 @@ class _EditEventViewState extends State<EditEventView> {
         );
       },
     );
-    
+
     if (time != null) {
       setState(() {
         _selectedTime = time;
@@ -896,7 +395,8 @@ class _EditEventViewState extends State<EditEventView> {
           content: const Text('Please select event date'),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
         ),
       );
       return;
@@ -908,7 +408,8 @@ class _EditEventViewState extends State<EditEventView> {
           content: const Text('Please select event time'),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
         ),
       );
       return;
@@ -927,8 +428,8 @@ class _EditEventViewState extends State<EditEventView> {
         : 0.0;
 
     // Only include image path if it's a local file (new image)
-    final bannerImagePath = _selectedImagePath?.startsWith('http') == false 
-        ? _selectedImagePath 
+    final bannerImagePath = _selectedImagePath?.startsWith('http') == false
+        ? _selectedImagePath
         : null;
 
     final request = UpdateEventRequest(
@@ -939,26 +440,28 @@ class _EditEventViewState extends State<EditEventView> {
       dateTime: eventDateTime,
       maxCapacity: int.parse(_capacityController.text),
       // Only update ticket types if we can edit them
-      ticketTypes: _canEditTicketType() ? [
-        UpdateTicketTypeRequest(
-          id: widget.event.ticketTypes.first.id,
-          name: _selectedTicketType == 'Free'
-              ? 'Free Ticket'
-              : 'General Admission',
-          description: 'Standard event ticket',
-          price: ticketPrice,
-          quantity: int.parse(_capacityController.text),
-        ),
-      ] : null,
+      ticketTypes: _canEditTicketType()
+          ? [
+              UpdateTicketTypeRequest(
+                id: widget.event.ticketTypes.first.id,
+                name: _selectedTicketType == 'Free'
+                    ? 'Free Ticket'
+                    : 'General Admission',
+                description: 'Standard event ticket',
+                price: ticketPrice,
+                quantity: int.parse(_capacityController.text),
+              ),
+            ]
+          : null,
     );
 
     context.read<EventManagementBloc>().add(
-      EventManagementEvent.updateEvent(
-        eventId: widget.event.id,
-        organizerId: widget.event.organizerId,
-        request: request,
-      ),
-    );
+          EventManagementEvent.updateEvent(
+            eventId: widget.event.id,
+            organizerId: widget.event.organizerId,
+            request: request,
+          ),
+        );
   }
 
   // Helper methods for business logic
@@ -980,17 +483,4 @@ class _EditEventViewState extends State<EditEventView> {
       (sum, ticket) => sum + (ticket.quantity - ticket.availableQuantity),
     );
   }
-
-  Color _getStatusColor(EventStatus status) {
-    switch (status) {
-      case EventStatus.active:
-        return const Color(0xFF4ADE80);
-      case EventStatus.draft:
-        return const Color(0xFFF59E0B);
-      case EventStatus.completed:
-        return const Color(0xFF06B6D4);
-      case EventStatus.cancelled:
-        return const Color(0xFFEF4444);
-    }
-  }
-}
+}

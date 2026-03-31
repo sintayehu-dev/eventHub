@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_header.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_performance_metrics.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_actions.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_info_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_shimmer.dart';
 
 class OrganizerEventDetailScreen extends StatelessWidget {
   final String eventId;
@@ -43,12 +48,15 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   Widget build(BuildContext context) {
     return BlocConsumer<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+
         state.whenOrNull(
           error: (message) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error: $message'),
-                backgroundColor: const Color(0xFFEF4444),
+                backgroundColor: colorScheme.error,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -60,7 +68,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Event cancelled successfully'),
-                backgroundColor: const Color(0xFF4ADE80),
+                backgroundColor: colorScheme.tertiary,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -73,7 +81,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Event deleted successfully'),
-                backgroundColor: const Color(0xFF4ADE80),
+                backgroundColor: colorScheme.tertiary,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -85,9 +93,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         );
       },
       builder: (context, state) {
-        return state.when(
-          initial: () => _buildLoadingScaffold(),
-          loading: () => _buildLoadingScaffold(),
+        return state.maybeWhen(
           eventLoaded: (event) => _buildEventDetailScaffold(context, event),
           eventsLoaded: (events) => events.isNotEmpty
               ? _buildEventDetailScaffold(context, events.first)
@@ -95,60 +101,70 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
           error: (message) => _buildErrorScaffold(message),
           eventCreated: (event) => _buildEventDetailScaffold(context, event),
           eventUpdated: (event) => _buildEventDetailScaffold(context, event),
-          eventDeleted: () => _buildErrorScaffold('Event has been deleted'),
           eventCancelled: (event) => _buildEventDetailScaffold(context, event),
-          eventDuplicated: (event) => _buildEventDetailScaffold(context, event),
           eventsSearched: (events) => events.isNotEmpty
               ? _buildEventDetailScaffold(context, events.first)
               : _buildErrorScaffold('Event not found'),
-          statisticsLoaded: (statistics) => _buildLoadingScaffold(),
-          bannerUploaded: (bannerUrl) => _buildLoadingScaffold(),
-          bannerDeleted: () => _buildLoadingScaffold(),
+          orElse: () => const EventDetailShimmer(),
         );
       },
     );
   }
 
-  Widget _buildLoadingScaffold() {
+  Widget _buildEventDetailScaffold(BuildContext context, EventEntity event) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A0B2E),
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: Text(
-          'Event Details',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          EventDetailHeader(
+            event: event,
+            onEdit: () => _editEvent(context, event),
+            onMore: () => _showMoreOptions(context, event),
           ),
-        ),
-      ),
-      body: const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF8B5CF6),
-        ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  EventPerformanceMetrics(event: event),
+                  SizedBox(height: 32.h),
+                  EventDetailActions(
+                    event: event,
+                    onViewAttendees: () => _viewAllAttendees(context, event.id),
+                    onBroadcast: () => _broadcastMessage(context, event),
+                    onCancel: () => _cancelEvent(context, event),
+                  ),
+                  SizedBox(height: 24.h),
+                  EventInfoSection(event: event),
+                  SizedBox(height: 20.h),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildErrorScaffold(String message) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A0B2E),
+        backgroundColor: colorScheme.surface,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
         ),
         title: Text(
           'Event Details',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -157,26 +173,20 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 48.sp,
-            ),
+            Icon(Icons.error_outline, color: colorScheme.error, size: 48.sp),
             SizedBox(height: 16.h),
             Text(
               'Error',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 8.h),
             Text(
               message,
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -189,7 +199,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
                     );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B5CF6),
+                backgroundColor: colorScheme.primary,
               ),
               child: const Text('Retry'),
             ),
@@ -197,718 +207,6 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         ),
       ),
     );
-  }
-
-  Widget _buildEventDetailScaffold(BuildContext context, EventEntity event) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A0B2E),
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(context, event),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildEventHeader(event),
-                  SizedBox(height: 32.h),
-                  _buildActionButtons(context, event),
-                  SizedBox(height: 24.h),
-                  _buildEventInfo(event),
-                  SizedBox(height: 20.h),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSliverAppBar(BuildContext context, EventEntity event) {
-    return SliverAppBar(
-      expandedHeight: 280.h,
-      pinned: true,
-      backgroundColor: const Color(0xFF1A0B2E),
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-      ),
-      title: Text(
-        'Event Details',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      actions: [
-        if (event.status.isEditable)
-          IconButton(
-            onPressed: () => _editEvent(context, event),
-            icon: const Icon(Icons.edit_outlined, color: Colors.white),
-          ),
-        IconButton(
-          onPressed: () => _showMoreOptions(context, event),
-          icon: const Icon(Icons.more_vert, color: Colors.white),
-        ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Event Banner Image or Placeholder
-            event.bannerUrl != null && event.bannerUrl!.isNotEmpty
-                ? Image.network(
-                    event.bannerUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: const Color(0xFF1A0B2E),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: const Color(0xFF8B5CF6),
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildEventBannerPlaceholder();
-                    },
-                  )
-                : _buildEventBannerPlaceholder(),
-
-            // Gradient overlay for better text readability
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.3),
-                    Colors.black.withValues(alpha: 0.7),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Content overlay
-            Positioned(
-              bottom: 80.h,
-              left: 20.w,
-              right: 20.w,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(event.status),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      event.status.displayName.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    event.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.grey[300],
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          event.location,
-                          style: TextStyle(
-                            color: Colors.grey[300],
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEventBannerPlaceholder() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            const Color(0xFF1A0B2E),
-            const Color(0xFF2A1B3D),
-            const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-          ],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Background pattern
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                    const Color(0xFF06B6D4).withValues(alpha: 0.1),
-                  ],
-                ),
-              ),
-              child: CustomPaint(
-                painter: _EventBackgroundPainter(),
-              ),
-            ),
-          ),
-          // Placeholder icon
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.image_outlined,
-                  color: Colors.white.withValues(alpha: 0.3),
-                  size: 64.sp,
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'No Banner Image',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 14.sp,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  Widget _buildEventHeader(EventEntity event) {
-    final soldTickets = event.ticketTypes.fold<int>(
-      0,
-      (sum, ticket) => sum + (ticket.quantity - ticket.availableQuantity),
-    );
-
-    final totalTickets = event.ticketTypes.fold<int>(
-      0,
-      (sum, ticket) => sum + ticket.quantity,
-    );
-
-    final revenue = event.ticketTypes.fold<double>(
-      0.0,
-      (sum, ticket) {
-        final sold = ticket.quantity - ticket.availableQuantity;
-        return sum + (sold * ticket.price);
-      },
-    );
-
-    final progress = totalTickets > 0 ? soldTickets / totalTickets : 0.0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Performance Overview Header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Performance Overview',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              'Live Data',
-              style: TextStyle(
-                color: const Color(0xFF8B5CF6),
-                fontSize: 12.sp,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        
-        // Tickets Sold Card
-        _buildMetricCard(
-          title: 'Tickets Sold',
-          value: soldTickets.toString(),
-          subtitle: '${(progress * 100).toInt()}% OF CAPACITY',
-          percentage: soldTickets > 0
-              ? '+${((soldTickets / totalTickets) * 100).toInt()}%'
-              : null,
-          color: const Color(0xFF8B5CF6),
-          progress: progress,
-          icon: Icons.confirmation_number_outlined,
-        ),
-        SizedBox(height: 12.h),
-        
-        // Remaining Card
-        _buildMetricCard(
-          title: 'Remaining',
-          value: (totalTickets - soldTickets).toString(),
-          subtitle: 'Tickets left to sell',
-          color: const Color(0xFF8B5CF6),
-          icon: Icons.people_outline,
-          showProgress: false,
-        ),
-        SizedBox(height: 12.h),
-        
-        // Revenue Card
-        _buildMetricCard(
-          title: 'Revenue',
-          value: revenue > 0 ? '\$${revenue.toStringAsFixed(0)}' : 'Free Event',
-          subtitle: 'Total earnings',
-          percentage: revenue > 0
-              ? '+${((revenue / (totalTickets * (event.ticketTypes.isNotEmpty ? event.ticketTypes.first.price : 1))) * 100).toInt()}%'
-              : null,
-          color: const Color(0xFF4ADE80),
-          icon: Icons.attach_money_outlined,
-          showProgress: false,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard({
-    required String title,
-    required String value,
-    required String subtitle,
-    required Color color,
-    required IconData icon,
-    String? percentage,
-    double? progress,
-    bool showProgress = true,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title and Icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(6.w),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 16.sp,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          
-          // Value and Percentage
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (percentage != null) ...[
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4ADE80).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
-                  child: Text(
-                    percentage,
-                    style: TextStyle(
-                      color: const Color(0xFF4ADE80),
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          SizedBox(height: 8.h),
-          
-          // Progress Bar (only for tickets sold)
-          if (showProgress && progress != null) ...[
-            Container(
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: Colors.grey[700],
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: progress,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 6.h),
-          ],
-          
-          // Subtitle
-          Text(
-            subtitle,
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 11.sp,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context, EventEntity event) {
-    return Column(
-      children: [
-        // View All Attendees Button
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _viewAllAttendees(context, event.id),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
-              padding: EdgeInsets.symmetric(vertical: 16.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.people_outline,
-                  color: Colors.white,
-                  size: 20.sp,
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  'View All Attendees',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(height: 12.h),
-        
-        // Secondary Action Buttons
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _broadcastMessage(context, event),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Colors.grey[600]!),
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.broadcast_on_personal_outlined,
-                      color: Colors.grey[400],
-                      size: 18.sp,
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      'Broadcast',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: event.status.canBeCancelled
-                    ? () => _cancelEvent(context, event)
-                    : null,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: event.status.canBeCancelled
-                        ? const Color(0xFFEF4444)
-                        : Colors.grey[600]!,
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 6.w,
-                      height: 6.h,
-                      decoration: BoxDecoration(
-                        color: event.status.canBeCancelled
-                            ? const Color(0xFFEF4444)
-                            : Colors.grey[600],
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      'Cancel Event',
-                      style: TextStyle(
-                        color: event.status.canBeCancelled
-                            ? const Color(0xFFEF4444)
-                            : Colors.grey[600],
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEventInfo(EventEntity event) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Event Information',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 16.h),
-        
-        // Event Description
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A1B3D),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Description',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                event.description,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  height: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 12.h),
-        
-        // Event Details
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A1B3D),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            children: [
-              _buildInfoRow(
-                'Date & Time',
-                _formatDateTime(event.dateTime),
-                Icons.calendar_today,
-              ),
-              SizedBox(height: 12.h),
-              _buildInfoRow(
-                'Location',
-                event.location,
-                Icons.location_on,
-              ),
-              SizedBox(height: 12.h),
-              _buildInfoRow(
-                'Capacity',
-                '${event.maxCapacity} attendees',
-                Icons.people,
-              ),
-              if (event.ticketTypes.isNotEmpty) ...[
-                SizedBox(height: 12.h),
-                _buildInfoRow(
-                  'Ticket Types',
-                  '${event.ticketTypes.length} type${event.ticketTypes.length > 1 ? 's' : ''}',
-                  Icons.confirmation_number,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: const Color(0xFF8B5CF6),
-          size: 16.sp,
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12.sp,
-                ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _getStatusColor(EventStatus status) {
-    switch (status) {
-      case EventStatus.active:
-        return const Color(0xFF4ADE80);
-      case EventStatus.draft:
-        return const Color(0xFFF59E0B);
-      case EventStatus.completed:
-        return const Color(0xFF06B6D4);
-      case EventStatus.cancelled:
-        return const Color(0xFFEF4444);
-    }
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-
-    final month = months[dateTime.month - 1];
-    final day = dateTime.day;
-    final year = dateTime.year;
-    final hour = dateTime.hour;
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-
-    return '$month $day, $year • $displayHour:$minute $period';
   }
 
   void _editEvent(BuildContext context, EventEntity event) {
@@ -929,9 +227,12 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _showMoreOptions(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2A1B3D),
+      backgroundColor: colorScheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -944,7 +245,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.grey[600],
+                color: colorScheme.outline,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -989,6 +290,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     VoidCallback onTap, {
     bool isDestructive = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pop();
@@ -999,7 +303,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
         margin: EdgeInsets.only(bottom: 8.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A0B2E),
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -1007,16 +311,15 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             Icon(
               icon,
               color: isDestructive
-                  ? const Color(0xFFEF4444)
-                  : const Color(0xFF8B5CF6),
+                  ? colorScheme.error : colorScheme.primary,
               size: 20.sp,
             ),
             SizedBox(width: 16.w),
             Text(
               title,
-              style: TextStyle(
-                color: isDestructive ? const Color(0xFFEF4444) : Colors.white,
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color:
+                    isDestructive ? colorScheme.error : colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1034,10 +337,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _broadcastMessage(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Broadcast functionality coming soon...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -1045,39 +351,49 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _cancelEvent(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final reasonController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Cancel Event',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Are you sure you want to cancel "${event.title}"? This action cannot be undone and all attendees will be notified.',
-              style: TextStyle(color: Colors.grey[300], fontSize: 14.sp),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             SizedBox(height: 16.h),
             TextField(
               controller: reasonController,
-              style: const TextStyle(color: Colors.white),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 labelText: 'Cancellation Reason',
-                labelStyle: TextStyle(color: Colors.grey[400]),
+                labelStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[600]!),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[600]!),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF8B5CF6)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: colorScheme.primary),
                 ),
               ),
               maxLines: 3,
@@ -1089,7 +405,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Keep Event',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           TextButton(
@@ -1107,7 +425,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             },
             child: Text(
               'Cancel Event',
-              style: TextStyle(color: Colors.red[400], fontSize: 14.sp),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.error,
+              ),
             ),
           ),
         ],
@@ -1127,10 +447,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _shareEvent(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Share functionality coming soon...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -1138,10 +461,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _exportData(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Export functionality coming soon...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -1149,10 +475,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _eventSettings(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Settings functionality coming soon...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -1160,26 +489,35 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _deleteEvent(BuildContext context, EventEntity event) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: colorScheme.surfaceContainerHighest,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Delete Event',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
+          ),
         ),
         content: Text(
           'Are you sure you want to permanently delete "${event.title}"? This action cannot be undone.',
-          style: TextStyle(color: Colors.grey[300], fontSize: 14.sp),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           TextButton(
@@ -1194,7 +532,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             },
             child: Text(
               'Delete',
-              style: TextStyle(color: Colors.red[400], fontSize: 14.sp),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.error,
+              ),
             ),
           ),
         ],

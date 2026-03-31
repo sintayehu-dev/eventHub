@@ -3,8 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
-import 'package:eventhub/features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
+import 'package:eventhub/features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_period_selector.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_key_metrics_grid.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_revenue_overview.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/top_performing_events_list.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/category_revenue_breakdown.dart';
+import 'package:eventhub/core/widgets/shimmer_widget.dart';
 
 class OrganizerAnalyticsScreen extends StatelessWidget {
   const OrganizerAnalyticsScreen({super.key});
@@ -40,15 +46,8 @@ class OrganizerAnalyticsScreen extends StatelessWidget {
   }
 }
 
-class OrganizerAnalyticsView extends StatefulWidget {
+class OrganizerAnalyticsView extends StatelessWidget {
   const OrganizerAnalyticsView({super.key});
-
-  @override
-  State<OrganizerAnalyticsView> createState() => _OrganizerAnalyticsViewState();
-}
-
-class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
-  AnalyticsPeriod _selectedPeriod = AnalyticsPeriod.thisMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -73,21 +72,16 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
       builder: (context, state) {
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
-        
+
         return Scaffold(
           backgroundColor: colorScheme.surface,
           body: Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: state.when(
-              initial: () => Center(
-                child: CircularProgressIndicator(color: colorScheme.primary),
-              ),
-              loading: () => Center(
-                child: CircularProgressIndicator(color: colorScheme.primary),
-              ),
-              loaded: (analytics, comparison) =>
-                  _buildLoadedContent(analytics, comparison),
-              error: (message) => _buildErrorContent(message),
+              initial: () => _buildShimmerContent(context),
+              loading: () => _buildShimmerContent(context),
+              loaded: (_, __) => _buildLoadedContent(context),
+              error: (message) => _buildErrorContent(context, message),
             ),
           ),
         );
@@ -95,11 +89,10 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
     );
   }
 
-  Widget _buildLoadedContent(
-      OrganizerAnalyticsEntity analytics, AnalyticsComparison? comparison) {
+  Widget _buildLoadedContent(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return RefreshIndicator(
       onRefresh: () async {
         context
@@ -123,34 +116,29 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
             ),
             SizedBox(height: 24.h),
 
-            // Time Period Selector
-            _buildTimePeriodSelector(),
+            const AnalyticsPeriodSelector(),
             SizedBox(height: 24.h),
 
-            // Key Metrics
-            _buildKeyMetrics(analytics, comparison),
-            SizedBox(height: 32.h),
-            
-            // Revenue Chart
-            _buildRevenueChart(analytics),
+            const AnalyticsKeyMetricsGrid(),
             SizedBox(height: 32.h),
 
-            // Top Events
-            _buildTopEvents(analytics),
+            const AnalyticsRevenueOverview(),
             SizedBox(height: 32.h),
 
-            // Category Breakdown
-            _buildCategoryBreakdown(analytics),
+            const TopPerformingEventsList(),
+            SizedBox(height: 32.h),
+
+            const CategoryRevenueBreakdown(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildErrorContent(String message) {
+  Widget _buildErrorContent(BuildContext context, String message) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -193,487 +181,265 @@ class _OrganizerAnalyticsViewState extends State<OrganizerAnalyticsView> {
     );
   }
 
-  Widget _buildTimePeriodSelector() {
+  Widget _buildShimmerContent(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header shimmer
+          ShimmerText(
+            width: 120.w,
+            height: 32.h,
+          ),
+          SizedBox(height: 24.h),
+
+          // Period selector shimmer
+          _buildPeriodSelectorShimmer(context),
+          SizedBox(height: 24.h),
+
+          // Key metrics grid shimmer
+          _buildKeyMetricsShimmer(context),
+          SizedBox(height: 32.h),
+
+          // Revenue overview shimmer
+          _buildRevenueOverviewShimmer(context),
+          SizedBox(height: 32.h),
+
+          // Top performing events shimmer
+          _buildTopEventsShimmer(context),
+          SizedBox(height: 32.h),
+
+          // Category breakdown shimmer
+          _buildCategoryBreakdownShimmer(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeriodSelectorShimmer(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
-        children: AnalyticsPeriod.values.take(3).map((period) {
-          final isSelected = _selectedPeriod == period;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedPeriod = period;
-                });
-                context.read<AnalyticsBloc>().add(
-                      AnalyticsEvent.changePeriod(period: period),
-                    );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: isSelected ? colorScheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  period.displayName,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: isSelected
-                        ? colorScheme.onPrimary
-                        : colorScheme.onSurfaceVariant,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+        children: List.generate(
+          4,
+          (index) => Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 2.w),
+              child: ShimmerBox(
+                height: 36.h,
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ),
-          );
-        }).toList(),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildKeyMetrics(
-      OrganizerAnalyticsEntity analytics, AnalyticsComparison? comparison) {
+  Widget _buildKeyMetricsShimmer(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Total Revenue',
-                value: '\$${analytics.totalRevenue.toStringAsFixed(0)}',
-                change: comparison?.changes.revenueChangeFormatted ?? '+0.0%',
-                isPositive: comparison?.changes.isRevenuePositive ?? true,
-                color: colorScheme.primary,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Tickets Sold',
-                value: '${analytics.totalTicketsSold}',
-                change:
-                    comparison?.changes.ticketsSoldChangeFormatted ?? '+0.0%',
-                isPositive: comparison?.changes.isTicketsSoldPositive ?? true,
-                color: colorScheme.tertiary,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Avg. Ticket Price',
-                value: '\$${analytics.averageTicketPrice.toStringAsFixed(2)}',
-                change: comparison?.changes.averageTicketPriceChangeFormatted ??
-                    '+0.0%',
-                isPositive:
-                    comparison?.changes.isAverageTicketPricePositive ?? true,
-                color: colorScheme.secondary,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Conversion Rate',
-                value: '${analytics.conversionRate.toStringAsFixed(1)}%',
-                change: comparison?.changes.conversionRateChangeFormatted ??
-                    '+0.0%',
-                isPositive:
-                    comparison?.changes.isConversionRatePositive ?? true,
-                color: colorScheme.tertiary,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard({
-    required String title,
-    required String value,
-    required String change,
-    required bool isPositive,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 16.w,
+      mainAxisSpacing: 16.h,
+      childAspectRatio: 1.5,
+      children: List.generate(
+        4,
+        (index) => Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.1),
             ),
           ),
-          SizedBox(height: 8.h),
-          Text(
-            value,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                isPositive ? Icons.trending_up : Icons.trending_down,
-                color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                size: 14.sp,
+              Row(
+                children: [
+                  ShimmerCircle(size: 24.w),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: ShimmerText(
+                      height: 14.h,
+                      width: double.infinity,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 4.w),
-              Text(
-                change,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                  fontWeight: FontWeight.w500,
-                ),
+              const Spacer(),
+              ShimmerText(
+                width: 80.w,
+                height: 24.h,
+              ),
+              SizedBox(height: 4.h),
+              ShimmerText(
+                width: 60.w,
+                height: 12.h,
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildRevenueChart(OrganizerAnalyticsEntity analytics) {
+  Widget _buildRevenueOverviewShimmer(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.3),
-          width: 1,
+          color: theme.colorScheme.outline.withOpacity(0.1),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Revenue Overview',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
+          ShimmerText(
+            width: 140.w,
+            height: 20.h,
           ),
-          SizedBox(height: 16.h),
-          Container(
-            height: 120.h,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  colorScheme.primary.withValues(alpha: 0.3),
-                  colorScheme.primary.withValues(alpha: 0.1),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: analytics.revenueChart.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.trending_up,
-                          color: colorScheme.primary,
-                          size: 32.sp,
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          'No revenue data yet',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : _buildSimpleChart(analytics.revenueChart),
+          SizedBox(height: 20.h),
+          ShimmerBox(
+            width: double.infinity,
+            height: 200.h,
+            borderRadius: BorderRadius.circular(8.r),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSimpleChart(List<RevenueDataPoint> dataPoints) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    if (dataPoints.isEmpty) return const SizedBox.shrink();
-
-    final maxRevenue =
-        dataPoints.map((e) => e.revenue).reduce((a, b) => a > b ? a : b);
-    if (maxRevenue == 0) return const SizedBox.shrink();
-
-    return Padding(
-      padding: EdgeInsets.all(16.w),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: dataPoints.take(7).map((point) {
-          final height = (point.revenue / maxRevenue) * 80.h;
-          return Container(
-            width: 8.w,
-            height: height.clamp(2.h, 80.h),
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-          );
-        }).toList(),
+  Widget _buildTopEventsShimmer(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.1),
+        ),
       ),
-    );
-  }
-
-  Widget _buildTopEvents(OrganizerAnalyticsEntity analytics) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Top Performing Events',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerText(
+            width: 180.w,
+            height: 20.h,
           ),
-        ),
-        SizedBox(height: 16.h),
-        if (analytics.topEvents.isEmpty)
-          Container(
-            padding: EdgeInsets.all(32.w),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.event_note,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 48.sp,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'No events yet',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    'Create your first event to see analytics',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          ...analytics.topEvents.asMap().entries.map((entry) {
-            final index = entry.key;
-            final event = entry.value;
-            return Padding(
-              padding: EdgeInsets.only(bottom: 12.h),
-              child: _buildTopEventItem(
-                rank: index + 1,
-                title: event.eventTitle,
-                revenue: '\$${event.revenue.toStringAsFixed(0)}',
-                tickets: '${event.ticketsSold} sold',
-                color: _getEventRankColor(index),
-              ),
-            );
-          }),
-      ],
-    );
-  }
-
-  Color _getEventRankColor(int index) {
-    switch (index) {
-      case 0:
-        return const Color(0xFF06B6D4);
-      case 1:
-        return const Color(0xFFF59E0B);
-      case 2:
-        return const Color(0xFFEF4444);
-      default:
-        return const Color(0xFF8B5CF6);
-    }
-  }
-
-  Widget _buildCategoryBreakdown(OrganizerAnalyticsEntity analytics) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    if (analytics.revenueByCategory.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Revenue by Category',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 16.h),
-        ...analytics.revenueByCategory.entries.map((entry) {
-          final percentage = analytics.totalRevenue > 0
-              ? (entry.value / analytics.totalRevenue) * 100
-              : 0.0;
-
-          return Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
+          SizedBox(height: 16.h),
+          ...List.generate(
+            3,
+            (index) => Padding(
+              padding: EdgeInsets.only(bottom: 16.h),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  ShimmerBox(
+                    width: 60.w,
+                    height: 60.h,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          entry.key,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        ShimmerText(
+                          width: double.infinity,
+                          height: 16.h,
                         ),
                         SizedBox(height: 4.h),
-                        Text(
-                          '${percentage.toStringAsFixed(1)}% of total',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        ShimmerText(
+                          width: 100.w,
+                          height: 12.h,
+                        ),
+                        SizedBox(height: 4.h),
+                        ShimmerText(
+                          width: 80.w,
+                          height: 12.h,
                         ),
                       ],
                     ),
                   ),
-                  Text(
-                    '\$${entry.value.toStringAsFixed(0)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  ShimmerText(
+                    width: 60.w,
+                    height: 16.h,
                   ),
                 ],
               ),
             ),
-          );
-        }),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildTopEventItem({
-    required int rank,
-    required String title,
-    required String revenue,
-    required String tickets,
-    required Color color,
-  }) {
+  Widget _buildCategoryBreakdownShimmer(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
+          color: theme.colorScheme.outline.withOpacity(0.1),
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 32.w,
-            height: 32.h,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '$rank',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
+          ShimmerText(
+            width: 160.w,
+            height: 20.h,
+          ),
+          SizedBox(height: 20.h),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: ShimmerBox(
+                  height: 150.h,
+                  borderRadius: BorderRadius.circular(75.h),
                 ),
               ),
-            ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
+              SizedBox(width: 20.w),
+              Expanded(
+                child: Column(
+                  children: List.generate(
+                    4,
+                    (index) => Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: Row(
+                        children: [
+                          ShimmerCircle(size: 12.w),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: ShimmerText(
+                              height: 12.h,
+                              width: double.infinity,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  tickets,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            revenue,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+              ),
+            ],
           ),
         ],
       ),
