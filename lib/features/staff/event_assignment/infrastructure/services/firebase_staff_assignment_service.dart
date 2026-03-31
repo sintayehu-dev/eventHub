@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
 import 'package:eventhub/features/staff/event_assignment/domain/services/staff_assignment_service.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/staff_assignment_widget.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/home/staff_assignment_widget.dart';
 
 @LazySingleton(as: StaffAssignmentService)
 class FirebaseStaffAssignmentService implements StaffAssignmentService {
@@ -29,15 +29,18 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
         }
 
         // Create a unique ID for the assignment
-        final assignmentRef = _firestore.collection('staff_event_assignments').doc();
-        
+        final assignmentRef =
+            _firestore.collection('staff_event_assignments').doc();
+
         final assignmentData = {
           'staffId': assignment.staffId, // Use actual staffId instead of email
           'staffName': assignment.staffName,
           'staffEmail': assignment.staffEmail,
           'eventId': eventId,
           'role': _mapRoleToString(assignment.role),
-          'permissions': assignment.permissions.map((p) => _mapPermissionToString(p)).toList(),
+          'permissions': assignment.permissions
+              .map((p) => _mapPermissionToString(p))
+              .toList(),
           'assignedBy': organizerId,
           'assignedAt': now,
           'isActive': true,
@@ -69,7 +72,7 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
           .get();
 
       final batch = _firestore.batch();
-      
+
       // Deactivate existing assignments
       for (final doc in existingQuery.docs) {
         batch.update(doc.reference, {
@@ -85,15 +88,18 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
           continue;
         }
 
-        final assignmentRef = _firestore.collection('staff_event_assignments').doc();
-        
+        final assignmentRef =
+            _firestore.collection('staff_event_assignments').doc();
+
         final assignmentData = {
           'staffId': assignment.staffId,
           'staffName': assignment.staffName,
           'staffEmail': assignment.staffEmail,
           'eventId': eventId,
           'role': _mapRoleToString(assignment.role),
-          'permissions': assignment.permissions.map((p) => _mapPermissionToString(p)).toList(),
+          'permissions': assignment.permissions
+              .map((p) => _mapPermissionToString(p))
+              .toList(),
           'assignedBy': organizerId,
           'assignedAt': now,
           'isActive': true,
@@ -142,16 +148,14 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
           .get();
 
       final assignments = <StaffEventAssignmentEntity>[];
-      
+
       for (final doc in query.docs) {
         final data = doc.data();
-        
+
         // Get event details from events collection
-        final eventDoc = await _firestore
-            .collection('events')
-            .doc(eventId)
-            .get();
-            
+        final eventDoc =
+            await _firestore.collection('events').doc(eventId).get();
+
         if (eventDoc.exists) {
           final eventData = eventDoc.data()!;
           assignments.add(_mapFirestoreToAssignment(doc.id, data, eventData));
@@ -185,7 +189,8 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
               .toList() ??
           [],
       assignedBy: assignmentData['assignedBy'] ?? '',
-      assignedAt: _parseDateTime(assignmentData['assignedAt']) ?? DateTime.now(),
+      assignedAt:
+          _parseDateTime(assignmentData['assignedAt']) ?? DateTime.now(),
       eventBannerUrl: eventData['bannerUrl'],
       isActive: assignmentData['isActive'] ?? true,
     );

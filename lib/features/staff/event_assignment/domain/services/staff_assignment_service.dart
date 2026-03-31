@@ -1,5 +1,5 @@
 import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/staff_assignment_widget.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/home/staff_assignment_widget.dart';
 
 abstract class StaffAssignmentService {
   Future<void> createStaffAssignments({
