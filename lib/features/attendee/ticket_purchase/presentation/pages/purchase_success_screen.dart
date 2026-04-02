@@ -85,7 +85,7 @@ class PurchaseSuccessScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => context.pushNamed(RouteName.ticketWallet),
+              onPressed: () => context.goNamed(RouteName.ticketWallet),
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,

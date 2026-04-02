@@ -75,7 +75,7 @@ class PaymentMethodSelector extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -84,16 +84,10 @@ class PaymentMethodSelector extends StatelessWidget {
 
   IconData _getPaymentIcon(PaymentMethod method) {
     switch (method) {
-      case PaymentMethod.mock:
+      case PaymentMethod.chapa:
         return Icons.account_balance_wallet_outlined;
-      case PaymentMethod.creditCard:
-        return Icons.credit_card;
-      case PaymentMethod.paypal:
-        return Icons.payment;
-      case PaymentMethod.applePay:
-        return Icons.apple;
-      case PaymentMethod.googlePay:
-        return Icons.account_balance;
+      case PaymentMethod.telebirr:
+        return Icons.phone_android;
     }
   }
 }

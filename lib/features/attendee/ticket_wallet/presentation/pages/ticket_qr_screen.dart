@@ -78,17 +78,6 @@ class TicketQRScreen extends StatelessWidget {
 
               // QR Code
               TicketQRCode(qrData: ticket.qrCode),
-              SizedBox(height: 24.h),
-
-              // QR Code Text
-              Text(
-                'QR Code: ${ticket.qrCode}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontFamily: 'monospace',
-                ),
-                textAlign: TextAlign.center,
-              ),
               SizedBox(height: 32.h),
 
               // Instructions

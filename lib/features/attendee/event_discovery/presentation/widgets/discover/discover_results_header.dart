@@ -13,10 +13,7 @@ class DiscoverResultsHeader extends StatelessWidget {
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
         
-        final eventCount = state.maybeWhen(
-          loaded: (events, _, __, ___) => events.length,
-          orElse: () => 0,
-        );
+        final eventCount = state.events.length;
         
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),

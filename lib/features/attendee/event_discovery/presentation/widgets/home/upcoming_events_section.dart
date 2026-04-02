@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
@@ -49,18 +50,15 @@ class UpcomingEventsSection extends StatelessWidget {
         SizedBox(height: 16.h),
         BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
           builder: (context, state) {
-            return state.when(
-              initial: () => _buildLoadingState(),
-              loading: () => _buildLoadingState(),
-              loadingDetails: () => _buildLoadingState(),
-              loaded: (events, isSearchResult, selectedCategory,
-                      searchFilters) =>
-                  _buildEventsList(context, events),
-              eventDetailsLoaded: (event) =>
-                  _buildEventsList(context, [event]),
-              error: (networkException) =>
-                  _buildErrorState(context, networkException.toString()),
-            );
+            if (state.hasError) {
+              return _buildErrorState(context, state.errorMessage);
+            }
+
+            if (state.isLoading || state.isLoadingDetails) {
+              return _buildLoadingState();
+            }
+
+            return _buildEventsList(context, state.events);
           },
         ),
       ],
@@ -122,43 +120,19 @@ class UpcomingEventsSection extends StatelessWidget {
   }
 
   Widget _buildErrorState(BuildContext context, String message) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
-      height: 200.h,
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.error.withValues(alpha: 0.3),
-          width: 1,
-        ),
+      constraints: BoxConstraints(
+        minHeight: 150.h,
+        maxHeight: 250.h,
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: colorScheme.error, size: 48.sp),
-            SizedBox(height: 16.h),
-            Text(
-              'Failed to load events',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
-        ),
+      padding: EdgeInsets.all(16.w),
+      child: AppErrorRetryWidget(
+        errorMessage: message,
+        onRetry: () {
+          context.read<EventDiscoveryBloc>().add(
+                const EventDiscoveryEvent.refreshEvents(),
+              );
+        },
       ),
     );
   }
@@ -202,7 +176,7 @@ class UpcomingEventsSection extends StatelessWidget {
             Icon(Icons.event_busy, color: colorScheme.primary, size: 48.sp),
             SizedBox(height: 16.h),
             Text(
-              'No events found',
+              'No events available',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w600,

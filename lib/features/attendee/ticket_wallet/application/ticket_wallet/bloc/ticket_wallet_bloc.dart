@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/domain/repositories/ticket_wallet_repository.dart';
 
@@ -16,7 +17,7 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
   TicketWalletBloc({
     required TicketWalletRepository repository,
   })  : _repository = repository,
-        super(const TicketWalletState.initial()) {
+        super(TicketWalletState.initial()) {
     on<_LoadWalletTickets>(_onLoadWalletTickets);
     on<_LoadUpcomingTickets>(_onLoadUpcomingTickets);
     on<_LoadPastTickets>(_onLoadPastTickets);
@@ -30,13 +31,33 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _LoadWalletTickets event,
     Emitter<TicketWalletState> emit,
   ) async {
-    emit(const TicketWalletState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getWalletTickets(userId: event.userId);
 
     result.fold(
-      (failure) => emit(TicketWalletState.error(message: failure)),
-      (walletData) => emit(TicketWalletState.loaded(walletData: walletData)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (walletData) => emit(state.copyWith(
+        walletData: walletData,
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -44,15 +65,33 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _LoadUpcomingTickets event,
     Emitter<TicketWalletState> emit,
   ) async {
-    emit(const TicketWalletState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getUpcomingTickets(userId: event.userId);
 
     result.fold(
-      (failure) => emit(TicketWalletState.error(message: failure)),
-      (tickets) => emit(TicketWalletState.ticketsLoaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
         tickets: tickets,
         filterType: TicketFilterType.upcoming,
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -61,15 +100,33 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _LoadPastTickets event,
     Emitter<TicketWalletState> emit,
   ) async {
-    emit(const TicketWalletState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getPastTickets(userId: event.userId);
 
     result.fold(
-      (failure) => emit(TicketWalletState.error(message: failure)),
-      (tickets) => emit(TicketWalletState.ticketsLoaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
         tickets: tickets,
         filterType: TicketFilterType.past,
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -78,7 +135,18 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _LoadTicketsByStatus event,
     Emitter<TicketWalletState> emit,
   ) async {
-    emit(const TicketWalletState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getTicketsByStatus(
       userId: event.userId,
@@ -86,11 +154,18 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     );
 
     result.fold(
-      (failure) => emit(TicketWalletState.error(message: failure)),
-      (tickets) => emit(TicketWalletState.ticketsLoaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
         tickets: tickets,
         filterType: TicketFilterType.byStatus,
         selectedStatus: event.status,
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -99,7 +174,18 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _SearchTickets event,
     Emitter<TicketWalletState> emit,
   ) async {
-    emit(const TicketWalletState.searching());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isSearching: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isSearching: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.searchTickets(
       userId: event.userId,
@@ -107,10 +193,17 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     );
 
     result.fold(
-      (failure) => emit(TicketWalletState.error(message: failure)),
-      (tickets) => emit(TicketWalletState.searchResults(
+      (failure) => emit(state.copyWith(
+        isSearching: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
         tickets: tickets,
-        query: event.query,
+        searchQuery: event.query,
+        isSearching: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -119,35 +212,25 @@ class TicketWalletBloc extends Bloc<TicketWalletEvent, TicketWalletState> {
     _RefreshWallet event,
     Emitter<TicketWalletState> emit,
   ) async {
-    // Refresh based on current state
-    state.maybeWhen(
-      loaded: (walletData) {
-        add(TicketWalletEvent.loadWalletTickets(userId: event.userId));
-      },
-      ticketsLoaded: (tickets, filterType, selectedStatus) {
-        switch (filterType) {
-          case TicketFilterType.upcoming:
-            add(TicketWalletEvent.loadUpcomingTickets(userId: event.userId));
-            break;
-          case TicketFilterType.past:
-            add(TicketWalletEvent.loadPastTickets(userId: event.userId));
-            break;
-          case TicketFilterType.byStatus:
-            if (selectedStatus != null) {
-              add(TicketWalletEvent.loadTicketsByStatus(
-                userId: event.userId,
-                status: selectedStatus,
-              ));
-            }
-            break;
-          default:
-            add(TicketWalletEvent.loadWalletTickets(userId: event.userId));
+    // Refresh based on current filter type
+    switch (state.filterType) {
+      case TicketFilterType.upcoming:
+        add(TicketWalletEvent.loadUpcomingTickets(userId: event.userId));
+        break;
+      case TicketFilterType.past:
+        add(TicketWalletEvent.loadPastTickets(userId: event.userId));
+        break;
+      case TicketFilterType.byStatus:
+        if (state.selectedStatus != null) {
+          add(TicketWalletEvent.loadTicketsByStatus(
+            userId: event.userId,
+            status: state.selectedStatus!,
+          ));
         }
-      },
-      orElse: () {
+        break;
+      default:
         add(TicketWalletEvent.loadWalletTickets(userId: event.userId));
-      },
-    );
+    }
   }
 
   void _onClearSearch(

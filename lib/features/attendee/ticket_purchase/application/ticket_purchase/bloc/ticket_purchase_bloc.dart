@@ -2,8 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/repositories/ticket_purchase_repository.dart';
+import 'package:eventhub/core/utils/local_storage.dart';
 
 part 'ticket_purchase_event.dart';
 part 'ticket_purchase_state.dart';
@@ -16,7 +18,7 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
   TicketPurchaseBloc({
     required TicketPurchaseRepository repository,
   })  : _repository = repository,
-        super(const TicketPurchaseState.initial()) {
+        super(TicketPurchaseState.initial()) {
     on<_PurchaseTickets>(_onPurchaseTickets);
     on<_LoadUserTickets>(_onLoadUserTickets);
     on<_LoadEventTickets>(_onLoadEventTickets);
@@ -31,17 +33,48 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _PurchaseTickets event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.purchasing());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isPurchasing: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isPurchasing: true, hasError: false, errorMessage: ''));
+
+    // Get user ID from local storage instead of using the passed userId
+    final userId = LocalStorage.instance.getUserId();
+
+    if (userId == null || userId.isEmpty) {
+      emit(state.copyWith(
+        isPurchasing: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(const NetworkExceptions.unauthorisedRequest()),
+      ));
+      return;
+    }
 
     final result = await _repository.purchaseTickets(
       request: event.request,
-      userId: event.userId,
+      userId: userId,
     );
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (purchaseResult) => emit(TicketPurchaseState.purchaseSuccess(
-        result: purchaseResult,
+      (failure) => emit(state.copyWith(
+        isPurchasing: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (purchaseResult) => emit(state.copyWith(
+        isPurchasing: false,
+        isPurchaseSuccessful: true,
+        purchaseResult: purchaseResult,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -50,13 +83,33 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _LoadUserTickets event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getUserTickets(userId: event.userId);
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (tickets) => emit(TicketPurchaseState.ticketsLoaded(tickets: tickets)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
+        isLoading: false,
+        tickets: tickets,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -64,7 +117,18 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _LoadEventTickets event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getEventTickets(
       userId: event.userId,
@@ -72,8 +136,17 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     );
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (tickets) => emit(TicketPurchaseState.ticketsLoaded(tickets: tickets)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (tickets) => emit(state.copyWith(
+        isLoading: false,
+        tickets: tickets,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -81,7 +154,18 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _LoadTicketDetails event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.loadingDetails());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isLoadingDetails: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoadingDetails: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getTicketDetails(
       ticketId: event.ticketId,
@@ -89,8 +173,17 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     );
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (ticket) => emit(TicketPurchaseState.ticketDetailsLoaded(ticket: ticket)),
+      (failure) => emit(state.copyWith(
+        isLoadingDetails: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (ticket) => emit(state.copyWith(
+        isLoadingDetails: false,
+        selectedTicket: ticket,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -98,7 +191,18 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _CancelTicket event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.processing());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isProcessing: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.cancelTicket(
       ticketId: event.ticketId,
@@ -106,15 +210,26 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     );
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
+      (failure) => emit(state.copyWith(
+        isProcessing: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
       (success) {
         if (success) {
-          emit(const TicketPurchaseState.ticketCancelled());
+          emit(state.copyWith(
+            isProcessing: false,
+            isTicketCancelled: true,
+            hasError: false,
+            errorMessage: '',
+          ));
           // Refresh tickets after cancellation
           add(TicketPurchaseEvent.loadUserTickets(userId: event.userId));
         } else {
-          emit(const TicketPurchaseState.error(
-            message: NetworkExceptions.unexpectedError(),
+          emit(state.copyWith(
+            isProcessing: false,
+            hasError: true,
+            errorMessage: NetworkExceptions.getRawErrorMessage(const NetworkExceptions.unexpectedError()),
           ));
         }
       },
@@ -125,7 +240,18 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _CheckInTicket event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.processing());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isProcessing: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isProcessing: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.checkInTicket(
       ticketId: event.ticketId,
@@ -133,8 +259,17 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     );
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (ticket) => emit(TicketPurchaseState.ticketCheckedIn(ticket: ticket)),
+      (failure) => emit(state.copyWith(
+        isProcessing: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (ticket) => emit(state.copyWith(
+        isProcessing: false,
+        selectedTicket: ticket,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -142,13 +277,33 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     _ValidateTicketQR event,
     Emitter<TicketPurchaseState> emit,
   ) async {
-    emit(const TicketPurchaseState.validating());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        isValidating: false,
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isValidating: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.validateTicketQR(qrCode: event.qrCode);
 
     result.fold(
-      (failure) => emit(TicketPurchaseState.error(message: failure)),
-      (ticket) => emit(TicketPurchaseState.qrValidated(ticket: ticket)),
+      (failure) => emit(state.copyWith(
+        isValidating: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (ticket) => emit(state.copyWith(
+        isValidating: false,
+        selectedTicket: ticket,
+        hasError: false,
+        errorMessage: '',
+      )),
     );
   }
 
@@ -157,13 +312,10 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
     Emitter<TicketPurchaseState> emit,
   ) async {
     // Refresh based on current state
-    state.maybeWhen(
-      ticketsLoaded: (tickets) {
-        add(TicketPurchaseEvent.loadUserTickets(userId: event.userId));
-      },
-      orElse: () {
-        add(TicketPurchaseEvent.loadUserTickets(userId: event.userId));
-      },
-    );
+    if (state.tickets.isNotEmpty) {
+      add(TicketPurchaseEvent.loadUserTickets(userId: event.userId));
+    } else {
+      add(TicketPurchaseEvent.loadUserTickets(userId: event.userId));
+    }
   }
 }

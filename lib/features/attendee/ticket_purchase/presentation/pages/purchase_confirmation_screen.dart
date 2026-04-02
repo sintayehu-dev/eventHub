@@ -5,9 +5,10 @@ import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/application/ticket_purchase/bloc/ticket_purchase_bloc.dart';
-import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import '../widgets/ticket_purchase_event_header.dart';
 import '../widgets/ticket_order_summary_card.dart';
 import '../widgets/payment_method_selector.dart';
@@ -29,7 +30,7 @@ class PurchaseConfirmationScreen extends StatefulWidget {
 }
 
 class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen> {
-  PaymentMethod _selectedPaymentMethod = PaymentMethod.mock;
+  PaymentMethod _selectedPaymentMethod = PaymentMethod.chapa;
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +54,19 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
       ),
       body: BlocListener<TicketPurchaseBloc, TicketPurchaseState>(
         listener: (context, state) {
-          state.maybeWhen(
-            purchaseSuccess: (result) {
-              context.pushReplacementNamed(
-                RouteName.purchaseSuccess,
-                extra: result,
-              );
-            },
-            error: (message) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Purchase failed: ${NetworkExceptions.getRawErrorMessage(message)}'),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                ),
-              );
-            },
-            orElse: () {},
-          );
+          if (state.isPurchaseSuccessful && state.purchaseResult != null) {
+            context.pushReplacementNamed(
+              RouteName.purchaseSuccess,
+              extra: state.purchaseResult,
+            );
+          }
+
+          if (state.hasError) {
+            AppHelpers.showErrorFlash(
+              context,
+              NetworkExceptions.getRawErrorMessage(state.errorMessage),
+            );
+          }
         },
         child: Column(
           children: [
@@ -170,10 +165,7 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
       ),
       child: BlocBuilder<TicketPurchaseBloc, TicketPurchaseState>(
         builder: (context, state) {
-          final isLoading = state.maybeWhen(
-            purchasing: () => true,
-            orElse: () => false,
-          );
+          final isLoading = state.isPurchasing;
 
           return SizedBox(
             width: double.infinity,
@@ -189,14 +181,9 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
                 elevation: 0,
               ),
               child: isLoading
-                  ? SizedBox(
-                      height: 24.h,
-                      width: 24.h,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.onPrimary),
-                      ),
+                  ? SpinKitLoadingWidget(
+                      color: colorScheme.onPrimary,
+                      size: 24.h,
                     )
                   : Text(
                       'Complete Purchase - \$${widget.totalAmount.toStringAsFixed(2)}',
@@ -213,20 +200,6 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
   }
 
   void _purchaseTickets() {
-    final authState = context.read<AuthStatusBloc>().state;
-    final userId = authState.user?.uid;
-
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please log in to purchase tickets'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
     // Create purchase requests for each ticket type
     for (final ticket in widget.selectedTickets) {
       final request = PurchaseTicketRequest(
@@ -239,7 +212,8 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
       context.read<TicketPurchaseBloc>().add(
         TicketPurchaseEvent.purchaseTickets(
           request: request,
-          userId: userId,
+              userId:
+                  '', // This will be ignored, userId comes from local storage in bloc
         ),
       );
     }

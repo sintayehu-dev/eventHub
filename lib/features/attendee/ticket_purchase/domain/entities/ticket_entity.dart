@@ -148,11 +148,8 @@ class PurchaseResult with _$PurchaseResult {
 }
 
 enum PaymentMethod {
-  mock, // For MVP
-  creditCard,
-  paypal,
-  applePay,
-  googlePay,
+  chapa, // Ethiopian payment gateway
+  telebirr, // Ethiopian mobile payment
 }
 
 enum PaymentStatus {
@@ -165,16 +162,10 @@ enum PaymentStatus {
 extension PaymentMethodExtension on PaymentMethod {
   String get displayName {
     switch (this) {
-      case PaymentMethod.mock:
-        return 'Mock Payment (Demo)';
-      case PaymentMethod.creditCard:
-        return 'Credit Card';
-      case PaymentMethod.paypal:
-        return 'PayPal';
-      case PaymentMethod.applePay:
-        return 'Apple Pay';
-      case PaymentMethod.googlePay:
-        return 'Google Pay';
+      case PaymentMethod.chapa:
+        return 'Chapa';
+      case PaymentMethod.telebirr:
+        return 'Telebirr';
     }
   }
 }

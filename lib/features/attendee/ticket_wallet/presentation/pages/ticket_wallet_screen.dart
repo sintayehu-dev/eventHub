@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/local_storage.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
-import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import '../widgets/ticket_wallet_header.dart';
 import '../widgets/ticket_wallet/ticket_wallet_body.dart';
 
@@ -29,21 +29,11 @@ class _TicketWalletScreenContent extends StatefulWidget {
 class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String? _userId;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
-    final authState = context.read<AuthStatusBloc>().state;
-    _userId = authState.user?.uid;
-
-    if (_userId != null) {
-      context.read<TicketWalletBloc>().add(
-        TicketWalletEvent.loadWalletTickets(userId: _userId!),
-      );
-    }
   }
 
   @override
@@ -57,53 +47,38 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    if (_userId == null) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const TicketWalletHeader(title: 'My Tickets'),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Please log in to view your tickets',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurface,
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(
+            0, MediaQuery.of(context).padding.top + 20.h, 0, 100.h),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: TicketWalletHeader(
+                title: 'My Tickets',
+                action: GestureDetector(
+                  onTap: _refreshTickets,
+                  child: Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.refresh_rounded,
+                      color: colorScheme.primary,
+                      size: 20.sp,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: Column(
-          children: [
-            TicketWalletHeader(
-              title: 'My Tickets',
-              action: GestureDetector(
-                onTap: _refreshTickets,
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Icon(
-                    Icons.refresh_rounded,
-                    color: colorScheme.primary,
-                    size: 20.sp,
-                  ),
-                ),
-              ),
             ),
+
+            SizedBox(height: 20.h),
             
+            // Ticket Wallet Body with expanded height
             Expanded(
               child: TicketWalletBody(tabController: _tabController),
             ),
@@ -114,9 +89,10 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
   }
 
   void _refreshTickets() {
-    if (_userId != null) {
+    final userId = LocalStorage.instance.getUserId();
+    if (userId != null) {
       context.read<TicketWalletBloc>().add(
-        TicketWalletEvent.refreshWallet(userId: _userId!),
+            TicketWalletEvent.refreshWallet(userId: userId),
       );
     }
   }
