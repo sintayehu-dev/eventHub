@@ -19,7 +19,6 @@ import 'package:eventhub/core/presentation/main/staff_shell_page.dart';
 // Attendee screens
 import 'package:eventhub/features/attendee/event_discovery/presentation/pages/attendee_home_screen.dart';
 import 'package:eventhub/features/attendee/event_discovery/presentation/pages/discover_screen.dart';
-import 'package:eventhub/features/attendee/ticket_wallet/presentation/pages/attendee_tickets_screen.dart';
 import 'package:eventhub/features/attendee/profile/presentation/pages/attendee_profile_screen.dart';
 
 // Ticket purchase screens
@@ -168,11 +167,11 @@ final router = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: RouteName.attendeeTickets,
+              name: RouteName.ticketWallet,
               path: '/attendee/tickets',
               builder: (context, state) => BlocProvider(
                 create: (_) => getIt<TicketWalletBloc>(),
-                child: const AttendeeTicketsScreen(),
+                child: const TicketWalletScreen(),
               ),
             ),
           ],
@@ -396,16 +395,6 @@ final router = GoRouter(
         final result = state.extra as PurchaseResult;
         return PurchaseSuccessScreen(purchaseResult: result);
       },
-    ),
-
-    // TICKET WALLET ROUTES
-    GoRoute(
-      name: RouteName.ticketWallet,
-      path: '/ticket-wallet',
-      builder: (context, state) => BlocProvider(
-        create: (_) => getIt<TicketWalletBloc>(),
-        child: const TicketWalletScreen(),
-      ),
     ),
 
     GoRoute(

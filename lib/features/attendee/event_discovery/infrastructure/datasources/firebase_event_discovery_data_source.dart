@@ -50,6 +50,9 @@ abstract class FirebaseEventDiscoveryDataSource {
 @Injectable(as: FirebaseEventDiscoveryDataSource)
 class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryDataSource {
   final FirebaseFirestore _firestore;
+  
+  // Cache for organizer names to avoid repeated database calls
+  final Map<String, String> _organizerNameCache = {};
 
   FirebaseEventDiscoveryDataSourceImpl(this._firestore);
 
@@ -280,7 +283,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
       final querySnapshot = await query.get();
       final events = querySnapshot.docs
-          .map((doc) => EventEntity.fromFirestoreData(doc.data() as Map<String, dynamic>))
+          .map((doc) => EventEntity.fromFirestoreData(doc.data()))
           .toList();
 
       // Filter upcoming events
@@ -444,9 +447,19 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
   /// Convert EventEntity Firestore data to EventDiscoveryEntity format
   Future<Map<String, dynamic>> _convertEventDataToDiscoveryData(Map<String, dynamic> eventData) async {
-    // Get organizer name
+    // Get organizer name - first check if it's already stored in the event
     final organizerId = eventData['organizerId'] as String;
-    final organizerName = await _getOrganizerName(organizerId);
+    String? storedOrganizerName = eventData['organizerName'] as String?;
+
+    // If organizer name is not stored or is "Unknown Organizer", fetch it
+    String organizerName;
+    if (storedOrganizerName == null ||
+        storedOrganizerName.isEmpty ||
+        storedOrganizerName == 'Unknown Organizer') {
+      organizerName = await _getOrganizerName(organizerId);
+    } else {
+      organizerName = storedOrganizerName;
+    }
     
     // Calculate derived fields
     final ticketTypesData = eventData['ticketTypes'] as List<dynamic>;
@@ -505,8 +518,13 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
   }) async {
     final discoveryEntities = <EventDiscoveryEntity>[];
 
+    // Batch fetch organizer names to improve performance
+    final organizerIds = events.map((e) => e.organizerId).toSet().toList();
+    await _batchFetchOrganizerNames(organizerIds);
+
     for (final event in events) {
-      final organizerName = await _getOrganizerName(event.organizerId);
+      final organizerName =
+          _organizerNameCache[event.organizerId] ?? 'Unknown Organizer';
       
       final discoveryEntity = EventDiscoveryEntity.fromEventEntity(
         event,
@@ -520,22 +538,254 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     return discoveryEntities;
   }
 
+  /// Batch fetch organizer names for better performance
+  Future<void> _batchFetchOrganizerNames(List<String> organizerIds) async {
+    final uncachedIds = organizerIds
+        .where((id) => !_organizerNameCache.containsKey(id))
+        .toList();
+
+    if (uncachedIds.isEmpty) return;
+
+    try {
+      // Firestore 'in' queries are limited to 10 items
+      for (int i = 0; i < uncachedIds.length; i += 10) {
+        final batch = uncachedIds.skip(i).take(10).toList();
+        final batchQuery = await _firestore
+            .collection(_organizersCollection)
+            .where(FieldPath.documentId, whereIn: batch)
+            .get();
+
+        // Process each organizer in the batch
+        for (final doc in batchQuery.docs) {
+          final organizerId = doc.id;
+          final data = doc.data();
+
+          String organizerName = 'Unknown Organizer';
+
+          // Check for organization name first
+          final organizerData = data['organizerData'] as Map<String, dynamic>?;
+          if (organizerData != null) {
+            final organizationName =
+                organizerData['organizationName'] as String?;
+            if (organizationName != null &&
+                organizationName.trim().isNotEmpty) {
+              organizerName = organizationName.trim();
+            }
+          }
+
+          // Check for user name if no organization name
+          if (organizerName == 'Unknown Organizer') {
+            final name = data['name'] as String?;
+            if (name != null && name.trim().isNotEmpty) {
+              organizerName = name.trim();
+            }
+          }
+
+          // Fallback to displayName
+          if (organizerName == 'Unknown Organizer') {
+            final displayName = data['displayName'] as String?;
+            if (displayName != null && displayName.trim().isNotEmpty) {
+              organizerName = displayName.trim();
+            }
+          }
+
+          // Last resort: use email prefix
+          if (organizerName == 'Unknown Organizer') {
+            final email = data['email'] as String?;
+            if (email != null && email.trim().isNotEmpty) {
+              final emailPrefix = email.split('@').first;
+              organizerName = emailPrefix.trim();
+            }
+          }
+
+          _organizerNameCache[organizerId] = organizerName;
+        }
+
+        // Mark missing organizers as unknown
+        for (final id in batch) {
+          if (!_organizerNameCache.containsKey(id)) {
+            _organizerNameCache[id] = 'Unknown Organizer';
+          }
+        }
+      }
+    } catch (e) {
+      print('Error batch fetching organizer names: $e');
+      // Mark all uncached IDs as unknown
+      for (final id in uncachedIds) {
+        if (!_organizerNameCache.containsKey(id)) {
+          _organizerNameCache[id] = 'Unknown Organizer';
+        }
+      }
+    }
+  }
+
+  /// Clear the organizer name cache
+  void clearOrganizerCache() {
+    _organizerNameCache.clear();
+  }
+
+  /// Debug method to test organizer name fetching
+  Future<void> debugOrganizerNames() async {
+    try {
+      print('🔍 Debug: Testing organizer name fetching...');
+
+      // Get a few events to test
+      final eventsQuery =
+          await _firestore.collection(_eventsCollection).limit(5).get();
+
+      for (final eventDoc in eventsQuery.docs) {
+        final data = eventDoc.data();
+        final organizerId = data['organizerId'] as String?;
+        final eventTitle = data['title'] as String?;
+
+        if (organizerId != null) {
+          final organizerName = await _getOrganizerName(organizerId);
+          print('📋 Event: $eventTitle');
+          print('   👤 Organizer ID: $organizerId');
+          print('   👤 Organizer Name: $organizerName');
+          print('   ---');
+        }
+      }
+    } catch (e) {
+      print('❌ Error in debugOrganizerNames: $e');
+    }
+  }
+
+  /// Update all events with organizer names (run once to fix existing data)
+  Future<void> updateAllEventsWithOrganizerNames() async {
+    try {
+      print('🔄 Starting organizer name update for all events...');
+
+      // Get all events
+      final eventsQuery = await _firestore.collection(_eventsCollection).get();
+
+      int updatedCount = 0;
+      int totalCount = eventsQuery.docs.length;
+
+      print('📊 Found $totalCount events to process');
+
+      for (final eventDoc in eventsQuery.docs) {
+        try {
+          final eventData = eventDoc.data();
+          final organizerId = eventData['organizerId'] as String?;
+
+          if (organizerId == null) {
+            print('⚠️ Event ${eventDoc.id} has no organizerId, skipping');
+            continue;
+          }
+
+          // Check if organizer name already exists and is not "Unknown Organizer"
+          final existingOrganizerName = eventData['organizerName'] as String?;
+          if (existingOrganizerName != null &&
+              existingOrganizerName != 'Unknown Organizer' &&
+              existingOrganizerName.trim().isNotEmpty) {
+            print(
+                '✅ Event ${eventDoc.id} already has organizer name: $existingOrganizerName');
+            continue;
+          }
+
+          // Get organizer name from user profile
+          final organizerName = await _getOrganizerName(organizerId);
+
+          // Only update if we found a valid name
+          if (organizerName != 'Unknown Organizer') {
+            await eventDoc.reference.update({
+              'organizerName': organizerName,
+            });
+
+            updatedCount++;
+            print(
+                '✅ Updated event ${eventDoc.id} with organizer name: $organizerName');
+          } else {
+            print(
+                '⚠️ Could not find valid organizer name for event ${eventDoc.id}');
+          }
+        } catch (e) {
+          print('❌ Error updating event ${eventDoc.id}: $e');
+        }
+      }
+
+      print('🎉 Organizer name update completed!');
+      print('📈 Updated $updatedCount out of $totalCount events');
+    } catch (e) {
+      print('❌ Error in updateAllEventsWithOrganizerNames: $e');
+    }
+  }
+
   Future<String> _getOrganizerName(String organizerId) async {
+    // Check cache first
+    if (_organizerNameCache.containsKey(organizerId)) {
+      return _organizerNameCache[organizerId]!;
+    }
+    
     try {
       final organizerDoc = await _firestore
           .collection(_organizersCollection)
           .doc(organizerId)
           .get();
 
+      String organizerName = 'Unknown Organizer';
+
       if (organizerDoc.exists) {
         final data = organizerDoc.data()!;
-        return data['displayName'] as String? ?? 
-               data['name'] as String? ?? 
-               'Unknown Organizer';
+        
+        // Priority order for organizer name:
+        // 1. organizerData.organizationName (for business/organization names)
+        // 2. name (user's display name)
+        // 3. displayName (fallback)
+        // 4. email (last resort)
+
+        // Check for organization name first (most appropriate for events)
+        final organizerData = data['organizerData'] as Map<String, dynamic>?;
+        if (organizerData != null) {
+          final organizationName = organizerData['organizationName'] as String?;
+          if (organizationName != null && organizationName.trim().isNotEmpty) {
+            organizerName = organizationName.trim();
+          }
+        }
+
+        // Check for user name if no organization name
+        if (organizerName == 'Unknown Organizer') {
+          final name = data['name'] as String?;
+          if (name != null && name.trim().isNotEmpty) {
+            organizerName = name.trim();
+          }
+        }
+
+        // Fallback to displayName if it exists
+        if (organizerName == 'Unknown Organizer') {
+          final displayName = data['displayName'] as String?;
+          if (displayName != null && displayName.trim().isNotEmpty) {
+            organizerName = displayName.trim();
+          }
+        }
+
+        // Last resort: use email prefix
+        if (organizerName == 'Unknown Organizer') {
+          final email = data['email'] as String?;
+          if (email != null && email.trim().isNotEmpty) {
+            final emailPrefix = email.split('@').first;
+            organizerName = emailPrefix.trim();
+          }
+        }
+
+        if (organizerName == 'Unknown Organizer') {
+          print(
+              'Warning: Organizer $organizerId exists but has no valid name fields');
+        }
+      } else {
+        print('Warning: Organizer profile not found for ID: $organizerId');
       }
-      return 'Unknown Organizer';
+      
+      // Cache the result
+      _organizerNameCache[organizerId] = organizerName;
+      return organizerName;
+      
     } catch (e) {
-      return 'Unknown Organizer';
+      print('Error fetching organizer name for $organizerId: $e');
+      const fallbackName = 'Unknown Organizer';
+      _organizerNameCache[organizerId] = fallbackName;
+      return fallbackName;
     }
   }
 

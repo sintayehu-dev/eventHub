@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppErrorRetryWidget extends StatelessWidget {
@@ -11,55 +10,73 @@ class AppErrorRetryWidget extends StatelessWidget {
   final Color? textColor;
 
   const AppErrorRetryWidget({
-    Key? key,
+    super.key,
     required this.errorMessage,
     required this.onRetry,
     this.buttonText,
     this.icon,
     this.iconColor,
     this.textColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon ?? Icons.error_outline,
-            color: iconColor ?? Colors.grey[400],
-            size: 32.sp,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return SingleChildScrollView(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: 200.h,
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
           ),
-          SizedBox(height: 8.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Text(
-              errorMessage.isNotEmpty ? errorMessage : 'Failed to fetch data',
-              style: GoogleFonts.outfit(
-                fontSize: 14.sp,
-                color: textColor ?? Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon ?? Icons.error_outline,
+                  color: iconColor ?? colorScheme.error,
+                  size: 32.sp,
+                ),
+                SizedBox(height: 12.h),
+                Flexible(
+                  child: Text(
+                    errorMessage,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor ?? colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                ElevatedButton.icon(
+                  onPressed: onRetry,
+                  icon: Icon(
+                    Icons.refresh_rounded,
+                    size: 18.sp,
+                  ),
+                  label: Text(buttonText ?? 'Try Again'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 12.h),
-          TextButton.icon(
-            onPressed: onRetry,
-            icon: Icon(
-              Icons.refresh_rounded,
-              color: iconColor ?? Theme.of(context).colorScheme.secondary,
-              size: 20.sp,
-            ),
-            label: Text(
-              buttonText ?? 'Try Again',
-              style: GoogleFonts.outfit(
-                fontSize: 14.sp,
-                color: iconColor ?? Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

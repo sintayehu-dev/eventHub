@@ -13,21 +13,6 @@ class DiscoverHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.arrow_back,
-                color: colorScheme.primary,
-                size: 20.sp,
-              ),
-            ),
-          ),
           Expanded(
             child: Text(
               'Search Events',

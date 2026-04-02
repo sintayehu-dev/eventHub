@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/repositories/event_discovery_repository.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -17,7 +18,7 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
   EventDiscoveryBloc({
     required EventDiscoveryRepository repository,
   })  : _repository = repository,
-        super(const EventDiscoveryState.initial()) {
+        super(EventDiscoveryState.initial()) {
     on<_LoadUpcomingEvents>(_onLoadUpcomingEvents);
     on<_LoadFeaturedEvents>(_onLoadFeaturedEvents);
     on<_LoadEventsByCategory>(_onLoadEventsByCategory);
@@ -34,7 +35,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadUpcomingEvents event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getUpcomingEvents(
       limit: event.limit,
@@ -42,10 +54,17 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -54,15 +73,33 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadFeaturedEvents event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getFeaturedEvents(limit: event.limit);
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -71,7 +108,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadEventsByCategory event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getEventsByCategory(
       category: event.category,
@@ -79,11 +127,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: false,
         selectedCategory: event.category,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -92,7 +147,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _SearchEvents event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.searchEvents(
       filters: event.filters,
@@ -100,11 +166,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: true,
         searchFilters: event.filters,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -113,7 +186,19 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadEventDetails event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loadingDetails());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoadingDetails: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+        isLoadingDetails: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getEventDetails(
       eventId: event.eventId,
@@ -121,9 +206,16 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (eventDetails) => emit(EventDiscoveryState.eventDetailsLoaded(
-        event: eventDetails,
+      (failure) => emit(state.copyWith(
+        isLoadingDetails: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (eventDetails) => emit(state.copyWith(
+        isLoadingDetails: false,
+        selectedEvent: eventDetails,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -132,40 +224,52 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _ToggleFavorite event,
     Emitter<EventDiscoveryState> emit,
   ) async {
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
     final result = await _repository.toggleEventFavorite(
       userId: event.userId,
       eventId: event.eventId,
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
+      (failure) => emit(state.copyWith(
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
       (isFavorite) {
         // Update the current state if we have events loaded
-        state.maybeWhen(
-          loaded: (events, isSearchResult, selectedCategory, searchFilters) {
-            final updatedEvents = events.map((e) {
-              if (e.id == event.eventId) {
-                return e.copyWith(isFavorite: isFavorite);
-              }
-              return e;
-            }).toList();
-
-            emit(EventDiscoveryState.loaded(
-              events: updatedEvents,
-              isSearchResult: isSearchResult,
-              selectedCategory: selectedCategory,
-              searchFilters: searchFilters,
-            ));
-          },
-          eventDetailsLoaded: (eventDetails) {
-            if (eventDetails.id == event.eventId) {
-              emit(EventDiscoveryState.eventDetailsLoaded(
-                event: eventDetails.copyWith(isFavorite: isFavorite),
-              ));
+        if (state.events.isNotEmpty) {
+          final updatedEvents = state.events.map((e) {
+            if (e.id == event.eventId) {
+              return e.copyWith(isFavorite: isFavorite);
             }
-          },
-          orElse: () {},
-        );
+            return e;
+          }).toList();
+
+          emit(state.copyWith(
+            events: updatedEvents,
+            hasError: false,
+            errorMessage: '',
+          ));
+        }
+
+        // Update selected event if it matches
+        if (state.selectedEvent?.id == event.eventId) {
+          emit(state.copyWith(
+            selectedEvent:
+                state.selectedEvent!.copyWith(isFavorite: isFavorite),
+            hasError: false,
+            errorMessage: '',
+          ));
+        }
       },
     );
   }
@@ -174,15 +278,33 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadFavoriteEvents event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getFavoriteEvents(userId: event.userId);
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -191,7 +313,18 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     _LoadNearbyEvents event,
     Emitter<EventDiscoveryState> emit,
   ) async {
-    emit(const EventDiscoveryState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getNearbyEvents(
       latitude: event.latitude,
@@ -201,10 +334,17 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     );
 
     result.fold(
-      (failure) => emit(EventDiscoveryState.error(message: failure)),
-      (events) => emit(EventDiscoveryState.loaded(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
         events: events,
         isSearchResult: false,
+        hasError: false,
+        errorMessage: '',
       )),
     );
   }
@@ -214,20 +354,14 @@ class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> 
     Emitter<EventDiscoveryState> emit,
   ) async {
     // Refresh the current view based on the current state
-    state.maybeWhen(
-      loaded: (events, isSearchResult, selectedCategory, searchFilters) {
-        if (isSearchResult && searchFilters != null) {
-          add(EventDiscoveryEvent.searchEvents(filters: searchFilters));
-        } else if (selectedCategory != null) {
-          add(EventDiscoveryEvent.loadEventsByCategory(category: selectedCategory));
-        } else {
-          add(const EventDiscoveryEvent.loadUpcomingEvents());
-        }
-      },
-      orElse: () {
-        add(const EventDiscoveryEvent.loadUpcomingEvents());
-      },
-    );
+    if (state.isSearchResult && state.searchFilters != null) {
+      add(EventDiscoveryEvent.searchEvents(filters: state.searchFilters!));
+    } else if (state.selectedCategory != null) {
+      add(EventDiscoveryEvent.loadEventsByCategory(
+          category: state.selectedCategory!));
+    } else {
+      add(const EventDiscoveryEvent.loadUpcomingEvents());
+    }
   }
 
   void _onClearSearch(

@@ -8,4 +8,5 @@ class LocalStorageKey {
   static const userData = 'userData';
   static const firebaseUserData = 'firebaseUserData';
   static const isFirstTime = 'isFirstTime';
+  static const isAuthenticated = 'isAuthenticated';
 }

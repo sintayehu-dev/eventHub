@@ -8,7 +8,6 @@ import 'package:eventhub/core/utils/local_storage_key.dart';
 class LocalStorage {
   LocalStorage._();
   static SharedPreferences? _preferences;
-  static LocalStorage? _localStorage;
   static final LocalStorage instance = LocalStorage._();
   
   static Future<void> ensureInitialized() async {
@@ -22,11 +21,6 @@ class LocalStorage {
       // Initialize with an empty instance to prevent further crashes
       _preferences = null;
     }
-  }
-
-  /// init shared preferences
-  Future<void> _init() async {
-    _preferences = await SharedPreferences.getInstance();
   }
 
   /// get is onboarding
@@ -224,5 +218,41 @@ class LocalStorage {
     await deleteRefreshToken();
     await deleteUserData();
     await deleteFirebaseUserData();
+    await setIsAuthenticated(false);
+  }
+
+  /// set authentication status
+  Future<void> setIsAuthenticated(bool value) async {
+    if (_preferences == null) {
+      return;
+    }
+    await _preferences?.setBool(LocalStorageKey.isAuthenticated, value);
+    log('setIsAuthenticated: $value');
+  }
+
+  /// get authentication status
+  bool getIsAuthenticated() {
+    if (_preferences == null) {
+      return false;
+    }
+    final isAuthenticated =
+        _preferences?.getBool(LocalStorageKey.isAuthenticated) ?? false;
+    log('getIsAuthenticated: $isAuthenticated');
+    return isAuthenticated;
+  }
+
+  /// get user ID from Firebase user data
+  String? getUserId() {
+    final firebaseUserData = getFirebaseUserData();
+    return firebaseUserData?['uid'] as String?;
+  }
+
+  /// check if user data is available and valid
+  bool hasValidUserData() {
+    final isAuthenticated = getIsAuthenticated();
+    final firebaseUserData = getFirebaseUserData();
+    final userId = firebaseUserData?['uid'] as String?;
+
+    return isAuthenticated && userId != null && userId.isNotEmpty;
   }
 }

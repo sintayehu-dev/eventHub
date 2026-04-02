@@ -74,6 +74,10 @@ import '../../features/organizer/analytics/infrastructure/datasources/firebase_a
     as _i41;
 import '../../features/organizer/analytics/infrastructure/repositories/analytics_repository_impl.dart'
     as _i908;
+import '../../features/organizer/attendee_management/application/attendee_management/bloc/attendee_management_bloc.dart'
+    as _i746;
+import '../../features/organizer/attendee_management/domain/repositories/attendee_management_repository.dart'
+    as _i455;
 import '../../features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart'
     as _i263;
 import '../../features/organizer/event_management/domain/repositories/event_repository.dart'
@@ -82,6 +86,10 @@ import '../../features/organizer/event_management/infrastructure/datasources/fir
     as _i912;
 import '../../features/organizer/event_management/infrastructure/repositories/event_repository_impl.dart'
     as _i413;
+import '../../features/organizer/staff_management/application/staff_management/bloc/staff_management_bloc.dart'
+    as _i479;
+import '../../features/organizer/staff_management/domain/repositories/staff_management_repository.dart'
+    as _i547;
 import '../../features/organizer/staff_management/infrastructure/datasources/firebase_staff_management_data_source.dart'
     as _i409;
 import '../../features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart'
@@ -186,6 +194,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i935.StaffAssignmentService>(() =>
         _i912.FirebaseStaffAssignmentService(
             firestore: gh<_i974.FirebaseFirestore>()));
+    gh.factory<_i746.AttendeeManagementBloc>(() =>
+        _i746.AttendeeManagementBloc(gh<_i455.AttendeeManagementRepository>()));
+    gh.factory<_i479.StaffManagementBloc>(
+        () => _i479.StaffManagementBloc(gh<_i547.StaffManagementRepository>()));
     gh.lazySingleton<_i1043.StaffReportsRepository>(() =>
         _i926.StaffReportsRepositoryImpl(
             gh<_i964.FirebaseStaffReportsDataSource>()));
@@ -286,12 +298,12 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
         ));
-    gh.factory<_i984.TicketScannerBloc>(
-        () => _i984.TicketScannerBloc(gh<_i253.TicketScannerRepository>()));
     gh.factory<_i190.AnalyticsBloc>(
         () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
     gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
         repository: gh<_i805.TicketPurchaseRepository>()));
+    gh.factory<_i984.TicketScannerBloc>(() => _i984.TicketScannerBloc(
+        repository: gh<_i253.TicketScannerRepository>()));
     gh.factory<_i112.TicketWalletBloc>(() =>
         _i112.TicketWalletBloc(repository: gh<_i743.TicketWalletRepository>()));
     return this;

@@ -25,7 +25,6 @@ class RouteName {
   // Attendee routes
   static const attendeeHome = 'attendee_home';
   static const attendeeDiscover = 'attendee_discover';
-  static const attendeeTickets = 'attendee_tickets';
   static const attendeeProfile = 'attendee_profile';
   
   // Ticket purchase routes
