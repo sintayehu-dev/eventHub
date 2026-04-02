@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
-import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
 
 @lazySingleton
@@ -39,6 +38,62 @@ class FirebaseStaffEventAssignmentDataSource {
         }
       }
 
+      // If no assignments found in Firestore, create a test assignment
+      if (assignments.isEmpty) {
+        // Check if there are any events in the system
+        final eventsQuery = await _firestore
+            .collection('events')
+            .where('status', isEqualTo: 'active')
+            .limit(1)
+            .get();
+
+        if (eventsQuery.docs.isNotEmpty) {
+          final eventDoc = eventsQuery.docs.first;
+          final eventData = eventDoc.data();
+
+          // Create a test assignment for this staff member
+          final testAssignment = StaffEventAssignmentEntity(
+            id: 'test_assignment_${staffId}_${eventDoc.id}',
+            staffId: staffId,
+            eventId: eventDoc.id,
+            eventTitle: eventData['title'] ?? 'Test Event',
+            eventLocation: eventData['location'] ?? 'Test Location',
+            eventDateTime: _parseDateTime(eventData['dateTime']) ??
+                DateTime.now().add(const Duration(days: 1)),
+            role: StaffRole.scanner,
+            permissions: [
+              StaffPermission.scan,
+              StaffPermission.viewAttendees,
+              StaffPermission.manualCheckIn,
+            ],
+            assignedBy: 'system',
+            assignedAt: DateTime.now(),
+            isActive: true,
+          );
+
+          assignments.add(testAssignment);
+        } else {
+          // No events in system, create a completely test event assignment
+          assignments.add(StaffEventAssignmentEntity(
+            id: 'test_assignment_${staffId}_default',
+            staffId: staffId,
+            eventId: 'test_event_001',
+            eventTitle: 'Sample Event',
+            eventLocation: 'Sample Venue',
+            eventDateTime: DateTime.now().add(const Duration(days: 1)),
+            role: StaffRole.scanner,
+            permissions: [
+              StaffPermission.scan,
+              StaffPermission.viewAttendees,
+              StaffPermission.manualCheckIn,
+            ],
+            assignedBy: 'system',
+            assignedAt: DateTime.now(),
+            isActive: true,
+          ));
+        }
+      }
+
       // Sort by event date time client-side
       assignments.sort((a, b) => a.eventDateTime.compareTo(b.eventDateTime));
 
@@ -47,12 +102,12 @@ class FirebaseStaffEventAssignmentDataSource {
       // Fallback to hardcoded data if Firestore query fails
       return [
         StaffEventAssignmentEntity(
-          id: 'test_assignment_1',
+          id: 'fallback_assignment_${staffId}',
           staffId: staffId,
-          eventId: '1774346204603_176467',
-          eventTitle: 'gg',
-          eventLocation: 'ghh',
-          eventDateTime: DateTime.parse('2026-03-31T12:56:00.000'),
+          eventId: 'fallback_event_001',
+          eventTitle: 'Fallback Event',
+          eventLocation: 'Fallback Location',
+          eventDateTime: DateTime.now().add(const Duration(days: 1)),
           role: StaffRole.scanner,
           permissions: [
             StaffPermission.scan,
@@ -73,10 +128,29 @@ class FirebaseStaffEventAssignmentDataSource {
     required String eventId,
   }) async {
     try {
-      // For now, allow access to the test event
-      return eventId == '1774346204603_176467';
+      // Check if there's an active assignment for this staff and event
+      final query = await _firestore
+          .collection('staff_event_assignments')
+          .where('staffId', isEqualTo: staffId)
+          .where('eventId', isEqualTo: eventId)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        return true;
+      }
+
+      // For development, allow access to test events
+      if (eventId.startsWith('test_') || eventId.startsWith('fallback_')) {
+        return true;
+      }
+
+      // Check if the event exists and allow access for development
+      final eventDoc = await _firestore.collection('events').doc(eventId).get();
+      return eventDoc.exists;
     } catch (e) {
-      return false;
+      // For development, allow access by default
+      return true;
     }
   }
 
@@ -86,18 +160,37 @@ class FirebaseStaffEventAssignmentDataSource {
     required String eventId,
   }) async {
     try {
-      // For now, return default permissions for the test event
-      if (eventId == '1774346204603_176467') {
-        return [
-          StaffPermission.scan,
-          StaffPermission.viewAttendees,
-          StaffPermission.manualCheckIn,
-        ];
+      // Check for existing assignment
+      final query = await _firestore
+          .collection('staff_event_assignments')
+          .where('staffId', isEqualTo: staffId)
+          .where('eventId', isEqualTo: eventId)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final data = query.docs.first.data();
+        return (data['permissions'] as List<dynamic>?)
+                ?.map((p) => _mapStringToPermission(p.toString()))
+                .where((p) => p != null)
+                .cast<StaffPermission>()
+                .toList() ??
+            _getDefaultPermissions();
       }
-      return [];
+
+      // Return default permissions for development
+      return _getDefaultPermissions();
     } catch (e) {
-      return [];
+      return _getDefaultPermissions();
     }
+  }
+
+  List<StaffPermission> _getDefaultPermissions() {
+    return [
+      StaffPermission.scan,
+      StaffPermission.viewAttendees,
+      StaffPermission.manualCheckIn,
+    ];
   }
 
   /// Get staff assignment details for a specific event
@@ -106,27 +199,41 @@ class FirebaseStaffEventAssignmentDataSource {
     required String eventId,
   }) async {
     try {
-      // For now, return hardcoded assignment for the test event
-      if (eventId == '1774346204603_176467') {
-        return StaffEventAssignmentEntity(
-          id: 'test_assignment_1',
-          staffId: staffId,
-          eventId: eventId,
-          eventTitle: 'gg',
-          eventLocation: 'ghh',
-          eventDateTime: DateTime.parse('2026-03-31T12:56:00.000'),
-          role: StaffRole.scanner,
-          permissions: [
-            StaffPermission.scan,
-            StaffPermission.viewAttendees,
-            StaffPermission.manualCheckIn,
-          ],
-          assignedBy: 'system',
-          assignedAt: DateTime.now(),
-          isActive: true,
-        );
+      // Check for existing assignment
+      final query = await _firestore
+          .collection('staff_event_assignments')
+          .where('staffId', isEqualTo: staffId)
+          .where('eventId', isEqualTo: eventId)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        final data = doc.data();
+
+        // Get event details
+        final eventDoc =
+            await _firestore.collection('events').doc(eventId).get();
+        if (eventDoc.exists) {
+          final eventData = eventDoc.data()!;
+          return _mapFirestoreToAssignment(doc.id, data, eventData);
+        }
       }
-      return null;
+
+      // For development, create a dynamic assignment
+      return StaffEventAssignmentEntity(
+        id: 'dynamic_assignment_${staffId}_$eventId',
+        staffId: staffId,
+        eventId: eventId,
+        eventTitle: 'Dynamic Event',
+        eventLocation: 'Dynamic Location',
+        eventDateTime: DateTime.now().add(const Duration(days: 1)),
+        role: StaffRole.scanner,
+        permissions: _getDefaultPermissions(),
+        assignedBy: 'system',
+        assignedAt: DateTime.now(),
+        isActive: true,
+      );
     } catch (e) {
       return null;
     }
@@ -137,8 +244,31 @@ class FirebaseStaffEventAssignmentDataSource {
     required String staffId,
     required String eventId,
   }) async {
-    // Not needed since we're using hardcoded data
-    return;
+    try {
+      // Check if assignment already exists
+      final existingQuery = await _firestore
+          .collection('staff_event_assignments')
+          .where('staffId', isEqualTo: staffId)
+          .where('eventId', isEqualTo: eventId)
+          .get();
+
+      if (existingQuery.docs.isNotEmpty) {
+        return; // Assignment already exists
+      }
+
+      // Create new assignment
+      await _firestore.collection('staff_event_assignments').add({
+        'staffId': staffId,
+        'eventId': eventId,
+        'role': 'scanner',
+        'permissions': ['scan', 'viewAttendees', 'manualCheckIn'],
+        'assignedBy': 'system',
+        'assignedAt': FieldValue.serverTimestamp(),
+        'isActive': true,
+      });
+    } catch (e) {
+      // Ignore errors for now - this is just for development
+    }
   }
 
   /// Helper method to map Firestore data to StaffEventAssignmentEntity

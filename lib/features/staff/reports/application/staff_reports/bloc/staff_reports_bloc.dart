@@ -1,6 +1,8 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/staff/reports/domain/entities/staff_report_entity.dart';
 import 'package:eventhub/features/staff/reports/domain/repositories/staff_reports_repository.dart';
 
@@ -11,27 +13,41 @@ part 'staff_reports_bloc.freezed.dart';
 @injectable
 class StaffReportsBloc extends Bloc<StaffReportsEvent, StaffReportsState> {
   final StaffReportsRepository _repository;
-  
-  String? _currentEventId;
-  String? _currentStaffId;
 
-  StaffReportsBloc(this._repository) : super(const StaffReportsState.initial()) {
+  StaffReportsBloc(this._repository) : super(StaffReportsState.initial()) {
     on<_LoadReport>(_onLoadReport);
+    on<_LoadCheckInAnalytics>(_onLoadCheckInAnalytics);
+    on<_LoadStaffPerformance>(_onLoadStaffPerformance);
+    on<_LoadRealTimeMetrics>(_onLoadRealTimeMetrics);
     on<_ChangeTimePeriod>(_onChangeTimePeriod);
     on<_RefreshReport>(_onRefreshReport);
-    on<_LoadRealTimeMetrics>(_onLoadRealTimeMetrics);
+    on<_ClearError>(_onClearError);
   }
 
   Future<void> _onLoadReport(
     _LoadReport event,
     Emitter<StaffReportsState> emit,
   ) async {
-    _currentEventId = event.eventId;
-    _currentStaffId = event.staffId;
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
 
-    emit(StaffReportsState.loading(
+    emit(state.copyWith(
+      isLoading: true,
+      hasError: false,
+      errorMessage: '',
+      currentEventId: event.eventId,
+      currentStaffId: event.staffId,
       selectedTimePeriod: event.timePeriod,
-      previousReport: state.mapOrNull(loaded: (state) => state.report),
+      customStartDate: event.startDate,
+      customEndDate: event.endDate,
     ));
 
     final result = await _repository.getStaffReport(
@@ -43,14 +59,144 @@ class StaffReportsBloc extends Bloc<StaffReportsEvent, StaffReportsState> {
     );
 
     result.fold(
-      (failure) => emit(StaffReportsState.error(
-        message: failure.toString(),
-        selectedTimePeriod: event.timePeriod,
-        previousReport: state.mapOrNull(loaded: (state) => state.report),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
       )),
-      (report) => emit(StaffReportsState.loaded(
+      (report) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
         report: report,
-        selectedTimePeriod: event.timePeriod,
+        metrics: report.metrics,
+        hourlyData: report.hourlyData,
+        staffPerformance: report.staffPerformance,
+      )),
+    );
+  }
+
+  Future<void> _onLoadCheckInAnalytics(
+    _LoadCheckInAnalytics event,
+    Emitter<StaffReportsState> emit,
+  ) async {
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoadingAnalytics: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isLoadingAnalytics: true,
+      hasError: false,
+      errorMessage: '',
+    ));
+
+    final result = await _repository.getCheckInAnalytics(
+      eventId: event.eventId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoadingAnalytics: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (hourlyData) => emit(state.copyWith(
+        isLoadingAnalytics: false,
+        hasError: false,
+        errorMessage: '',
+        hourlyData: hourlyData,
+      )),
+    );
+  }
+
+  Future<void> _onLoadStaffPerformance(
+    _LoadStaffPerformance event,
+    Emitter<StaffReportsState> emit,
+  ) async {
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoadingAnalytics: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isLoadingAnalytics: true,
+      hasError: false,
+      errorMessage: '',
+    ));
+
+    final result = await _repository.getStaffPerformance(
+      eventId: event.eventId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoadingAnalytics: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (staffPerformance) => emit(state.copyWith(
+        isLoadingAnalytics: false,
+        hasError: false,
+        errorMessage: '',
+        staffPerformance: staffPerformance,
+      )),
+    );
+  }
+
+  Future<void> _onLoadRealTimeMetrics(
+    _LoadRealTimeMetrics event,
+    Emitter<StaffReportsState> emit,
+  ) async {
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoadingMetrics: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isLoadingMetrics: true,
+      hasError: false,
+      errorMessage: '',
+    ));
+
+    final result = await _repository.getRealTimeMetrics(
+      eventId: event.eventId,
+      staffId: event.staffId,
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoadingMetrics: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (metrics) => emit(state.copyWith(
+        isLoadingMetrics: false,
+        hasError: false,
+        errorMessage: '',
+        metrics: metrics,
       )),
     );
   }
@@ -59,14 +205,21 @@ class StaffReportsBloc extends Bloc<StaffReportsEvent, StaffReportsState> {
     _ChangeTimePeriod event,
     Emitter<StaffReportsState> emit,
   ) async {
-    if (_currentEventId != null && _currentStaffId != null) {
+    emit(state.copyWith(
+      selectedTimePeriod: event.timePeriod,
+      customStartDate: event.startDate,
+      customEndDate: event.endDate,
+    ));
+
+    // Reload report with new time period if we have current event and staff
+    if (state.currentEventId != null && state.currentStaffId != null) {
       add(StaffReportsEvent.loadReport(
-        eventId: _currentEventId!,
-        staffId: _currentStaffId!,
+        eventId: state.currentEventId!,
+        staffId: state.currentStaffId!,
         timePeriod: event.timePeriod,
+        startDate: event.startDate,
+        endDate: event.endDate,
       ));
-    } else {
-      emit(state.copyWith(selectedTimePeriod: event.timePeriod));
     }
   }
 
@@ -74,60 +227,21 @@ class StaffReportsBloc extends Bloc<StaffReportsEvent, StaffReportsState> {
     _RefreshReport event,
     Emitter<StaffReportsState> emit,
   ) async {
-    if (_currentEventId != null && _currentStaffId != null) {
+    if (state.currentEventId != null && state.currentStaffId != null) {
       add(StaffReportsEvent.loadReport(
-        eventId: _currentEventId!,
-        staffId: _currentStaffId!,
+        eventId: state.currentEventId!,
+        staffId: state.currentStaffId!,
         timePeriod: state.selectedTimePeriod,
+        startDate: state.customStartDate,
+        endDate: state.customEndDate,
       ));
     }
   }
 
-  Future<void> _onLoadRealTimeMetrics(
-    _LoadRealTimeMetrics event,
+  void _onClearError(
+    _ClearError event,
     Emitter<StaffReportsState> emit,
-  ) async {
-    final result = await _repository.getRealTimeMetrics(
-      eventId: event.eventId,
-      staffId: event.staffId,
-    );
-
-    result.fold(
-      (failure) => emit(StaffReportsState.error(
-        message: failure.toString(),
-        selectedTimePeriod: state.selectedTimePeriod,
-      )),
-      (metrics) => emit(StaffReportsState.metricsLoaded(
-        metrics: metrics,
-        selectedTimePeriod: state.selectedTimePeriod,
-      )),
-    );
-  }
-}
-
-extension StaffReportsStateExtension on StaffReportsState {
-  StaffReportsState copyWith({ReportTimePeriod? selectedTimePeriod}) {
-    return when(
-      initial: (currentPeriod) => StaffReportsState.initial(
-        selectedTimePeriod: selectedTimePeriod ?? currentPeriod,
-      ),
-      loading: (currentPeriod, report) => StaffReportsState.loading(
-        selectedTimePeriod: selectedTimePeriod ?? currentPeriod,
-        previousReport: report,
-      ),
-      loaded: (report, currentPeriod) => StaffReportsState.loaded(
-        report: report,
-        selectedTimePeriod: selectedTimePeriod ?? currentPeriod,
-      ),
-      error: (message, currentPeriod, report) => StaffReportsState.error(
-        message: message,
-        selectedTimePeriod: selectedTimePeriod ?? currentPeriod,
-        previousReport: report,
-      ),
-      metricsLoaded: (metrics, currentPeriod) => StaffReportsState.metricsLoaded(
-        metrics: metrics,
-        selectedTimePeriod: selectedTimePeriod ?? currentPeriod,
-      ),
-    );
+  ) {
+    emit(state.copyWith(hasError: false, errorMessage: ''));
   }
 }

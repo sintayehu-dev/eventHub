@@ -35,4 +35,6 @@ class TicketScannerEvent with _$TicketScannerEvent {
   }) = _LoadRecentCheckIns;
   
   const factory TicketScannerEvent.resetScanner() = _ResetScanner;
+  
+  const factory TicketScannerEvent.clearError() = _ClearError;
 }

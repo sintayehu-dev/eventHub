@@ -10,14 +10,30 @@ class StaffReportsEvent with _$StaffReportsEvent {
     DateTime? endDate,
   }) = _LoadReport;
 
-  const factory StaffReportsEvent.changeTimePeriod({
-    required ReportTimePeriod timePeriod,
-  }) = _ChangeTimePeriod;
+  const factory StaffReportsEvent.loadCheckInAnalytics({
+    required String eventId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) = _LoadCheckInAnalytics;
 
-  const factory StaffReportsEvent.refreshReport() = _RefreshReport;
+  const factory StaffReportsEvent.loadStaffPerformance({
+    required String eventId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) = _LoadStaffPerformance;
 
   const factory StaffReportsEvent.loadRealTimeMetrics({
     required String eventId,
     required String staffId,
   }) = _LoadRealTimeMetrics;
+
+  const factory StaffReportsEvent.changeTimePeriod({
+    required ReportTimePeriod timePeriod,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) = _ChangeTimePeriod;
+
+  const factory StaffReportsEvent.refreshReport() = _RefreshReport;
+
+  const factory StaffReportsEvent.clearError() = _ClearError;
 }

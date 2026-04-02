@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/staff/reports/application/staff_reports/bloc/staff_reports_bloc.dart';
 import 'package:eventhub/features/staff/reports/domain/entities/staff_report_entity.dart';
+import 'package:eventhub/features/staff/reports/presentation/widgets/reports_shimmer.dart';
 
 class StaffReportsScreen extends StatelessWidget {
   const StaffReportsScreen({super.key});
@@ -20,6 +23,21 @@ class StaffReportsScreen extends StatelessWidget {
         ..add(StaffReportsEvent.loadRealTimeMetrics(
           eventId: '1774346204603_176467', // Using the test event ID
           staffId: staffId,
+        ))
+        ..add(StaffReportsEvent.loadReport(
+          eventId: '1774346204603_176467',
+          staffId: staffId,
+          timePeriod: ReportTimePeriod.today,
+        ))
+        ..add(StaffReportsEvent.loadCheckInAnalytics(
+          eventId: '1774346204603_176467',
+          startDate: DateTime.now().subtract(const Duration(hours: 24)),
+          endDate: DateTime.now(),
+        ))
+        ..add(StaffReportsEvent.loadStaffPerformance(
+          eventId: '1774346204603_176467',
+          startDate: DateTime.now().subtract(const Duration(hours: 24)),
+          endDate: DateTime.now(),
         )),
       child: const StaffReportsView(),
     );
@@ -46,24 +64,41 @@ class _StaffReportsViewState extends State<StaffReportsView> {
       body: SafeArea(
         child: BlocConsumer<StaffReportsBloc, StaffReportsState>(
           listener: (context, state) {
-            state.whenOrNull(
-              error: (message, _, __) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error loading reports: $message'),
-                    backgroundColor: colorScheme.error,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            );
+            if (state.hasError && state.errorMessage.isNotEmpty) {
+              AppHelpers.showErrorSnackBar(
+                  context, 'Error loading reports: ${state.errorMessage}');
+            }
           },
           builder: (context, state) {
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<StaffReportsBloc>().add(
-                      const StaffReportsEvent.refreshReport(),
-                    );
+                final userService = getIt<UserService>();
+                final currentUser = userService.getCurrentUser();
+                final staffId = currentUser?.uid ?? 'unknown_staff';
+
+                // Load all data on refresh
+                context.read<StaffReportsBloc>()
+                  ..add(StaffReportsEvent.loadRealTimeMetrics(
+                    eventId: '1774346204603_176467',
+                    staffId: staffId,
+                  ))
+                  ..add(StaffReportsEvent.loadReport(
+                    eventId: '1774346204603_176467',
+                    staffId: staffId,
+                    timePeriod: _selectedPeriod,
+                  ))
+                  ..add(StaffReportsEvent.loadCheckInAnalytics(
+                    eventId: '1774346204603_176467',
+                    startDate:
+                        DateTime.now().subtract(const Duration(hours: 24)),
+                    endDate: DateTime.now(),
+                  ))
+                  ..add(StaffReportsEvent.loadStaffPerformance(
+                    eventId: '1774346204603_176467',
+                    startDate:
+                        DateTime.now().subtract(const Duration(hours: 24)),
+                    endDate: DateTime.now(),
+                  ));
               },
               color: colorScheme.primary,
               backgroundColor: colorScheme.surfaceContainerHighest,
@@ -82,19 +117,7 @@ class _StaffReportsViewState extends State<StaffReportsView> {
                     SizedBox(height: 24.h),
 
                     // Content based on state
-                    state.when(
-                      initial: (_) => _buildLoadingState(),
-                      loading: (_, previousReport) => previousReport != null
-                          ? _buildReportContent(previousReport)
-                          : _buildLoadingState(),
-                      loaded: (report, _) => _buildReportContent(report),
-                      error: (message, _, previousReport) =>
-                          previousReport != null
-                              ? _buildReportContent(previousReport)
-                              : _buildErrorState(message),
-                      metricsLoaded: (metrics, _) =>
-                          _buildMetricsContent(metrics),
-                    ),
+                    _buildContent(state),
                   ],
                 ),
               ),
@@ -103,6 +126,33 @@ class _StaffReportsViewState extends State<StaffReportsView> {
         ),
       ),
     );
+  }
+
+  Widget _buildContent(StaffReportsState state) {
+    // Show shimmer when loading and no data available
+    if (state.isLoading && state.report == null && state.metrics == null) {
+      return const ReportsShimmer();
+    }
+
+    // Show error state if there's an error and no cached data
+    if (state.hasError &&
+        state.errorMessage.isNotEmpty &&
+        state.report == null &&
+        state.metrics == null) {
+      return _buildErrorState(state.errorMessage);
+    }
+
+    // Show content if we have data (even if loading for refresh)
+    if (state.report != null) {
+      return _buildReportContent(state.report!);
+    }
+
+    if (state.metrics != null) {
+      return _buildMetricsContent(state.metrics!);
+    }
+
+    // Fallback to shimmer
+    return const ReportsShimmer();
   }
 
   Widget _buildHeader() {
@@ -118,17 +168,32 @@ class _StaffReportsViewState extends State<StaffReportsView> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        IconButton(
-          onPressed: () {
-            context.read<StaffReportsBloc>().add(
-                  const StaffReportsEvent.refreshReport(),
-                );
+        BlocBuilder<StaffReportsBloc, StaffReportsState>(
+          builder: (context, state) {
+            return IconButton(
+              onPressed: state.isLoading
+                  ? null
+                  : () {
+                      context.read<StaffReportsBloc>().add(
+                            const StaffReportsEvent.refreshReport(),
+                          );
+                    },
+              icon: state.isLoading
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(colorScheme.primary),
+                      ),
+                    )
+                  : Icon(
+                      Icons.refresh,
+                      color: colorScheme.primary,
+                      size: 24.sp,
+                    ),
+            );
           },
-          icon: Icon(
-            Icons.refresh,
-            color: colorScheme.primary,
-            size: 24.sp,
-          ),
         ),
       ],
     );
@@ -150,6 +215,11 @@ class _StaffReportsViewState extends State<StaffReportsView> {
           return Expanded(
             child: GestureDetector(
               onTap: () {
+                // Get current state to check if loading
+                final currentState = context.read<StaffReportsBloc>().state;
+                if (currentState.isLoading)
+                  return; // Prevent changes while loading
+                
                 setState(() {
                   _selectedPeriod = period;
                 });
@@ -181,75 +251,14 @@ class _StaffReportsViewState extends State<StaffReportsView> {
     );
   }
 
-  Widget _buildLoadingState() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      children: [
-        SizedBox(height: 100.h),
-        CircularProgressIndicator(
-          color: colorScheme.primary,
-        ),
-        SizedBox(height: 16.h),
-        Text(
-          'Loading reports...',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildErrorState(String message) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      children: [
-        SizedBox(height: 100.h),
-        Icon(
-          Icons.error_outline,
-          color: colorScheme.error,
-          size: 48.sp,
-        ),
-        SizedBox(height: 16.h),
-        Text(
-          'Failed to load reports',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          message,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 24.h),
-        ElevatedButton(
-          onPressed: () {
-            context.read<StaffReportsBloc>().add(
-                  const StaffReportsEvent.refreshReport(),
-                );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-          ),
-          child: Text(
-            'Retry',
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: colorScheme.onPrimary,
-            ),
-          ),
-        ),
-      ],
+    return AppErrorRetryWidget(
+      errorMessage: message,
+      onRetry: () {
+        context.read<StaffReportsBloc>().add(
+              const StaffReportsEvent.refreshReport(),
+            );
+      },
     );
   }
 
@@ -258,9 +267,27 @@ class _StaffReportsViewState extends State<StaffReportsView> {
       children: [
         _buildKeyMetrics(metrics),
         SizedBox(height: 32.h),
-        _buildCheckInChart(),
+        
+        // Show chart shimmer if analytics are loading
+        BlocBuilder<StaffReportsBloc, StaffReportsState>(
+          builder: (context, state) {
+            if (state.isLoadingAnalytics) {
+              return const ChartShimmer();
+            }
+            return _buildCheckInChart();
+          },
+        ),
         SizedBox(height: 32.h),
-        _buildEventSummary(metrics),
+        
+        // Show staff performance shimmer if loading
+        BlocBuilder<StaffReportsBloc, StaffReportsState>(
+          builder: (context, state) {
+            if (state.isLoadingAnalytics && state.staffPerformance.isEmpty) {
+              return const StaffPerformanceShimmer();
+            }
+            return _buildEventSummary(metrics);
+          },
+        ),
       ],
     );
   }
@@ -270,9 +297,27 @@ class _StaffReportsViewState extends State<StaffReportsView> {
       children: [
         _buildKeyMetrics(report.metrics),
         SizedBox(height: 32.h),
-        _buildCheckInChart(hourlyData: report.hourlyData),
+        
+        // Show chart shimmer if analytics are loading, otherwise show chart with data
+        BlocBuilder<StaffReportsBloc, StaffReportsState>(
+          builder: (context, state) {
+            if (state.isLoadingAnalytics) {
+              return const ChartShimmer();
+            }
+            return _buildCheckInChart(hourlyData: report.hourlyData);
+          },
+        ),
         SizedBox(height: 32.h),
-        _buildStaffPerformance(report.staffPerformance),
+        
+        // Show staff performance shimmer if loading, otherwise show data
+        BlocBuilder<StaffReportsBloc, StaffReportsState>(
+          builder: (context, state) {
+            if (state.isLoadingAnalytics && report.staffPerformance.isEmpty) {
+              return const StaffPerformanceShimmer();
+            }
+            return _buildStaffPerformance(report.staffPerformance);
+          },
+        ),
         SizedBox(height: 32.h),
         _buildEventSummary(report.metrics),
       ],
@@ -280,57 +325,70 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildKeyMetrics(StaffReportMetrics metrics) {
-    return Column(
-      children: [
-        Row(
+    return BlocBuilder<StaffReportsBloc, StaffReportsState>(
+      builder: (context, state) {
+        // Show shimmer if metrics are loading and we don't have data
+        if (state.isLoadingMetrics && state.metrics == null) {
+          return const MetricsShimmer();
+        }
+        
+        return Column(
           children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Total Check-ins',
-                value: '${metrics.totalCheckIns}',
-                change: '+${metrics.todayCheckIns} today',
-                color: const Color(0xFF4ADE80),
-                icon: Icons.check_circle,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'Total Check-ins',
+                    value: '${metrics.totalCheckIns}',
+                    change: '+${metrics.todayCheckIns} today',
+                    color: const Color(0xFF4ADE80),
+                    icon: Icons.check_circle,
+                    isLoading: state.isLoadingMetrics,
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'Avg. Wait Time',
+                    value: '${metrics.averageWaitTime.toStringAsFixed(1)} min',
+                    change: 'Real-time data',
+                    color: const Color(0xFF06B6D4),
+                    icon: Icons.timer,
+                    isLoading: state.isLoadingMetrics,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Avg. Wait Time',
-                value: '${metrics.averageWaitTime.toStringAsFixed(1)} min',
-                change: 'Real-time data',
-                color: const Color(0xFF06B6D4),
-                icon: Icons.timer,
-              ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'Peak Hour',
+                    value: metrics.peakHour,
+                    change: '${metrics.peakHourCheckIns} entries',
+                    color: const Color(0xFFF59E0B),
+                    icon: Icons.trending_up,
+                    isLoading: state.isLoadingMetrics,
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: _buildMetricCard(
+                    title: 'Check-in Rate',
+                    value: '${metrics.checkInRate.toStringAsFixed(1)}%',
+                    change:
+                        '${metrics.checkedInAttendees}/${metrics.totalAttendees}',
+                    color: const Color(0xFF8B5CF6),
+                    icon: Icons.analytics,
+                    isLoading: state.isLoadingMetrics,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Peak Hour',
-                value: metrics.peakHour,
-                change: '${metrics.peakHourCheckIns} entries',
-                color: const Color(0xFFF59E0B),
-                icon: Icons.trending_up,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _buildMetricCard(
-                title: 'Check-in Rate',
-                value: '${metrics.checkInRate.toStringAsFixed(1)}%',
-                change:
-                    '${metrics.checkedInAttendees}/${metrics.totalAttendees}',
-                color: const Color(0xFF8B5CF6),
-                icon: Icons.analytics,
-              ),
-            ),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -340,11 +398,15 @@ class _StaffReportsViewState extends State<StaffReportsView> {
     required String change,
     required Color color,
     required IconData icon,
+    bool isLoading = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -359,33 +421,45 @@ class _StaffReportsViewState extends State<StaffReportsView> {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12.sp,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              Icon(
-                icon,
-                color: color,
-                size: 16.sp,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    color: color,
+                    size: 16.sp,
+                  ),
+                  if (isLoading)
+                    SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        valueColor: AlwaysStoppedAnimation(
+                            color.withValues(alpha: 0.7)),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
           SizedBox(height: 8.h),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.sp,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             change,
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 11.sp,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -394,13 +468,16 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildCheckInChart({List<HourlyCheckInData>? hourlyData}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -409,9 +486,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
         children: [
           Text(
             'Check-in Activity',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -426,6 +502,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildHourlyChart(List<HourlyCheckInData> hourlyData) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final maxCheckIns =
         hourlyData.map((e) => e.checkIns).reduce((a, b) => a > b ? a : b);
 
@@ -449,8 +527,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF4ADE80).withValues(alpha: 0.8),
-                      const Color(0xFF4ADE80).withValues(alpha: 0.4),
+                      colorScheme.primary.withValues(alpha: 0.8),
+                      colorScheme.primary.withValues(alpha: 0.4),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(2.r),
@@ -459,9 +537,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
               SizedBox(height: 4.h),
               Text(
                 '${data.hour}h',
-                style: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 10.sp,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -472,6 +549,9 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildPlaceholderChart() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       height: 120.h,
       decoration: BoxDecoration(
@@ -479,8 +559,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF4ADE80).withValues(alpha: 0.3),
-            const Color(0xFF4ADE80).withValues(alpha: 0.1),
+            colorScheme.primary.withValues(alpha: 0.3),
+            colorScheme.primary.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(12.r),
@@ -491,15 +571,14 @@ class _StaffReportsViewState extends State<StaffReportsView> {
           children: [
             Icon(
               Icons.bar_chart,
-              color: const Color(0xFF4ADE80),
+              color: colorScheme.primary,
               size: 32.sp,
             ),
             SizedBox(height: 8.h),
             Text(
               'Check-in Timeline',
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 14.sp,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -509,14 +588,16 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildStaffPerformance(List<StaffPerformanceData> staffPerformance) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Staff Performance',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -536,13 +617,16 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildEventSummary(StaffReportMetrics metrics) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -551,9 +635,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
         children: [
           Text(
             'Event Summary',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -568,6 +651,9 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Widget _buildSummaryRow(String label, String value) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
@@ -575,16 +661,14 @@ class _StaffReportsViewState extends State<StaffReportsView> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14.sp,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           Text(
             value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.sp,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -600,10 +684,13 @@ class _StaffReportsViewState extends State<StaffReportsView> {
     required String status,
     required Color color,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -632,18 +719,16 @@ class _StaffReportsViewState extends State<StaffReportsView> {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   '$checkIns check-ins • $avgTime avg',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12.sp,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -657,9 +742,8 @@ class _StaffReportsViewState extends State<StaffReportsView> {
             ),
             child: Text(
               status,
-              style: TextStyle(
+              style: theme.textTheme.labelSmall?.copyWith(
                 color: color,
-                fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -670,15 +754,17 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   }
 
   Color _getStatusColor(String status) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     switch (status.toLowerCase()) {
       case 'active':
-        return const Color(0xFF4ADE80);
+        return colorScheme.tertiary;
       case 'idle':
-        return const Color(0xFFF59E0B);
+        return colorScheme.secondary;
       case 'offline':
-        return const Color(0xFFEF4444);
+        return colorScheme.error;
       default:
-        return const Color(0xFF06B6D4);
+        return colorScheme.primary;
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
@@ -8,6 +9,7 @@ import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
 import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
+import '../widgets/staff_profile_shimmer.dart';
 
 class StaffProfileScreen extends StatelessWidget {
   const StaffProfileScreen({super.key});
@@ -15,19 +17,8 @@ class StaffProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-    
-    if (currentUser == null) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Center(
-          child: Text(
-            'Please log in to view your profile',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ),
-      );
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     return BlocProvider(
       create: (_) => getIt<UserProfileBloc>()
@@ -97,11 +88,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
                 style: theme.textTheme.titleMedium,
               ),
             ),
-            loading: () => Center(
-              child: CircularProgressIndicator(
-                color: colorScheme.primary,
-              ),
-            ),
+            loading: () => const StaffProfileShimmer(),
             loaded: (profile) => _buildProfileContent(profile),
             profileUpdated: (profile) => _buildProfileContent(profile),
             error: (message) => Center(
@@ -438,25 +425,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   }
 
   void _showToBeImplemented(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Feature to be implemented',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onTertiary,
-          ),
-        ),
-        backgroundColor: colorScheme.tertiary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(context, 'Feature to be implemented');
   }
 
   Widget _buildLogoutCard() {
@@ -523,19 +492,8 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   }
 
   void _showEditProfileDialog() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Edit profile functionality coming soon'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(
+        context, 'Edit profile functionality coming soon');
   }
 
   void _showLogoutDialog(BuildContext context) {

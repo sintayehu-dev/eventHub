@@ -57,14 +57,16 @@ class FirebaseTicketScannerDataSource {
               
           if (newTicketDoc.exists) {
             final ticketData = newTicketDoc.data()!;
-            print('Demo ticket created successfully'); // Debug log
+            print(
+                'Demo ticket created successfully with attendee: ${ticketData['ticketHolderName']}'); // Debug log
             
             return TicketValidationResult(
               isValid: true,
               ticketId: ticketId,
               eventId: eventId,
               status: CheckInStatus.valid,
-              ticketHolderName: ticketData['ticketHolderName'] ?? 'Demo User',
+              ticketHolderName:
+                  ticketData['ticketHolderName'] ?? 'Unknown Attendee',
               ticketTypeName: ticketData['ticketTypeName'] ?? 'General Admission',
               eventTitle: ticketData['eventTitle'] ?? 'Demo Event',
               eventDateTime: DateTime.now().add(const Duration(hours: 2)),
@@ -84,6 +86,10 @@ class FirebaseTicketScannerDataSource {
 
       final ticketData = ticketDoc.data()!;
       print('Found ticket data: ${ticketData.keys}'); // Debug log
+      
+      // Try to get attendee name from multiple sources
+      String? attendeeName = await _getAttendeeNameFromTicket(ticketData);
+      print('Resolved attendee name: $attendeeName'); // Debug log
       
       // Extract event ID from QR code for comparison
       String? qrEventId;
@@ -126,7 +132,7 @@ class FirebaseTicketScannerDataSource {
           eventId: eventId,
           status: CheckInStatus.alreadyUsed,
           errorMessage: 'Ticket has already been used',
-          ticketHolderName: ticketData['ticketHolderName'],
+          ticketHolderName: attendeeName,
           ticketTypeName: ticketData['ticketTypeName'],
           eventTitle: ticketData['eventTitle'],
         );
@@ -164,7 +170,8 @@ class FirebaseTicketScannerDataSource {
         }
       }
 
-      print('Ticket validation successful: $ticketId'); // Debug log
+      print(
+          'Ticket validation successful: $ticketId for attendee: $attendeeName'); // Debug log
       
       // Parse event date time
       DateTime? eventDateTime;
@@ -191,7 +198,7 @@ class FirebaseTicketScannerDataSource {
         ticketId: ticketId,
         eventId: ticketData['eventId'] ?? eventId,
         status: CheckInStatus.valid,
-        ticketHolderName: ticketData['ticketHolderName'] ?? 'Test User',
+        ticketHolderName: attendeeName ?? 'Unknown Attendee',
         ticketTypeName: ticketData['ticketTypeName'] ?? 'General Admission',
         eventTitle: ticketData['eventTitle'] ?? 'Sample Event',
         eventDateTime: eventDateTime,
@@ -221,6 +228,9 @@ class FirebaseTicketScannerDataSource {
           .get();
 
       final ticketData = ticketDoc.data()!;
+      
+      // Get proper attendee name using the same logic as validation
+      String? attendeeName = await _getAttendeeNameFromTicket(ticketData);
 
       final checkInEntity = CheckInEntity(
         id: checkInId,
@@ -230,7 +240,7 @@ class FirebaseTicketScannerDataSource {
         checkInTime: checkInTime,
         status: CheckInStatus.valid,
         qrCode: ticketData['qrCode'],
-        ticketHolderName: ticketData['ticketHolderName'],
+        ticketHolderName: attendeeName ?? 'Unknown Attendee',
         ticketTypeName: ticketData['ticketTypeName'],
         eventTitle: ticketData['eventTitle'],
         notes: notes,
@@ -391,15 +401,114 @@ class FirebaseTicketScannerDataSource {
     return _firestore.collection('temp').doc().id;
   }
 
-  /// Create a demo ticket for testing purposes
+  /// Get attendee name from ticket data with fallback options
+  Future<String?> _getAttendeeNameFromTicket(
+      Map<String, dynamic> ticketData) async {
+    // Priority order for getting attendee name:
+    // 1. ticketHolderName (direct field)
+    // 2. attendeeName (alternative field)
+    // 3. Look up user profile by userId
+    // 4. Extract from email
+
+    // Check direct name fields
+    if (ticketData['ticketHolderName'] != null &&
+        ticketData['ticketHolderName'].toString().isNotEmpty &&
+        ticketData['ticketHolderName'] != 'Demo User' &&
+        ticketData['ticketHolderName'] != 'Test User') {
+      return ticketData['ticketHolderName'];
+    }
+
+    if (ticketData['attendeeName'] != null &&
+        ticketData['attendeeName'].toString().isNotEmpty) {
+      return ticketData['attendeeName'];
+    }
+
+    // Try to get name from user profile if userId is available
+    if (ticketData['userId'] != null) {
+      try {
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(ticketData['userId'])
+            .get();
+
+        if (userDoc.exists) {
+          final userData = userDoc.data()!;
+
+          // Check various name fields in user profile
+          if (userData['displayName'] != null &&
+              userData['displayName'].toString().isNotEmpty) {
+            return userData['displayName'];
+          }
+          if (userData['name'] != null &&
+              userData['name'].toString().isNotEmpty) {
+            return userData['name'];
+          }
+          if (userData['firstName'] != null && userData['lastName'] != null) {
+            return '${userData['firstName']} ${userData['lastName']}';
+          }
+        }
+      } catch (e) {
+        print('Error fetching user profile: $e'); // Debug log
+      }
+    }
+
+    // Extract name from email as last resort
+    if (ticketData['ticketHolderEmail'] != null) {
+      final email = ticketData['ticketHolderEmail'].toString();
+      final emailPrefix = email.split('@')[0];
+
+      // Convert email prefix to readable name (e.g., john.doe -> John Doe)
+      if (emailPrefix.contains('.')) {
+        final parts = emailPrefix.split('.');
+        return parts
+            .map((part) => part.isNotEmpty
+                ? '${part[0].toUpperCase()}${part.substring(1)}'
+                : '')
+            .join(' ');
+      } else {
+        return emailPrefix.isNotEmpty
+            ? '${emailPrefix[0].toUpperCase()}${emailPrefix.substring(1)}'
+            : null;
+      }
+    }
+
+    return null;
+  }
+
+  /// Create a demo ticket for testing purposes with realistic attendee names
   Future<void> _createDemoTicket(String ticketId, String eventId) async {
     try {
+      // Generate realistic attendee names based on ticket ID
+      final attendeeNames = [
+        'John Smith',
+        'Sarah Johnson',
+        'Michael Brown',
+        'Emily Davis',
+        'David Wilson',
+        'Jessica Miller',
+        'Christopher Moore',
+        'Ashley Taylor',
+        'Matthew Anderson',
+        'Amanda Thomas',
+        'James Jackson',
+        'Jennifer White',
+        'Robert Harris',
+        'Lisa Martin',
+        'William Thompson',
+      ];
+
+      // Use ticket ID to consistently generate the same name for the same ticket
+      final nameIndex = ticketId.hashCode.abs() % attendeeNames.length;
+      final attendeeName = attendeeNames[nameIndex];
+      
       final ticketData = {
         'id': ticketId,
         'eventId': eventId,
-        'ticketHolderName': 'Demo User',
-        'ticketHolderEmail': 'demo@example.com',
-        'ticketHolderPhone': '+1234567890',
+        'ticketHolderName': attendeeName,
+        'ticketHolderEmail':
+            '${attendeeName.toLowerCase().replaceAll(' ', '.')}@example.com',
+        'ticketHolderPhone':
+            '+1${(ticketId.hashCode.abs() % 9000000000 + 1000000000)}',
         'ticketTypeName': 'General Admission',
         'eventTitle': 'Demo Event',
         'eventLocation': 'Demo Venue',
@@ -417,9 +526,82 @@ class FirebaseTicketScannerDataSource {
           .doc(ticketId)
           .set(ticketData);
           
-      print('Demo ticket created with ID: $ticketId'); // Debug log
+      print(
+          'Demo ticket created with ID: $ticketId for attendee: $attendeeName'); // Debug log
     } catch (e) {
       print('Error creating demo ticket: $e'); // Debug log
+    }
+  }
+
+  /// Create multiple sample tickets for testing with different attendee names
+  static Future<void> createSampleTickets() async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      final sampleTickets = [
+        {
+          'id': '1774346550999',
+          'eventId': '1774346204603',
+          'ticketHolderName': 'Alex Johnson',
+          'ticketHolderEmail': 'alex.johnson@example.com',
+          'ticketTypeName': 'VIP Access',
+        },
+        {
+          'id': '1774346550998',
+          'eventId': '1774346204603',
+          'ticketHolderName': 'Maria Garcia',
+          'ticketHolderEmail': 'maria.garcia@example.com',
+          'ticketTypeName': 'General Admission',
+        },
+        {
+          'id': '1774346550997',
+          'eventId': '1774346204603',
+          'ticketHolderName': 'David Chen',
+          'ticketHolderEmail': 'david.chen@example.com',
+          'ticketTypeName': 'Student Discount',
+        },
+        {
+          'id': '1',
+          'eventId': 'sample-event-id',
+          'ticketHolderName': 'Sarah Williams',
+          'ticketHolderEmail': 'sarah.williams@example.com',
+          'ticketTypeName': 'Early Bird',
+        },
+      ];
+
+      for (final ticket in sampleTickets) {
+        final ticketData = {
+          'id': ticket['id'],
+          'eventId': ticket['eventId'],
+          'ticketHolderName': ticket['ticketHolderName'],
+          'ticketHolderEmail': ticket['ticketHolderEmail'],
+          'ticketHolderPhone':
+              '+1${(ticket['id'].hashCode.abs() % 9000000000 + 1000000000)}',
+          'ticketTypeName': ticket['ticketTypeName'],
+          'eventTitle': 'Tech Conference 2026',
+          'eventLocation': 'Convention Center',
+          'eventDateTime':
+              Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
+          'price': 199.0,
+          'currency': 'USD',
+          'status': 'active',
+          'qrCode':
+              'TICKET_${ticket['id']}_EVENT_${ticket['eventId']}_${DateTime.now().millisecondsSinceEpoch}',
+          'createdAt': Timestamp.fromDate(DateTime.now()),
+          'updatedAt': Timestamp.fromDate(DateTime.now()),
+        };
+
+        await firestore
+            .collection('tickets')
+            .doc(ticket['id']!)
+            .set(ticketData);
+        print(
+            '✅ Sample ticket created for ${ticket['ticketHolderName']} (ID: ${ticket['id']})');
+      }
+
+      print('🎫 All sample tickets created successfully!');
+    } catch (e) {
+      print('❌ Error creating sample tickets: $e');
     }
   }
 
@@ -433,15 +615,15 @@ class FirebaseTicketScannerDataSource {
       final ticketData = {
         'id': ticketId,
         'eventId': eventId,
-        'ticketHolderName': 'John Doe',
-        'ticketHolderEmail': 'john.doe@example.com',
+        'ticketHolderName': 'Alex Johnson',
+        'ticketHolderEmail': 'alex.johnson@example.com',
         'ticketHolderPhone': '+1234567890',
-        'ticketTypeName': 'General Admission',
-        'eventTitle': 'Sample Event',
-        'eventLocation': 'Sample Venue',
+        'ticketTypeName': 'VIP Access',
+        'eventTitle': 'Tech Conference 2026',
+        'eventLocation': 'Convention Center',
         'eventDateTime':
-            Timestamp.fromDate(DateTime.parse('2026-03-31 15:00:00')),
-        'price': 99.0,
+            Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
+        'price': 299.0,
         'currency': 'USD',
         'status': 'active',
         'qrCode':
@@ -452,7 +634,8 @@ class FirebaseTicketScannerDataSource {
 
       await firestore.collection('tickets').doc(ticketId).set(ticketData);
 
-      print('✅ Specific ticket created successfully with ID: $ticketId');
+      print(
+          '✅ Specific ticket created successfully with ID: $ticketId for Alex Johnson');
       print('📱 QR code should now work when scanned!');
     } catch (e) {
       print('❌ Error creating specific ticket: $e');
