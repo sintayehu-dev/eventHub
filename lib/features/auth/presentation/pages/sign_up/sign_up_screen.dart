@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_event.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_state.dart';
@@ -56,12 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: BlocConsumer<RegistrationBloc, RegistrationState>(
             listener: (context, state) {
               if (state.isRegistrationSuccessful) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Registration successful!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                AppHelpers.showRegistrationSuccessSnackBar(context);
                 // Use role-based routing
                 if (state.routeName != null) {
                   context.goNamed(state.routeName!);
@@ -72,12 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }
               
               if (state.isRegistrationError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.errorMessage),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                AppHelpers.showErrorSnackBar(context, state.errorMessage);
               }
             },
             builder: (context, state) {
@@ -288,6 +280,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 },
                               ),
                             ),
+                            // Email validation error
+                            if (state.showErrorMessages &&
+                                state.email != null &&
+                                !state.email!.isValid())
+                              AppValidationErrorWidget(
+                                errorMessage: state.email!.value.fold(
+                                  (f) => f.failedValue,
+                                  (_) => '',
+                                ),
+                              ),
                             
                             SizedBox(height: 24.h),
                             
@@ -357,6 +359,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 },
                               ),
                             ),
+                            // Password validation error
+                            if (state.showErrorMessages &&
+                                state.password != null &&
+                                !state.password!.isValid())
+                              AppValidationErrorWidget(
+                                errorMessage: state.password!.value.fold(
+                                  (f) => f.failedValue,
+                                  (_) => '',
+                                ),
+                              ),
                             
                             SizedBox(height: 32.h),
                             
@@ -399,6 +411,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ],
                             ),
+                            // Role validation error
+                            if (state.showErrorMessages &&
+                                state.userRole != null &&
+                                !state.userRole!.isValid())
+                              AppValidationErrorWidget(
+                                errorMessage: state.userRole!.value.fold(
+                                  (f) => f.failedValue,
+                                  (_) => '',
+                                ),
+                              ),
                             
                             SizedBox(height: 40.h),
                             

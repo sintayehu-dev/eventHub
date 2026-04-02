@@ -78,6 +78,7 @@ class UserServiceImpl implements UserService {
   @override
   Future<void> saveUserData(FirebaseUserEntity user) async {
     await LocalStorage.instance.setFirebaseUserData(user.toJson());
+    await LocalStorage.instance.setIsAuthenticated(true);
   }
 
   @override

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eventhub/core/utils/local_storage.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/domain/repositories/ticket_wallet_repository.dart';
-import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import '../attendee_tickets/attendee_tickets_list_view.dart';
 import '../attendee_tickets/attendee_tickets_error.dart';
 import '../attendee_tickets/attendee_tickets_loading.dart';
@@ -10,7 +10,7 @@ import 'ticket_wallet_tab_bar.dart';
 import 'ticket_wallet_summary_section.dart';
 import 'ticket_wallet_search_results.dart';
 
-class TicketWalletBody extends StatelessWidget {
+class TicketWalletBody extends StatefulWidget {
   final TabController tabController;
 
   const TicketWalletBody({
@@ -19,66 +19,129 @@ class TicketWalletBody extends StatelessWidget {
   });
 
   @override
+  State<TicketWalletBody> createState() => _TicketWalletBodyState();
+}
+
+class _TicketWalletBodyState extends State<TicketWalletBody> {
+  @override
+  void initState() {
+    super.initState();
+    // Load tickets when the widget initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTickets();
+    });
+  }
+
+  void _loadTickets() {
+    final userId = LocalStorage.instance.getUserId();
+    if (userId != null) {
+      context.read<TicketWalletBloc>().add(
+            TicketWalletEvent.loadWalletTickets(userId: userId),
+          );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // Tab Bar
-        TicketWalletTabBar(controller: tabController),
+        TicketWalletTabBar(controller: widget.tabController),
 
         // Content
-        Expanded(
-          child: BlocBuilder<TicketWalletBloc, TicketWalletState>(
-            builder: (context, state) {
-              return state.when(
-                initial: () => const AttendeeTicketsLoading(),
-                loading: () => const AttendeeTicketsLoading(),
-                searching: () => const AttendeeTicketsLoading(),
-                loaded: (walletData) => _buildWalletContent(context, walletData),
-                ticketsLoaded: (tickets, filterType, selectedStatus) =>
-                    AttendeeTicketsListView(tickets: tickets),
-                searchResults: (tickets, query) =>
-                    TicketWalletSearchResults(tickets: tickets, query: query),
-                error: (error) => AttendeeTicketsError(
-                  error: error,
-                  onRetry: () => _refreshTickets(context),
-                ),
-              );
-            },
-          ),
-        ),
+        const _TicketWalletContent(),
       ],
+    );
+  }
+}
+
+class _TicketWalletContent extends StatelessWidget {
+  const _TicketWalletContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TicketWalletBloc, TicketWalletState>(
+      builder: (context, state) {
+        // Handle error state
+        if (state.hasError) {
+          return AttendeeTicketsError(
+            error: state.errorMessage,
+            onRetry: () => _refreshTickets(context),
+          );
+        }
+
+        // Handle loading states
+        if (state.isLoading || state.isSearching) {
+          return const Expanded(child: AttendeeTicketsLoading());
+        }
+
+        // Handle search results
+        if (state.searchQuery.isNotEmpty) {
+          return Expanded(
+            child: TicketWalletSearchResults(
+              tickets: state.tickets,
+              query: state.searchQuery,
+            ),
+          );
+        }
+
+        // Handle wallet data (when we have walletData)
+        if (state.walletData != null) {
+          return _buildWalletContent(context, state.walletData!);
+        }
+
+        // Handle filtered tickets (when filterType is not 'all')
+        if (state.filterType != TicketFilterType.all) {
+          return Expanded(
+              child: AttendeeTicketsListView(tickets: state.tickets));
+        }
+
+        // Default loading state
+        return const Expanded(child: AttendeeTicketsLoading());
+      },
     );
   }
 
   Widget _buildWalletContent(BuildContext context, TicketWalletData walletData) {
-    return Column(
-      children: [
-        // Summary Cards
-        TicketWalletSummarySection(walletData: walletData),
+    // Get the TabController from the parent TicketWalletBody
+    final ticketWalletBody =
+        context.findAncestorStateOfType<_TicketWalletBodyState>();
+    final tabController = ticketWalletBody?.widget.tabController;
 
-        // Tabs Content
-        Expanded(
-          child: TabBarView(
-            controller: tabController,
-            children: [
-              AttendeeTicketsListView(tickets: walletData.upcomingTickets),
-              AttendeeTicketsListView(tickets: walletData.pastTickets),
-              AttendeeTicketsListView(
-                tickets: [
-                  ...walletData.upcomingTickets,
-                  ...walletData.pastTickets,
-                  ...walletData.cancelledTickets,
-                ],
-              ),
-            ],
+    if (tabController == null) {
+      return const AttendeeTicketsLoading();
+    }
+
+    return Expanded(
+      child: Column(
+        children: [
+          // Summary Cards
+          TicketWalletSummarySection(walletData: walletData),
+
+          // Tabs Content with expanded height
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                AttendeeTicketsListView(tickets: walletData.upcomingTickets),
+                AttendeeTicketsListView(tickets: walletData.pastTickets),
+                AttendeeTicketsListView(
+                  tickets: [
+                    ...walletData.upcomingTickets,
+                    ...walletData.pastTickets,
+                    ...walletData.cancelledTickets,
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   void _refreshTickets(BuildContext context) {
-    final userId = context.read<AuthStatusBloc>().state.user?.uid;
+    final userId = LocalStorage.instance.getUserId();
     if (userId != null) {
       context.read<TicketWalletBloc>().add(
             TicketWalletEvent.refreshWallet(userId: userId),

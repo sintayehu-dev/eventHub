@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_bloc.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_event.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_state.dart';
@@ -23,8 +25,8 @@ class _SignInScreenState extends State<SignInScreen> {
   void initState() {
     super.initState();
     // Pre-fill with test credentials for development
-    _emailController.text = 'test@gmail.com';
-    _passwordController.text = 'Password@123';
+    _emailController.text = 'enter your email';
+    _passwordController.text = 'enter your password';
   }
 
   @override
@@ -61,12 +63,7 @@ class _SignInScreenState extends State<SignInScreen> {
           child: BlocConsumer<LoginBloc, LoginState>(
             listener: (context, state) {
               if (state.isLoginSuccessful) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Login successful!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
+                AppHelpers.showLoginSuccessSnackBar(context);
                 // Use role-based routing
                 if (state.routeName != null) {
                   context.goNamed(state.routeName!);
@@ -77,12 +74,7 @@ class _SignInScreenState extends State<SignInScreen> {
               }
               
               if (state.isLoginError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.errorMessage),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                AppHelpers.showErrorSnackBar(context, state.errorMessage);
               }
             },
             builder: (context, state) {
@@ -199,6 +191,12 @@ class _SignInScreenState extends State<SignInScreen> {
                               },
                             ),
                           ),
+                          // Email validation error
+                          if (state.showErrorMessages &&
+                              state.firstInvalidField['key'] == 'email')
+                            AppValidationErrorWidget(
+                              errorMessage: state.firstInvalidField['error'],
+                            ),
                         ],
                       ),
                       
@@ -291,6 +289,12 @@ class _SignInScreenState extends State<SignInScreen> {
                               },
                             ),
                           ),
+                          // Password validation error
+                          if (state.showErrorMessages &&
+                              state.firstInvalidField['key'] == 'password')
+                            AppValidationErrorWidget(
+                              errorMessage: state.firstInvalidField['error'],
+                            ),
                         ],
                       ),
                       

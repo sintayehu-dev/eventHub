@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_bloc.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_event.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_state.dart';
@@ -111,12 +112,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           }
           
           if (state.isError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Something went wrong. Please restart the app.'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            AppHelpers.showErrorSnackBar(
+                context, 'Something went wrong. Please restart the app.');
           }
         },
         child: Scaffold(
@@ -276,18 +273,20 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                 ),
                                 child: Stack(
                                   children: [
-                                    Container(
-                                      width: double.infinity *
-                                          _progressAnimation.value,
-                                      height: 4.h,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            colorScheme.primary,
-                                            colorScheme.secondary,
-                                          ],
+                                    FractionallySizedBox(
+                                      widthFactor: _progressAnimation.value,
+                                      child: Container(
+                                        height: 4.h,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              colorScheme.primary,
+                                              colorScheme.secondary,
+                                            ],
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(2),
                                         ),
-                                        borderRadius: BorderRadius.circular(2),
                                       ),
                                     ),
                                   ],

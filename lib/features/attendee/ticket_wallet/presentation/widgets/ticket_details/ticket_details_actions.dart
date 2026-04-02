@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 
 class TicketDetailsActions extends StatelessWidget {
   final TicketEntity ticket;
@@ -65,15 +66,6 @@ class TicketDetailsActions extends StatelessWidget {
   }
 
   void _shareTicket(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Ticket sharing feature coming soon!'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
+    AppHelpers.showCheckFlash(context, 'Ticket sharing feature coming soon!');
   }
 }

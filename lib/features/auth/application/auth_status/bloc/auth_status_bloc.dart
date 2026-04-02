@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:eventhub/core/navigation/navigation_service.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/utils/local_storage.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_state.dart';
+import 'package:eventhub/features/auth/domain/entities/firebase_user_entity.dart';
 import 'package:eventhub/features/auth/domain/repositories/auth_repository.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 
@@ -35,12 +37,20 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStatusState> {
 
   void _onAuthStateChanged(AuthStateChanged event, Emitter<AuthStatusState> emit) {
     if (event.user != null) {
+      // Save auth status to local storage
+      LocalStorage.instance.setIsAuthenticated(true);
+      LocalStorage.instance.setFirebaseUserData(event.user!.toJson());
+      
       emit(state.copyWith(
         user: event.user,
         status: AuthStatus.authenticated,
         isLoading: false,
       ));
     } else {
+      // Clear auth status from local storage
+      LocalStorage.instance.setIsAuthenticated(false);
+      LocalStorage.instance.clearUserSession();
+      
       emit(state.copyWith(
         user: null,
         status: AuthStatus.unauthenticated,
@@ -90,6 +100,30 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStatusState> {
   Future<void> _onCheckAuthStatus(CheckAuthStatus event, Emitter<AuthStatusState> emit) async {
     emit(state.copyWith(isLoading: true));
     
+    // First check local storage
+    final hasValidUserData = LocalStorage.instance.hasValidUserData();
+
+    if (hasValidUserData) {
+      // Load user from local storage
+      final userData = LocalStorage.instance.getFirebaseUserData();
+      if (userData != null) {
+        try {
+          final user = FirebaseUserEntity.fromJson(userData);
+          emit(state.copyWith(
+            user: user,
+            status: AuthStatus.authenticated,
+            isLoading: false,
+            errorMessage: '',
+          ));
+          return;
+        } catch (e) {
+          // Invalid stored data, clear it
+          await LocalStorage.instance.clearUserSession();
+        }
+      }
+    }
+
+    // Fallback to Firebase auth check
     final result = await _authRepository.getCurrentUser();
     
     await result.fold(
@@ -105,6 +139,7 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStatusState> {
       (user) async {
         if (user != null) {
           await _userService.saveUserData(user);
+          await LocalStorage.instance.setIsAuthenticated(true);
           if (!emit.isDone) {
             emit(state.copyWith(
               user: user,
@@ -114,6 +149,7 @@ class AuthStatusBloc extends Bloc<AuthStatusEvent, AuthStatusState> {
             ));
           }
         } else {
+          await LocalStorage.instance.setIsAuthenticated(false);
           if (!emit.isDone) {
             emit(state.copyWith(
               user: null,
