@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_header.dart';
@@ -48,65 +50,28 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   Widget build(BuildContext context) {
     return BlocConsumer<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-
-        state.whenOrNull(
-          error: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $message'),
-                backgroundColor: colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-            );
-          },
-          eventCancelled: (event) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Event cancelled successfully'),
-                backgroundColor: colorScheme.tertiary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-            );
-            context.pop();
-          },
-          eventDeleted: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Event deleted successfully'),
-                backgroundColor: colorScheme.tertiary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-            );
-            context.pop();
-          },
-        );
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        }
       },
       builder: (context, state) {
-        return state.maybeWhen(
-          eventLoaded: (event) => _buildEventDetailScaffold(context, event),
-          eventsLoaded: (events) => events.isNotEmpty
-              ? _buildEventDetailScaffold(context, events.first)
-              : _buildErrorScaffold('Event not found'),
-          error: (message) => _buildErrorScaffold(message),
-          eventCreated: (event) => _buildEventDetailScaffold(context, event),
-          eventUpdated: (event) => _buildEventDetailScaffold(context, event),
-          eventCancelled: (event) => _buildEventDetailScaffold(context, event),
-          eventsSearched: (events) => events.isNotEmpty
-              ? _buildEventDetailScaffold(context, events.first)
-              : _buildErrorScaffold('Event not found'),
-          orElse: () => const EventDetailShimmer(),
-        );
+        if (state.isLoading) {
+          return const EventDetailShimmer();
+        }
+
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          return _buildErrorScaffold(state.errorMessage);
+        }
+
+        if (state.selectedEvent != null) {
+          return _buildEventDetailScaffold(context, state.selectedEvent!);
+        }
+
+        if (state.events.isNotEmpty) {
+          return _buildEventDetailScaffold(context, state.events.first);
+        }
+
+        return _buildErrorScaffold('Event not found');
       },
     );
   }
@@ -169,42 +134,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: colorScheme.error, size: 48.sp),
-            SizedBox(height: 16.h),
-            Text(
-              'Error',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: () {
-                context.read<EventManagementBloc>().add(
-                      EventManagementEvent.loadEventById(
-                          eventId: widget.eventId),
-                    );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
+      body: AppErrorRetryWidget(
+        errorMessage: message,
+        onRetry: () {
+          context.read<EventManagementBloc>().add(
+                EventManagementEvent.loadEventById(eventId: widget.eventId),
+              );
+        },
       ),
     );
   }
@@ -337,17 +273,8 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _broadcastMessage(BuildContext context, EventEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Broadcast functionality coming soon...'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(
+        context, 'Broadcast functionality coming soon...');
   }
 
   void _cancelEvent(BuildContext context, EventEntity event) {
@@ -447,45 +374,16 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   void _shareEvent(BuildContext context, EventEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Share functionality coming soon...'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(context, 'Share functionality coming soon...');
   }
 
   void _exportData(BuildContext context, EventEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Export functionality coming soon...'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(context, 'Export functionality coming soon...');
   }
 
   void _eventSettings(BuildContext context, EventEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Settings functionality coming soon...'),
-        backgroundColor: colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(
+        context, 'Settings functionality coming soon...');
   }
 
   void _deleteEvent(BuildContext context, EventEntity event) {
@@ -541,51 +439,4 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
       ),
     );
   }
-}
-
-class _EventBackgroundPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.05)
-      ..style = PaintingStyle.fill;
-
-    // Draw mountain-like shapes
-    final path = Path();
-    path.moveTo(0, size.height * 0.7);
-    path.quadraticBezierTo(
-      size.width * 0.25, size.height * 0.5,
-      size.width * 0.5, size.height * 0.6,
-    );
-    path.quadraticBezierTo(
-      size.width * 0.75, size.height * 0.7,
-      size.width, size.height * 0.5,
-    );
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-
-    // Draw additional decorative elements
-    paint.color = Colors.white.withValues(alpha: 0.03);
-    final path2 = Path();
-    path2.moveTo(0, size.height * 0.8);
-    path2.quadraticBezierTo(
-      size.width * 0.3, size.height * 0.6,
-      size.width * 0.6, size.height * 0.75,
-    );
-    path2.quadraticBezierTo(
-      size.width * 0.8, size.height * 0.85,
-      size.width, size.height * 0.7,
-    );
-    path2.lineTo(size.width, size.height);
-    path2.lineTo(0, size.height);
-    path2.close();
-
-    canvas.drawPath(path2, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

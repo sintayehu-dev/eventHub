@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 
 class OrganizerProfileMenuItems extends StatelessWidget {
   const OrganizerProfileMenuItems({super.key});
@@ -76,24 +77,6 @@ class OrganizerProfileMenuItems extends StatelessWidget {
   }
 
   void _showToBeImplemented(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Feature to be implemented',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSecondary,
-          ),
-        ),
-        backgroundColor: colorScheme.secondary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(context, 'Feature to be implemented');
   }
 }

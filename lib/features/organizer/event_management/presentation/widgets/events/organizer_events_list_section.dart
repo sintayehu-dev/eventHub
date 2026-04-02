@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'organizer_event_item_card.dart';
@@ -14,22 +15,31 @@ class OrganizerEventsListSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<EventManagementBloc, EventManagementState>(
       builder: (context, state) {
-        return state.when(
-          initial: () => const _EmptyState(),
-          loading: () => _buildLoadingList(),
-          eventsLoaded: (events) => _buildEventsList(context, events),
-          eventLoaded: (event) => _buildEventsList(context, [event]),
-          error: (message) => _ErrorState(message: message),
-          eventCreated: (event) => _buildEventsList(context, [event]),
-          eventUpdated: (event) => _buildEventsList(context, [event]),
-          eventDeleted: () => const _EmptyState(message: 'Event deleted successfully'),
-          eventCancelled: (event) => _buildEventsList(context, [event]),
-          eventDuplicated: (event) => _buildEventsList(context, [event]),
-          eventsSearched: (events) => _buildEventsList(context, events),
-          statisticsLoaded: (_) => const SizedBox.shrink(),
-          bannerUploaded: (_) => const SizedBox.shrink(),
-          bannerDeleted: () => const SizedBox.shrink(),
-        );
+        if (state.isLoading) {
+          return _buildLoadingList();
+        }
+
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          return _ErrorState(
+            message: state.errorMessage,
+            onRetry: () {
+              // Clear error and let parent handle refresh
+              context.read<EventManagementBloc>().add(
+                    const EventManagementEvent.clearError(),
+                  );
+            },
+          );
+        }
+
+        if (state.events.isNotEmpty) {
+          return _buildEventsList(context, state.events);
+        }
+
+        if (state.selectedEvent != null) {
+          return _buildEventsList(context, [state.selectedEvent!]);
+        }
+
+        return const _EmptyState();
       },
     );
   }
@@ -70,8 +80,7 @@ class OrganizerEventsListSection extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  final String? message;
-  const _EmptyState({this.message});
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
@@ -86,28 +95,28 @@ class _EmptyState extends StatelessWidget {
             Icon(Icons.event_note, color: colorScheme.onSurfaceVariant, size: 64.sp),
             SizedBox(height: 16.h),
             Text(
-              message ?? 'No events found',
+              'No events available',
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (message == null) ...[
-              SizedBox(height: 8.h),
-              Text(
-                'Create your first event to get started',
-                style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+            SizedBox(height: 8.h),
+            Text(
+              'Create your first event to get started',
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
+            ),
+            SizedBox(height: 24.h),
+            ElevatedButton(
+              onPressed: () => context.pushNamed(RouteName.createEventScreen),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
               ),
-              SizedBox(height: 24.h),
-              ElevatedButton(
-                onPressed: () => context.pushNamed(RouteName.createEventScreen),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
-                ),
-                child: Text('Create Event', style: TextStyle(color: colorScheme.onPrimary)),
-              ),
-            ],
+              child: Text('Create Event',
+                  style: TextStyle(color: colorScheme.onPrimary)),
+            ),
           ],
         ),
       ),
@@ -117,35 +126,19 @@ class _EmptyState extends StatelessWidget {
 
 class _ErrorState extends StatelessWidget {
   final String message;
-  const _ErrorState({required this.message});
+  final VoidCallback onRetry;
+
+  const _ErrorState({
+    required this.message,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return SliverFillRemaining(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: colorScheme.error, size: 48.sp),
-            SizedBox(height: 16.h),
-            Text(
-              'Error loading events',
-              style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSurface, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8.h),
-            Text(message, textAlign: TextAlign.center, style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: () {
-                // This would ideally retry the last event, but for now it's simple
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
+      child: AppErrorRetryWidget(
+        errorMessage: message,
+        onRetry: onRetry,
       ),
     );
   }

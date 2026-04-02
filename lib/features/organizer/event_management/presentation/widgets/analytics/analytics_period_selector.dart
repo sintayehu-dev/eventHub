@@ -14,10 +14,7 @@ class AnalyticsPeriodSelector extends StatelessWidget {
 
     return BlocBuilder<AnalyticsBloc, AnalyticsState>(
       builder: (context, state) {
-        final selectedPeriod = state.maybeWhen(
-          loaded: (analytics, _) => analytics.period,
-          orElse: () => AnalyticsPeriod.thisMonth,
-        );
+        final selectedPeriod = state.selectedPeriod;
 
         return Container(
           padding: EdgeInsets.all(4.w),

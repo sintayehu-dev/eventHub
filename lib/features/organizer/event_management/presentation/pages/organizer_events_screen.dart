@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -14,24 +15,9 @@ class OrganizerEventsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-
-    if (currentUser == null) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: Center(
-          child: Text(
-            'Please log in to view your events',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ),
-      );
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     return BlocProvider(
       create: (_) => getIt<EventManagementBloc>()
@@ -74,35 +60,9 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
 
     return BlocListener<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
-        state.whenOrNull(
-          error: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $message'),
-                backgroundColor: colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          },
-          eventDeleted: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Event deleted successfully')),
-            );
-            _loadEvents(context);
-          },
-          eventCancelled: (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Event cancelled successfully')),
-            );
-            _loadEvents(context);
-          },
-          eventDuplicated: (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Event duplicated successfully')),
-            );
-            _loadEvents(context);
-          },
-        );
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        }
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,

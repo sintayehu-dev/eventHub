@@ -11,10 +11,10 @@ class CategoryRevenueBreakdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AnalyticsBloc, AnalyticsState>(
       builder: (context, state) {
-        return state.maybeWhen(
-          loaded: (analytics, _) => _buildBreakdown(context, analytics),
-          orElse: () => const SizedBox.shrink(),
-        );
+        if (state.analytics != null) {
+          return _buildBreakdown(context, state.analytics!);
+        }
+        return const SizedBox.shrink();
       },
     );
   }

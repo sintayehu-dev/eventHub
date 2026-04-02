@@ -11,11 +11,10 @@ class AnalyticsKeyMetricsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AnalyticsBloc, AnalyticsState>(
       builder: (context, state) {
-        return state.maybeWhen(
-          loaded: (analytics, comparison) =>
-              _buildGrid(context, analytics, comparison),
-          orElse: () => const SizedBox.shrink(),
-        );
+        if (state.analytics != null) {
+          return _buildGrid(context, state.analytics!, state.comparison);
+        }
+        return const SizedBox.shrink();
       },
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import '../active_event_card.dart';
@@ -15,22 +16,23 @@ class OrganizerActiveEventsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<EventManagementBloc, EventManagementState>(
       builder: (context, state) {
-        return state.when(
-          initial: () => _buildLoadingEvents(context),
-          loading: () => _buildLoadingEvents(context),
-          eventsLoaded: (events) => _buildActiveEventsContent(context, events),
-          eventLoaded: (event) => _buildActiveEventsContent(context, [event]),
-          error: (message) => _buildErrorSection(context, message),
-          eventCreated: (event) => _buildActiveEventsContent(context, [event]),
-          eventUpdated: (event) => _buildActiveEventsContent(context, [event]),
-          eventDeleted: () => _buildLoadingEvents(context),
-          eventCancelled: (event) => _buildActiveEventsContent(context, [event]),
-          eventDuplicated: (event) => _buildActiveEventsContent(context, [event]),
-          eventsSearched: (events) => _buildActiveEventsContent(context, events),
-          statisticsLoaded: (statistics) => _buildLoadingEvents(context),
-          bannerUploaded: (bannerUrl) => _buildLoadingEvents(context),
-          bannerDeleted: () => _buildLoadingEvents(context),
-        );
+        if (state.isLoading) {
+          return _buildLoadingEvents(context);
+        }
+
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          return _buildErrorSection(context, state.errorMessage);
+        }
+
+        if (state.events.isNotEmpty) {
+          return _buildActiveEventsContent(context, state.events);
+        }
+
+        if (state.selectedEvent != null) {
+          return _buildActiveEventsContent(context, [state.selectedEvent!]);
+        }
+
+        return _buildActiveEventsContent(context, []);
       },
     );
   }
@@ -165,31 +167,22 @@ class OrganizerActiveEventsSection extends StatelessWidget {
   }
 
   Widget _buildErrorSection(BuildContext context, String message) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.error_outline, color: colorScheme.error, size: 32.sp),
-          SizedBox(height: 8.h),
-          Text(
-            'Error loading events',
-            style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: AppErrorRetryWidget(
+        errorMessage: message,
+        onRetry: () {
+          // Clear error and let parent handle refresh
+          context.read<EventManagementBloc>().add(
+                const EventManagementEvent.clearError(),
+              );
+        },
       ),
     );
   }

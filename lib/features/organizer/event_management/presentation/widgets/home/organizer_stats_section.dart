@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
@@ -12,22 +13,23 @@ class OrganizerStatsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<EventManagementBloc, EventManagementState>(
       builder: (context, state) {
-        return state.when(
-          initial: () => _buildLoadingStats(context),
-          loading: () => _buildLoadingStats(context),
-          eventsLoaded: (events) => _buildStatsContent(context, events),
-          eventLoaded: (event) => _buildStatsContent(context, [event]),
-          error: (message) => _buildErrorSection(context, message),
-          eventCreated: (event) => _buildStatsContent(context, [event]),
-          eventUpdated: (event) => _buildStatsContent(context, [event]),
-          eventDeleted: () => _buildLoadingStats(context),
-          eventCancelled: (event) => _buildStatsContent(context, [event]),
-          eventDuplicated: (event) => _buildStatsContent(context, [event]),
-          eventsSearched: (events) => _buildStatsContent(context, events),
-          statisticsLoaded: (statistics) => _buildLoadingStats(context),
-          bannerUploaded: (bannerUrl) => _buildLoadingStats(context),
-          bannerDeleted: () => _buildLoadingStats(context),
-        );
+        if (state.isLoading) {
+          return _buildLoadingStats(context);
+        }
+
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          return _buildErrorSection(context, state.errorMessage);
+        }
+
+        if (state.events.isNotEmpty) {
+          return _buildStatsContent(context, state.events);
+        }
+
+        if (state.selectedEvent != null) {
+          return _buildStatsContent(context, [state.selectedEvent!]);
+        }
+
+        return _buildLoadingStats(context);
       },
     );
   }
@@ -131,31 +133,22 @@ class OrganizerStatsSection extends StatelessWidget {
   }
 
   Widget _buildErrorSection(BuildContext context, String message) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
       ),
-      child: Column(
-        children: [
-          Icon(Icons.error_outline, color: colorScheme.error, size: 32.sp),
-          SizedBox(height: 8.h),
-          Text(
-            'Error loading stats',
-            style: theme.textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: AppErrorRetryWidget(
+        errorMessage: message,
+        onRetry: () {
+          // Clear error and let parent handle refresh
+          context.read<EventManagementBloc>().add(
+                const EventManagementEvent.clearError(),
+              );
+        },
       ),
     );
   }

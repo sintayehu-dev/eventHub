@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
@@ -9,29 +11,16 @@ import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
 import '../widgets/organizer_profile_header.dart';
 import '../widgets/organizer_profile_menu_items.dart';
 import '../widgets/organizer_profile_logout_card.dart';
+import '../widgets/organizer_profile_shimmer.dart';
 
 class OrganizerProfileScreen extends StatelessWidget {
   const OrganizerProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-
-    if (currentUser == null) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: Center(
-          child: Text(
-            'Please log in to view your profile',
-            style: theme.textTheme.bodyLarge
-                ?.copyWith(color: colorScheme.onSurface),
-          ),
-        ),
-      );
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     return BlocProvider(
       create: (_) => getIt<UserProfileBloc>()
@@ -96,63 +85,17 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
         builder: (context, state) {
           return state.when(
             initial: () => const Center(child: Text('Welcome')),
-            loading: () => Center(
-              child: CircularProgressIndicator(
-                color: colorScheme.primary,
-              ),
-            ),
+            loading: () => const OrganizerProfileShimmer(),
             loaded: (profile) => _buildProfileContent(profile),
             profileUpdated: (profile) => _buildProfileContent(profile),
-            error: (message) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: colorScheme.error,
-                    size: 48.sp,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Error loading profile',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    message,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface.withValues(alpha: 0.75),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24.h),
-                  ElevatedButton(
-                    onPressed: () {
-                      final uid =
-                          getIt<UserService>().getCurrentUser()?.uid ?? '';
-                      context.read<UserProfileBloc>().add(
-                            UserProfileEvent.loadUserProfile(userId: uid),
-                          );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      'Retry',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            error: (message) => AppErrorRetryWidget(
+              errorMessage: message,
+              onRetry: () {
+                final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
+                context.read<UserProfileBloc>().add(
+                      UserProfileEvent.loadUserProfile(userId: uid),
+                    );
+              },
             ),
             preferencesUpdated: (preferences) =>
                 const Center(child: Text('Preferences updated')),
@@ -191,17 +134,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
   }
 
   void _showEditProfileDialog() {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Edit profile functionality coming soon'),
-        backgroundColor: colorScheme.secondary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-      ),
-    );
+    AppHelpers.showInfoSnackBar(
+        context, 'Edit profile functionality coming soon');
   }
-}
+}

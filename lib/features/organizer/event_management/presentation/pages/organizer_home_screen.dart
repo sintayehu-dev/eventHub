@@ -16,23 +16,9 @@ class OrganizerHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-
-    if (currentUser == null) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: Center(
-          child: Text(
-            'Please log in to view your dashboard',
-            style: theme.textTheme.bodyLarge
-                ?.copyWith(color: colorScheme.onSurface),
-          ),
-        ),
-      );
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     return BlocProvider(
       create: (_) => getIt<EventManagementBloc>()
