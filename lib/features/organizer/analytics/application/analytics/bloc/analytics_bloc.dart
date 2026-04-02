@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/organizer/analytics/domain/repositories/analytics_repository.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
 
@@ -11,24 +13,36 @@ part 'analytics_state.dart';
 @injectable
 class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
   final AnalyticsRepository _analyticsRepository;
-  
-  String? _currentOrganizerId;
-  AnalyticsPeriod _currentPeriod = AnalyticsPeriod.thisMonth;
 
-  AnalyticsBloc(this._analyticsRepository) : super(const AnalyticsState.initial()) {
+  AnalyticsBloc(this._analyticsRepository) : super(AnalyticsState.initial()) {
     on<_LoadAnalytics>(_onLoadAnalytics);
     on<_ChangePeriod>(_onChangePeriod);
     on<_RefreshAnalytics>(_onRefreshAnalytics);
+    on<_ClearError>(_onClearError);
   }
 
   Future<void> _onLoadAnalytics(
     _LoadAnalytics event,
     Emitter<AnalyticsState> emit,
   ) async {
-    emit(const AnalyticsState.loading());
-    
-    _currentOrganizerId = event.organizerId;
-    _currentPeriod = event.period;
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isLoading: true,
+      hasError: false,
+      errorMessage: '',
+      selectedPeriod: event.period,
+      organizerId: event.organizerId,
+    ));
 
     final result = await _analyticsRepository.getOrganizerAnalytics(
       organizerId: event.organizerId,
@@ -37,7 +51,11 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
 
     await result.fold(
       (failure) async {
-        emit(AnalyticsState.error(message: failure.toString()));
+        emit(state.copyWith(
+          isLoading: false,
+          hasError: true,
+          errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+        ));
       },
       (analytics) async {
         // Try to get comparison with previous period
@@ -50,14 +68,27 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
           );
           
           comparisonResult.fold(
-            (failure) => emit(AnalyticsState.loaded(analytics: analytics)),
-            (comparison) => emit(AnalyticsState.loaded(
+            (failure) => emit(state.copyWith(
+              isLoading: false,
+              hasError: false,
+              errorMessage: '',
+              analytics: analytics,
+            )),
+            (comparison) => emit(state.copyWith(
+              isLoading: false,
+              hasError: false,
+              errorMessage: '',
               analytics: analytics,
               comparison: comparison,
             )),
           );
         } else {
-          emit(AnalyticsState.loaded(analytics: analytics));
+          emit(state.copyWith(
+            isLoading: false,
+            hasError: false,
+            errorMessage: '',
+            analytics: analytics,
+          ));
         }
       },
     );
@@ -67,9 +98,9 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
     _ChangePeriod event,
     Emitter<AnalyticsState> emit,
   ) async {
-    if (_currentOrganizerId != null) {
+    if (state.organizerId != null) {
       add(AnalyticsEvent.loadAnalytics(
-        organizerId: _currentOrganizerId!,
+        organizerId: state.organizerId!,
         period: event.period,
       ));
     }
@@ -79,12 +110,19 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
     _RefreshAnalytics event,
     Emitter<AnalyticsState> emit,
   ) async {
-    if (_currentOrganizerId != null) {
+    if (state.organizerId != null) {
       add(AnalyticsEvent.loadAnalytics(
-        organizerId: _currentOrganizerId!,
-        period: _currentPeriod,
+        organizerId: state.organizerId!,
+        period: state.selectedPeriod,
       ));
     }
+  }
+
+  void _onClearError(
+    _ClearError event,
+    Emitter<AnalyticsState> emit,
+  ) {
+    emit(state.copyWith(hasError: false, errorMessage: ''));
   }
 
   AnalyticsPeriod? _getPreviousPeriod(AnalyticsPeriod current) {

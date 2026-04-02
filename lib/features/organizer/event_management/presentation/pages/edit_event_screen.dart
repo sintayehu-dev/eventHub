@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/edit/edit_event_status_section.dart';
@@ -122,34 +123,25 @@ class _EditEventViewState extends State<EditEventView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<EventManagementBloc, EventManagementState>(
-      listener: (context, state) {
-        state.whenOrNull(
-          eventUpdated: (event) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Event updated successfully!'),
-                backgroundColor: const Color(0xFF4ADE80),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-            );
-            context.pop(event); // Return updated event
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<EventManagementBloc, EventManagementState>(
+          listener: (context, state) {
+            if (state.hasError && state.errorMessage.isNotEmpty) {
+              AppHelpers.showErrorSnackBar(context, state.errorMessage);
+            }
           },
-          error: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $message'),
-                backgroundColor: const Color(0xFFEF4444),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-            );
+        ),
+        BlocListener<EventManagementBloc, EventManagementState>(
+          listenWhen: (previous, current) =>
+              previous.isUpdating && !current.isUpdating && !current.hasError,
+          listener: (context, state) {
+            AppHelpers.showSuccessSnackBar(
+                context, 'Event updated successfully!');
+            context.pop(state.selectedEvent); // Return updated event
           },
-        );
-      },
+        ),
+      ],
       child: PopScope(
         canPop: !_hasChanges,
         onPopInvokedWithResult: (didPop, result) async {
@@ -180,10 +172,7 @@ class _EditEventViewState extends State<EditEventView> {
           ),
           body: BlocBuilder<EventManagementBloc, EventManagementState>(
             builder: (context, state) {
-              final isLoading = state.maybeWhen(
-                loading: () => true,
-                orElse: () => false,
-              );
+              final isLoading = state.isUpdating;
               
               return Stack(
                 children: [
@@ -390,28 +379,12 @@ class _EditEventViewState extends State<EditEventView> {
     }
 
     if (_selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select event date'),
-          backgroundColor: const Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
+      AppHelpers.showErrorSnackBar(context, 'Please select event date');
       return;
     }
 
     if (_selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select event time'),
-          backgroundColor: const Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
+      AppHelpers.showErrorSnackBar(context, 'Please select event time');
       return;
     }
 
@@ -483,4 +456,4 @@ class _EditEventViewState extends State<EditEventView> {
       (sum, ticket) => sum + (ticket.quantity - ticket.availableQuantity),
     );
   }
-}
+}

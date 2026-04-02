@@ -65,4 +65,10 @@ class EventManagementEvent with _$EventManagementEvent {
     required String eventId,
     required String bannerUrl,
   }) = _DeleteEventBanner;
+
+  const factory EventManagementEvent.refreshEvents({
+    required String organizerId,
+  }) = _RefreshEvents;
+
+  const factory EventManagementEvent.clearError() = _ClearError;
 }

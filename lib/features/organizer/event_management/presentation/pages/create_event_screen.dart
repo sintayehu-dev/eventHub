@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/home/staff_assignment_widget.dart';
-import 'package:eventhub/features/staff/event_assignment/domain/services/staff_assignment_service.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_basic_info_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_banner_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_location_date_time_section.dart';
@@ -89,64 +88,9 @@ class _CreateEventViewState extends State<CreateEventView> {
 
     return BlocListener<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
-        state.whenOrNull(
-          eventCreated: (event) async {
-            // Create staff assignments after event is created
-            if (_staffAssignments.isNotEmpty) {
-              try {
-                final staffAssignmentService = getIt<StaffAssignmentService>();
-                final userService = getIt<UserService>();
-                final currentUser = userService.getCurrentUser();
-
-                if (currentUser != null) {
-                  await staffAssignmentService.createStaffAssignments(
-                    eventId: event.id,
-                    organizerId: currentUser.uid,
-                    assignments: _staffAssignments,
-                  );
-                }
-              } catch (e) {
-                // Show warning but don't prevent success message
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text('Event created but staff assignment failed: $e'),
-                      backgroundColor: colorScheme.secondary,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                  );
-                }
-              }
-            }
-
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Event created successfully!'),
-                  backgroundColor: colorScheme.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r)),
-                ),
-              );
-              context.pop();
-            }
-          },
-          error: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $message'),
-                backgroundColor: colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-            );
-          },
-        );
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        }
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,
@@ -156,10 +100,7 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
         body: BlocBuilder<EventManagementBloc, EventManagementState>(
           builder: (context, state) {
-            final isLoading = state.maybeWhen(
-              loading: () => true,
-              orElse: () => false,
-            );
+            final isLoading = state.isCreating;
 
             return Stack(
               children: [
@@ -359,38 +300,17 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
 
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please log in to create events'),
-          backgroundColor: Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     if (_selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an event category'),
-          backgroundColor: Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppHelpers.showErrorSnackBar(context, 'Please select an event category');
       return;
     }
 
     if (_selectedDate == null || _selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select event date and time'),
-          backgroundColor: Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppHelpers.showErrorSnackBar(
+          context, 'Please select event date and time');
       return;
     }
 
@@ -398,13 +318,8 @@ class _CreateEventViewState extends State<CreateEventView> {
     for (int i = 0; i < _ticketTypes.length; i++) {
       final ticketType = _ticketTypes[i];
       if (ticketType.nameController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Please fill in ticket type ${i + 1} name'),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppHelpers.showErrorSnackBar(
+            context, 'Please fill in ticket type ${i + 1} name');
         return;
       }
     }
@@ -413,14 +328,8 @@ class _CreateEventViewState extends State<CreateEventView> {
     for (int i = 0; i < _staffAssignments.length; i++) {
       final assignment = _staffAssignments[i];
       if (assignment.staffId.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('Please select a staff member for assignment ${i + 1}'),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppHelpers.showErrorSnackBar(
+            context, 'Please select a staff member for assignment ${i + 1}');
         return;
       }
     }

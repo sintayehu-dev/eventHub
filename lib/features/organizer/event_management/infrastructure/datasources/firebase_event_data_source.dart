@@ -91,12 +91,51 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
   FirebaseEventDataSourceImpl(this._firestore, this._cloudinaryService);
 
   static const String _eventsCollection = 'events';
+  static const String _usersCollection = 'users'; // For organizer names
 
   /// Generate a simple unique ID using timestamp and random number
   String _generateId() {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final randomNum = _random.nextInt(999999);
     return '${timestamp}_$randomNum';
+  }
+
+  /// Get organizer name from user profile
+  Future<String> _getOrganizerName(String organizerId) async {
+    try {
+      final organizerDoc =
+          await _firestore.collection(_usersCollection).doc(organizerId).get();
+
+      if (organizerDoc.exists) {
+        final data = organizerDoc.data()!;
+        // Check for name field first (from UserProfileEntity)
+        final name = data['name'] as String?;
+        if (name != null && name.isNotEmpty) {
+          return name;
+        }
+
+        // Fallback to displayName if it exists
+        final displayName = data['displayName'] as String?;
+        if (displayName != null && displayName.isNotEmpty) {
+          return displayName;
+        }
+
+        // If organizer has organizerData with organizationName, use that
+        final organizerData = data['organizerData'] as Map<String, dynamic>?;
+        if (organizerData != null) {
+          final organizationName = organizerData['organizationName'] as String?;
+          if (organizationName != null && organizationName.isNotEmpty) {
+            return organizationName;
+          }
+        }
+
+        return 'Unknown Organizer';
+      }
+      return 'Unknown Organizer';
+    } catch (e) {
+      print('Error fetching organizer name for $organizerId: $e');
+      return 'Unknown Organizer';
+    }
   }
 
   @override
@@ -156,10 +195,22 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
         metadata: request.metadata,
       );
 
+      // Store event data with organizer name for better performance
+      final eventData = event.toFirestoreData();
+
+      // Get organizer name and add it to the event data
+      try {
+        final organizerName = await _getOrganizerName(organizerId);
+        eventData['organizerName'] = organizerName;
+      } catch (e) {
+        print('Warning: Could not fetch organizer name for $organizerId: $e');
+        eventData['organizerName'] = 'Unknown Organizer';
+      }
+
       await _firestore
           .collection(_eventsCollection)
           .doc(eventId)
-          .set(event.toFirestoreData());
+          .set(eventData);
 
       return event;
     } catch (e) {

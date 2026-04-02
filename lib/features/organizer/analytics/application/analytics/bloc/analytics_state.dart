@@ -3,16 +3,15 @@ part of 'analytics_bloc.dart';
 
 @freezed
 class AnalyticsState with _$AnalyticsState {
-  const factory AnalyticsState.initial() = _Initial;
-  
-  const factory AnalyticsState.loading() = _Loading;
-  
-  const factory AnalyticsState.loaded({
-    required OrganizerAnalyticsEntity analytics,
+  const factory AnalyticsState({
+    OrganizerAnalyticsEntity? analytics,
     AnalyticsComparison? comparison,
-  }) = _Loaded;
-  
-  const factory AnalyticsState.error({
-    required String message,
-  }) = _Error;
+    @Default(false) bool isLoading,
+    @Default(false) bool hasError,
+    @Default('') String errorMessage,
+    @Default(AnalyticsPeriod.thisMonth) AnalyticsPeriod selectedPeriod,
+    String? organizerId,
+  }) = _AnalyticsState;
+
+  factory AnalyticsState.initial() => const AnalyticsState();
 }

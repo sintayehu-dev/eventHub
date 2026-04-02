@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
 import 'package:eventhub/features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart';
@@ -17,23 +19,9 @@ class OrganizerAnalyticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-
-    if (currentUser == null) {
-      return Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: Center(
-          child: Text(
-            'Please log in to view analytics',
-            style: theme.textTheme.bodyLarge
-                ?.copyWith(color: colorScheme.onSurface),
-          ),
-        ),
-      );
-    }
+    final currentUser = userService
+        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
     return BlocProvider(
       create: (_) => getIt<AnalyticsBloc>()
@@ -53,21 +41,9 @@ class OrganizerAnalyticsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AnalyticsBloc, AnalyticsState>(
       listener: (context, state) {
-        state.whenOrNull(
-          error: (message) {
-            final colorScheme = Theme.of(context).colorScheme;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: $message'),
-                backgroundColor: colorScheme.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-            );
-          },
-        );
+        if (state.hasError && state.errorMessage.isNotEmpty) {
+          AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        }
       },
       builder: (context, state) {
         final theme = Theme.of(context);
@@ -77,16 +53,27 @@ class OrganizerAnalyticsView extends StatelessWidget {
           backgroundColor: colorScheme.surface,
           body: Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-            child: state.when(
-              initial: () => _buildShimmerContent(context),
-              loading: () => _buildShimmerContent(context),
-              loaded: (_, __) => _buildLoadedContent(context),
-              error: (message) => _buildErrorContent(context, message),
-            ),
+            child: _buildContent(context, state),
           ),
         );
       },
     );
+  }
+
+  Widget _buildContent(BuildContext context, AnalyticsState state) {
+    if (state.isLoading) {
+      return _buildShimmerContent(context);
+    }
+
+    if (state.hasError && state.errorMessage.isNotEmpty) {
+      return _buildErrorContent(context, state.errorMessage);
+    }
+
+    if (state.analytics != null) {
+      return _buildLoadedContent(context);
+    }
+
+    return _buildShimmerContent(context);
   }
 
   Widget _buildLoadedContent(BuildContext context) {
@@ -136,48 +123,13 @@ class OrganizerAnalyticsView extends StatelessWidget {
   }
 
   Widget _buildErrorContent(BuildContext context, String message) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            color: colorScheme.error,
-            size: 48.sp,
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'Error loading analytics',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            message,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: () {
-              context
-                  .read<AnalyticsBloc>()
-                  .add(const AnalyticsEvent.refreshAnalytics());
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-            ),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
+    return AppErrorRetryWidget(
+      errorMessage: message,
+      onRetry: () {
+        context
+            .read<AnalyticsBloc>()
+            .add(const AnalyticsEvent.refreshAnalytics());
+      },
     );
   }
 

@@ -13,4 +13,6 @@ class AnalyticsEvent with _$AnalyticsEvent {
   }) = _ChangePeriod;
 
   const factory AnalyticsEvent.refreshAnalytics() = _RefreshAnalytics;
+
+  const factory AnalyticsEvent.clearError() = _ClearError;
 }

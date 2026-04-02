@@ -1,6 +1,8 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_statistics_entity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/repositories/event_repository.dart';
@@ -13,7 +15,8 @@ part 'event_management_bloc.freezed.dart';
 class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementState> {
   final EventRepository _eventRepository;
 
-  EventManagementBloc(this._eventRepository) : super(const EventManagementState.initial()) {
+  EventManagementBloc(this._eventRepository)
+      : super(EventManagementState.initial()) {
     on<_CreateEvent>(_onCreateEvent);
     on<_LoadOrganizerEvents>(_onLoadOrganizerEvents);
     on<_LoadEventById>(_onLoadEventById);
@@ -25,13 +28,26 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     on<_LoadEventStatistics>(_onLoadEventStatistics);
     on<_UploadEventBanner>(_onUploadEventBanner);
     on<_DeleteEventBanner>(_onDeleteEventBanner);
+    on<_RefreshEvents>(_onRefreshEvents);
+    on<_ClearError>(_onClearError);
   }
 
   Future<void> _onCreateEvent(
     _CreateEvent event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isCreating: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isCreating: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.createEvent(
       organizerId: event.organizerId,
@@ -39,8 +55,21 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (createdEvent) => emit(EventManagementState.eventCreated(createdEvent)),
+      (failure) => emit(state.copyWith(
+        isCreating: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (createdEvent) {
+        final updatedEvents = [createdEvent, ...state.events];
+        emit(state.copyWith(
+          isCreating: false,
+          hasError: false,
+          errorMessage: '',
+          events: updatedEvents,
+          selectedEvent: createdEvent,
+        ));
+      },
     );
   }
 
@@ -48,7 +77,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _LoadOrganizerEvents event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.getOrganizerEvents(
       organizerId: event.organizerId,
@@ -58,8 +98,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (events) => emit(EventManagementState.eventsLoaded(events)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        events: events,
+        filterStatus: event.status,
+      )),
     );
   }
 
@@ -67,13 +117,33 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _LoadEventById event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.getEventById(event.eventId);
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (eventEntity) => emit(EventManagementState.eventLoaded(eventEntity)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (eventEntity) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        selectedEvent: eventEntity,
+      )),
     );
   }
 
@@ -81,7 +151,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _UpdateEvent event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isUpdating: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isUpdating: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.updateEvent(
       eventId: event.eventId,
@@ -90,8 +171,23 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (updatedEvent) => emit(EventManagementState.eventUpdated(updatedEvent)),
+      (failure) => emit(state.copyWith(
+        isUpdating: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (updatedEvent) {
+        final updatedEvents = state.events
+            .map((e) => e.id == updatedEvent.id ? updatedEvent : e)
+            .toList();
+        emit(state.copyWith(
+          isUpdating: false,
+          hasError: false,
+          errorMessage: '',
+          events: updatedEvents,
+          selectedEvent: updatedEvent,
+        ));
+      },
     );
   }
 
@@ -99,7 +195,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _DeleteEvent event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isDeleting: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isDeleting: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.deleteEvent(
       eventId: event.eventId,
@@ -107,8 +214,24 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (_) => emit(const EventManagementState.eventDeleted()),
+      (failure) => emit(state.copyWith(
+        isDeleting: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (_) {
+        final updatedEvents =
+            state.events.where((e) => e.id != event.eventId).toList();
+        emit(state.copyWith(
+          isDeleting: false,
+          hasError: false,
+          errorMessage: '',
+          events: updatedEvents,
+          selectedEvent: state.selectedEvent?.id == event.eventId
+              ? null
+              : state.selectedEvent,
+        ));
+      },
     );
   }
 
@@ -116,7 +239,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _CancelEvent event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isUpdating: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isUpdating: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.cancelEvent(
       eventId: event.eventId,
@@ -125,8 +259,23 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (cancelledEvent) => emit(EventManagementState.eventCancelled(cancelledEvent)),
+      (failure) => emit(state.copyWith(
+        isUpdating: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (cancelledEvent) {
+        final updatedEvents = state.events
+            .map((e) => e.id == cancelledEvent.id ? cancelledEvent : e)
+            .toList();
+        emit(state.copyWith(
+          isUpdating: false,
+          hasError: false,
+          errorMessage: '',
+          events: updatedEvents,
+          selectedEvent: cancelledEvent,
+        ));
+      },
     );
   }
 
@@ -134,7 +283,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _DuplicateEvent event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isCreating: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isCreating: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.duplicateEvent(
       eventId: event.eventId,
@@ -144,8 +304,21 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (duplicatedEvent) => emit(EventManagementState.eventDuplicated(duplicatedEvent)),
+      (failure) => emit(state.copyWith(
+        isCreating: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (duplicatedEvent) {
+        final updatedEvents = [duplicatedEvent, ...state.events];
+        emit(state.copyWith(
+          isCreating: false,
+          hasError: false,
+          errorMessage: '',
+          events: updatedEvents,
+          selectedEvent: duplicatedEvent,
+        ));
+      },
     );
   }
 
@@ -153,7 +326,25 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _SearchEvents event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isLoading: true,
+      hasError: false,
+      errorMessage: '',
+      searchQuery: event.query,
+      filterStartDate: event.startDate,
+      filterEndDate: event.endDate,
+    ));
     
     final result = await _eventRepository.searchEvents(
       organizerId: event.organizerId,
@@ -165,8 +356,17 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (events) => emit(EventManagementState.eventsSearched(events)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (events) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        events: events,
+      )),
     );
   }
 
@@ -174,7 +374,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _LoadEventStatistics event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.getEventStatistics(
       eventId: event.eventId,
@@ -182,8 +393,17 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (statistics) => emit(EventManagementState.statisticsLoaded(statistics)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (statistics) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        statistics: statistics,
+      )),
     );
   }
 
@@ -191,7 +411,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _UploadEventBanner event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.uploadEventBanner(
       eventId: event.eventId,
@@ -199,8 +430,17 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (bannerUrl) => emit(EventManagementState.bannerUploaded(bannerUrl)),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (bannerUrl) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        uploadedBannerUrl: bannerUrl,
+      )),
     );
   }
 
@@ -208,7 +448,18 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     _DeleteEventBanner event,
     Emitter<EventManagementState> emit,
   ) async {
-    emit(const EventManagementState.loading());
+    // Check connectivity first
+    final connected = await AppConnectivity.connectivity();
+    if (!connected) {
+      emit(state.copyWith(
+        hasError: true,
+        isLoading: false,
+        errorMessage: 'No internet connection. Please check your network.',
+      ));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, hasError: false, errorMessage: ''));
     
     final result = await _eventRepository.deleteEventBanner(
       eventId: event.eventId,
@@ -216,8 +467,35 @@ class EventManagementBloc extends Bloc<EventManagementEvent, EventManagementStat
     );
     
     result.fold(
-      (failure) => emit(EventManagementState.error(failure.toString())),
-      (_) => emit(const EventManagementState.bannerDeleted()),
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: NetworkExceptions.getRawErrorMessage(failure),
+      )),
+      (_) => emit(state.copyWith(
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        uploadedBannerUrl: '',
+      )),
     );
+  }
+
+  Future<void> _onRefreshEvents(
+    _RefreshEvents event,
+    Emitter<EventManagementState> emit,
+  ) async {
+    // Reload events with current filters
+    add(EventManagementEvent.loadOrganizerEvents(
+      organizerId: event.organizerId,
+      status: state.filterStatus,
+    ));
+  }
+
+  void _onClearError(
+    _ClearError event,
+    Emitter<EventManagementState> emit,
+  ) {
+    emit(state.copyWith(hasError: false, errorMessage: ''));
   }
 }
