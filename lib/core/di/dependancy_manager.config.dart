@@ -142,7 +142,6 @@ import '../../features/staff/ticket_scanner/infrastructure/datasources/firebase_
     as _i967;
 import '../../features/staff/ticket_scanner/infrastructure/repositories/ticket_scanner_repository_impl.dart'
     as _i807;
-import '../handlers/http_service.dart' as _i350;
 import '../services/cloudinary_service.dart' as _i837;
 import 'firebase_module.dart' as _i616;
 
@@ -162,7 +161,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i974.FirebaseFirestore>(
         () => firebaseModule.firebaseFirestore);
     gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
-    gh.lazySingleton<_i350.HttpService>(() => _i350.HttpService());
     gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
     gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
         _i409.FirebaseStaffManagementDataSource(
