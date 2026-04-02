@@ -15,13 +15,16 @@ class EventDetailInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+          color: colorScheme.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -30,12 +33,12 @@ class EventDetailInfoCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+              color: colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFF8B5CF6),
+              color: colorScheme.primary,
               size: 20.sp,
             ),
           ),
@@ -45,18 +48,16 @@ class EventDetailInfoCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w500,
                 ),
               ),
               SizedBox(height: 4.h),
               Text(
                 subtitle,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),

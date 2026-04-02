@@ -69,12 +69,16 @@ class FirebaseAttendeeManagementDataSource {
       final hasMore = docs.length > limit;
       final attendeeDocs = hasMore ? docs.take(limit).toList() : docs;
       
-      final attendees = attendeeDocs.map((doc) {
+      final attendees = <AttendeeEntity>[];
+
+      for (final doc in attendeeDocs) {
         final data = doc.data() as Map<String, dynamic>;
         print(
             'Processing ticket: ${doc.id}, data keys: ${data.keys}'); // Debug log
-        return _mapFirestoreToAttendee(doc.id, data);
-      }).toList();
+
+        final attendee = await _mapFirestoreToAttendeeAsync(doc.id, data);
+        attendees.add(attendee);
+      }
 
       // Apply client-side search filter if needed
       List<AttendeeEntity> filteredAttendees = attendees;
@@ -142,7 +146,7 @@ class FirebaseAttendeeManagementDataSource {
         throw const NetworkExceptions.unauthorisedRequest();
       }
 
-      return _mapFirestoreToAttendee(doc.id, data);
+      return _mapFirestoreToAttendeeAsync(doc.id, data);
     } catch (e) {
       if (e is NetworkExceptions) rethrow;
       throw const NetworkExceptions.unexpectedError();
@@ -179,7 +183,7 @@ class FirebaseAttendeeManagementDataSource {
 
       // Get the updated document
       final updatedDoc = await docRef.get();
-      return _mapFirestoreToAttendee(updatedDoc.id, updatedDoc.data()!);
+      return _mapFirestoreToAttendeeAsync(updatedDoc.id, updatedDoc.data()!);
     } catch (e) {
       throw const NetworkExceptions.unexpectedError();
     }
@@ -295,8 +299,73 @@ class FirebaseAttendeeManagementDataSource {
     }
   }
 
-  /// Helper method to map Firestore data to AttendeeEntity
-  AttendeeEntity _mapFirestoreToAttendee(String id, Map<String, dynamic> data) {
+  /// Get attendee name from user profile with fallback options
+  Future<String?> _getAttendeeNameFromUserProfile(String? userId) async {
+    if (userId == null || userId.isEmpty) {
+      print('❌ No userId provided for profile lookup'); // Debug log
+      return null;
+    }
+
+    try {
+      print('🔍 Fetching user profile for userId: $userId'); // Debug log
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        final userData = userDoc.data()!;
+        print('✅ User profile found, data keys: ${userData.keys}'); // Debug log
+
+        // Check various name fields in user profile
+        if (userData['displayName'] != null &&
+            userData['displayName'].toString().isNotEmpty) {
+          print('✅ Found displayName: ${userData['displayName']}'); // Debug log
+          return userData['displayName'];
+        }
+        if (userData['name'] != null &&
+            userData['name'].toString().isNotEmpty) {
+          print('✅ Found name: ${userData['name']}'); // Debug log
+          return userData['name'];
+        }
+        if (userData['firstName'] != null && userData['lastName'] != null) {
+          final fullName = '${userData['firstName']} ${userData['lastName']}';
+          print('✅ Found firstName + lastName: $fullName'); // Debug log
+          return fullName;
+        }
+
+        // Try email-based name extraction from user profile
+        if (userData['email'] != null) {
+          final email = userData['email'].toString();
+          if (email.isNotEmpty && email.contains('@')) {
+            final emailPrefix = email.split('@')[0];
+            if (emailPrefix.contains('.')) {
+              final parts = emailPrefix.split('.');
+              final name = parts
+                  .map((part) => part.isNotEmpty
+                      ? '${part[0].toUpperCase()}${part.substring(1)}'
+                      : '')
+                  .join(' ');
+              if (name.isNotEmpty) {
+                print('✅ Generated name from user email: $name'); // Debug log
+                return name;
+              }
+            }
+          }
+        }
+
+        print(
+            '⚠️ User profile exists but no usable name fields found'); // Debug log
+      } else {
+        print('❌ User profile not found for userId: $userId'); // Debug log
+      }
+    } catch (e) {
+      print('❌ Error fetching user profile for $userId: $e'); // Debug log
+    }
+
+    return null;
+  }
+
+  /// Async helper method to map Firestore data to AttendeeEntity with enhanced name resolution
+  Future<AttendeeEntity> _mapFirestoreToAttendeeAsync(
+      String id, Map<String, dynamic> data) async {
     // Handle date parsing for different formats
     DateTime? parseDateTime(dynamic dateValue) {
       if (dateValue == null) return null;
@@ -312,11 +381,101 @@ class FirebaseAttendeeManagementDataSource {
       return null;
     }
 
+    // Enhanced name resolution with multiple fallback options including user profile lookup
+    Future<String> resolveAttendeeNameAsync(
+        Map<String, dynamic> ticketData) async {
+      // Priority order for getting attendee name:
+      // 1. ticketHolderName (direct field) - if not generic
+      // 2. attendeeName (alternative field)
+      // 3. Look up user profile by userId (MOST IMPORTANT)
+      // 4. Extract from email
+      // 5. Use a more user-friendly fallback
+
+      print(
+          '🔍 Resolving name for ticket data keys: ${ticketData.keys}'); // Debug log
+      print(
+          '📋 ticketHolderName: ${ticketData['ticketHolderName']}'); // Debug log
+      print('📋 userId: ${ticketData['userId']}'); // Debug log
+      print('📋 email: ${ticketData['ticketHolderEmail']}'); // Debug log
+
+      // Check direct name fields (but skip generic names)
+      if (ticketData['ticketHolderName'] != null &&
+          ticketData['ticketHolderName'].toString().isNotEmpty &&
+          ticketData['ticketHolderName'] != 'Demo User' &&
+          ticketData['ticketHolderName'] != 'Test User' &&
+          ticketData['ticketHolderName'] != 'Unknown') {
+        print(
+            '✅ Found ticketHolderName: ${ticketData['ticketHolderName']}'); // Debug log
+        return ticketData['ticketHolderName'];
+      }
+
+      if (ticketData['attendeeName'] != null &&
+          ticketData['attendeeName'].toString().isNotEmpty) {
+        print(
+            '✅ Found attendeeName: ${ticketData['attendeeName']}'); // Debug log
+        return ticketData['attendeeName'];
+      }
+
+      // Try to get name from user profile if userId is available
+      // Check multiple possible userId fields
+      final userId = ticketData['userId'] ??
+          ticketData['purchasedBy'] ??
+          ticketData['ownerId'] ??
+          ticketData['buyerId'];
+
+      if (userId != null && userId.toString().isNotEmpty) {
+        print('🔍 Looking up user profile for userId: $userId'); // Debug log
+        final userProfileName =
+            await _getAttendeeNameFromUserProfile(userId.toString());
+        if (userProfileName != null) {
+          print('✅ Found user profile name: $userProfileName'); // Debug log
+          return userProfileName;
+        } else {
+          print('❌ No user profile found for userId: $userId'); // Debug log
+        }
+      } else {
+        print('❌ No userId found in ticket data'); // Debug log
+      }
+
+      // Extract name from email as fallback
+      if (ticketData['ticketHolderEmail'] != null) {
+        final email = ticketData['ticketHolderEmail'].toString();
+        if (email.isNotEmpty && email.contains('@')) {
+          final emailPrefix = email.split('@')[0];
+
+          // Convert email prefix to readable name (e.g., john.doe -> John Doe)
+          if (emailPrefix.contains('.')) {
+            final parts = emailPrefix.split('.');
+            final name = parts
+                .map((part) => part.isNotEmpty
+                    ? '${part[0].toUpperCase()}${part.substring(1)}'
+                    : '')
+                .join(' ');
+            if (name.isNotEmpty) {
+              print('✅ Generated name from email: $name'); // Debug log
+              return name;
+            }
+          } else if (emailPrefix.isNotEmpty) {
+            final name =
+                '${emailPrefix[0].toUpperCase()}${emailPrefix.substring(1)}';
+            print('✅ Generated name from email prefix: $name'); // Debug log
+            return name;
+          }
+        }
+      }
+
+      // Better fallback: use "Guest" instead of ticket ID
+      print('⚠️ Using fallback name: Guest Attendee'); // Debug log
+      return 'Guest Attendee';
+    }
+
+    final resolvedName = await resolveAttendeeNameAsync(data);
+
     return AttendeeEntity(
       id: id,
       userId: data['userId'] ?? '',
       eventId: data['eventId'] ?? '',
-      name: data['ticketHolderName'] ?? 'Unknown',
+      name: resolvedName,
       email: data['ticketHolderEmail'] ?? '',
       phone: data['ticketHolderPhone'],
       ticketId: data['id'] ?? id,
@@ -332,6 +491,202 @@ class FirebaseAttendeeManagementDataSource {
       notes: data['staffNotes'],
       metadata: data['metadata'] as Map<String, dynamic>?,
     );
+  }
+
+  /// Fix existing tickets by populating proper attendee names from user profiles
+  static Future<void> fixExistingTicketNames({String? eventId}) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      print('🔧 Starting to fix existing ticket names...');
+
+      Query query = firestore.collection('tickets');
+
+      // If eventId is provided, only fix tickets for that event
+      if (eventId != null) {
+        query = query.where('eventId', isEqualTo: eventId);
+        print('🎯 Fixing tickets for event: $eventId');
+      }
+
+      final ticketsSnapshot = await query.get();
+      print('📋 Found ${ticketsSnapshot.docs.length} tickets to process');
+
+      int updatedCount = 0;
+
+      for (final ticketDoc in ticketsSnapshot.docs) {
+        final ticketData = ticketDoc.data() as Map<String, dynamic>;
+        final ticketId = ticketDoc.id;
+
+        // Skip if ticket already has a proper name
+        final currentName = ticketData['ticketHolderName'];
+        if (currentName != null &&
+            currentName.toString().isNotEmpty &&
+            currentName != 'Demo User' &&
+            currentName != 'Test User' &&
+            currentName != 'Unknown' &&
+            !currentName.toString().startsWith('Attendee ')) {
+          print('✅ Ticket $ticketId already has proper name: $currentName');
+          continue;
+        }
+
+        print('🔍 Processing ticket: $ticketId');
+
+        // Try to get name from user profile
+        final userId = ticketData['userId'] ??
+            ticketData['purchasedBy'] ??
+            ticketData['ownerId'] ??
+            ticketData['buyerId'];
+
+        String? resolvedName;
+
+        if (userId != null) {
+          try {
+            final userDoc = await firestore
+                .collection('users')
+                .doc(userId.toString())
+                .get();
+            if (userDoc.exists) {
+              final userData = userDoc.data()!;
+
+              // Try different name fields
+              if (userData['displayName'] != null &&
+                  userData['displayName'].toString().isNotEmpty) {
+                resolvedName = userData['displayName'];
+              } else if (userData['name'] != null &&
+                  userData['name'].toString().isNotEmpty) {
+                resolvedName = userData['name'];
+              } else if (userData['firstName'] != null &&
+                  userData['lastName'] != null) {
+                resolvedName =
+                    '${userData['firstName']} ${userData['lastName']}';
+              }
+            }
+          } catch (e) {
+            print('❌ Error fetching user $userId: $e');
+          }
+        }
+
+        // Fallback to email-based name
+        if (resolvedName == null && ticketData['ticketHolderEmail'] != null) {
+          final email = ticketData['ticketHolderEmail'].toString();
+          if (email.isNotEmpty && email.contains('@')) {
+            final emailPrefix = email.split('@')[0];
+            if (emailPrefix.contains('.')) {
+              final parts = emailPrefix.split('.');
+              resolvedName = parts
+                  .map((part) => part.isNotEmpty
+                      ? '${part[0].toUpperCase()}${part.substring(1)}'
+                      : '')
+                  .join(' ');
+            } else if (emailPrefix.isNotEmpty) {
+              resolvedName =
+                  '${emailPrefix[0].toUpperCase()}${emailPrefix.substring(1)}';
+            }
+          }
+        }
+
+        // Update ticket if we found a name
+        if (resolvedName != null && resolvedName.isNotEmpty) {
+          await ticketDoc.reference.update({
+            'ticketHolderName': resolvedName,
+            'updatedAt': Timestamp.now(),
+          });
+
+          print('✅ Updated ticket $ticketId with name: $resolvedName');
+          updatedCount++;
+        } else {
+          print('⚠️ Could not resolve name for ticket $ticketId');
+        }
+      }
+
+      print(
+          '🎉 Fixed $updatedCount out of ${ticketsSnapshot.docs.length} tickets');
+    } catch (e) {
+      print('❌ Error fixing ticket names: $e');
+    }
+  }
+
+  /// Create sample attendees for testing with proper names
+  static Future<void> createSampleAttendees(String eventId) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      final sampleAttendees = [
+        {
+          'ticketHolderName': 'Sarah Johnson',
+          'ticketHolderEmail': 'sarah.johnson@example.com',
+          'ticketHolderPhone': '+1234567890',
+          'ticketTypeName': 'VIP Access',
+        },
+        {
+          'ticketHolderName': 'Michael Chen',
+          'ticketHolderEmail': 'michael.chen@example.com',
+          'ticketHolderPhone': '+1234567891',
+          'ticketTypeName': 'General Admission',
+        },
+        {
+          'ticketHolderName': 'Emily Rodriguez',
+          'ticketHolderEmail': 'emily.rodriguez@example.com',
+          'ticketHolderPhone': '+1234567892',
+          'ticketTypeName': 'Student Discount',
+        },
+        {
+          'ticketHolderName': 'David Thompson',
+          'ticketHolderEmail': 'david.thompson@example.com',
+          'ticketHolderPhone': '+1234567893',
+          'ticketTypeName': 'Early Bird',
+        },
+        {
+          'ticketHolderName': 'Lisa Wang',
+          'ticketHolderEmail': 'lisa.wang@example.com',
+          'ticketHolderPhone': '+1234567894',
+          'ticketTypeName': 'General Admission',
+        },
+      ];
+
+      for (int i = 0; i < sampleAttendees.length; i++) {
+        final attendee = sampleAttendees[i];
+        final ticketId = 'sample_ticket_${eventId}_$i';
+
+        final ticketData = {
+          'id': ticketId,
+          'eventId': eventId,
+          'ticketHolderName': attendee['ticketHolderName'],
+          'ticketHolderEmail': attendee['ticketHolderEmail'],
+          'ticketHolderPhone': attendee['ticketHolderPhone'],
+          'ticketTypeName': attendee['ticketTypeName'],
+          'eventTitle': 'Tech Conference 2026',
+          'eventLocation': 'Convention Center',
+          'eventDateTime':
+              Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
+          'price': 199.0,
+          'currency': 'USD',
+          'status': 'active',
+          'attendeeStatus':
+              i < 2 ? 'checkedIn' : 'registered', // First 2 are checked in
+          'qrCode':
+              'TICKET_${ticketId}_EVENT_${eventId}_${DateTime.now().millisecondsSinceEpoch}',
+          'createdAt': Timestamp.fromDate(
+              DateTime.now().subtract(Duration(days: i + 1))),
+          'updatedAt': Timestamp.fromDate(DateTime.now()),
+        };
+
+        // Add check-in data for checked-in attendees
+        if (i < 2) {
+          ticketData['checkInTime'] = Timestamp.fromDate(
+              DateTime.now().subtract(Duration(hours: i + 1)));
+          ticketData['checkInStaffId'] = 'staff123';
+        }
+
+        await firestore.collection('tickets').doc(ticketId).set(ticketData);
+        print(
+            '✅ Sample attendee created: ${attendee['ticketHolderName']} (ID: $ticketId)');
+      }
+
+      print('👥 All sample attendees created successfully for event: $eventId');
+    } catch (e) {
+      print('❌ Error creating sample attendees: $e');
+    }
   }
 
   /// Helper method to map status enum to Firestore string

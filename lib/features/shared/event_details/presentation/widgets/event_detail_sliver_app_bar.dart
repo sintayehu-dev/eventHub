@@ -13,31 +13,37 @@ class EventDetailSliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return SliverAppBar(
       expandedHeight: 300.h,
       pinned: true,
-      backgroundColor: const Color(0xFF1A0B2E),
+      backgroundColor: colorScheme.surface,
       leading: GestureDetector(
         onTap: () => context.pop(),
         child: Container(
           margin: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: colorScheme.surface.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: colorScheme.onSurface,
             size: 20.sp,
           ),
         ),
       ),
       actions: [
-        _buildActionButton(Icons.share, () {}),
+        _buildActionButton(context, Icons.share, () {}),
         _buildActionButton(
+          context,
           event.isFavorite == true ? Icons.favorite : Icons.favorite_border,
           () {},
-          iconColor: event.isFavorite == true ? Colors.red : Colors.white,
+          iconColor: event.isFavorite == true
+              ? colorScheme.error
+              : colorScheme.onSurface,
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -49,9 +55,9 @@ class EventDetailSliverAppBar extends StatelessWidget {
                     event.bannerUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
-                        _buildImagePlaceholder(),
+                        _buildImagePlaceholder(context),
                   )
-                : _buildImagePlaceholder(),
+                : _buildImagePlaceholder(context),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -59,7 +65,7 @@ class EventDetailSliverAppBar extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.7),
+                    colorScheme.surface.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -70,27 +76,41 @@ class EventDetailSliverAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, VoidCallback onTap, {Color iconColor = Colors.white}) {
+  Widget _buildActionButton(
+      BuildContext context, IconData icon, VoidCallback onTap,
+      {Color? iconColor}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
       margin: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: colorScheme.surface.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: IconButton(
         onPressed: onTap,
-        icon: Icon(icon, color: iconColor, size: 20.sp),
+        icon: Icon(
+          icon,
+          color: iconColor ?? colorScheme.onSurface,
+          size: 20.sp,
+        ),
       ),
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF334155)],
+          colors: [
+            colorScheme.surfaceContainerLowest,
+            colorScheme.surfaceContainer,
+            colorScheme.surfaceContainerHigh,
+          ],
         ),
       ),
     );
