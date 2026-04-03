@@ -7,11 +7,11 @@ import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
 import 'package:eventhub/features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_period_selector.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_key_metrics_grid.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/analytics_revenue_overview.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/top_performing_events_list.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/analytics/category_revenue_breakdown.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/analytics/analytics_period_selector.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/analytics/analytics_key_metrics_grid.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/analytics/analytics_revenue_overview.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/analytics/top_performing_events_list.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/analytics/category_revenue_breakdown.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 
 class OrganizerAnalyticsScreen extends StatelessWidget {
@@ -51,8 +51,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
-          body: Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          body: SafeArea(
             child: _buildContent(context, state),
           ),
         );
@@ -96,7 +95,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
             // Header
             Text(
               'Analytics',
-              style: theme.textTheme.headlineMedium?.copyWith(
+              style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),

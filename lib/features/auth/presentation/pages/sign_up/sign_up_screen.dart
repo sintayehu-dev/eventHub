@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
+import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/core/theme/app_theme.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_event.dart';
@@ -451,13 +452,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ),
                                 ),
                                 child: state.isLoading
-                                    ? SizedBox(
-                                        width: 24.w,
-                                        height: 24.w,
-                                        child: CircularProgressIndicator(
+                                      ? SpinKitLoadingWidget(
                                           color: colorScheme.onPrimary,
-                                          strokeWidth: 2,
-                                        ),
+                                          size: 24.w,
                                       )
                                     : Row(
                                         mainAxisAlignment: MainAxisAlignment.center,

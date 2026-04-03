@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -108,10 +109,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                 if (isLoading)
                   Container(
                     color: colorScheme.surface.withValues(alpha: 0.8),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: colorScheme.primary,
-                      ),
+                    child: const Center(
+                      child: SpinKitLoadingWidget(),
                     ),
                   ),
               ],
@@ -222,6 +221,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
@@ -229,12 +231,12 @@ class _CreateEventViewState extends State<CreateEventView> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF8B5CF6),
-              onPrimary: Colors.white,
-              surface: Color(0xFF2A1B3D),
-              onSurface: Colors.white,
+          data: theme.copyWith(
+            colorScheme: colorScheme.copyWith(
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -249,17 +251,20 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   Future<void> _selectTime(BuildContext context) async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF8B5CF6),
-              onPrimary: Colors.white,
-              surface: Color(0xFF2A1B3D),
-              onSurface: Colors.white,
+          data: theme.copyWith(
+            colorScheme: colorScheme.copyWith(
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
             ),
           ),
           child: child!,

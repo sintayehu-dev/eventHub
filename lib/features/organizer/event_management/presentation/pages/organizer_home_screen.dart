@@ -60,26 +60,28 @@ class OrganizerHomeView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: RefreshIndicator(
-        onRefresh: () => _onRefresh(context),
-        color: colorScheme.primary,
-        backgroundColor: colorScheme.surface,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const OrganizerHeader(),
-              SizedBox(height: 32.h),
-              OrganizerWelcomeSection(organizerName: organizerName),
-              SizedBox(height: 32.h),
-              const OrganizerStatsSection(),
-              SizedBox(height: 32.h),
-              const OrganizerQuickActionsSection(),
-              SizedBox(height: 32.h),
-              const OrganizerActiveEventsSection(),
-            ],
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(context),
+          color: colorScheme.primary,
+          backgroundColor: colorScheme.surface,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const OrganizerHeader(),
+                SizedBox(height: 32.h),
+                OrganizerWelcomeSection(organizerName: organizerName),
+                SizedBox(height: 32.h),
+                const OrganizerStatsSection(),
+                SizedBox(height: 32.h),
+                const OrganizerQuickActionsSection(),
+                SizedBox(height: 32.h),
+                const OrganizerActiveEventsSection(),
+              ],
+            ),
           ),
         ),
       ),

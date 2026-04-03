@@ -66,33 +66,35 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,
-        body: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 0),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const OrganizerEventsHeader(),
-                    SizedBox(height: 24.h),
-                    OrganizerEventsFilterSection(
-                      selectedStatus: _selectedStatus,
-                      onStatusChanged: (status) {
-                        setState(() {
-                          _selectedStatus = status;
-                        });
-                        _loadEvents(context);
-                      },
-                    ),
-                    SizedBox(height: 24.h),
-                  ],
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const OrganizerEventsHeader(),
+                      SizedBox(height: 24.h),
+                      OrganizerEventsFilterSection(
+                        selectedStatus: _selectedStatus,
+                        onStatusChanged: (status) {
+                          setState(() {
+                            _selectedStatus = status;
+                          });
+                          _loadEvents(context);
+                        },
+                      ),
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const OrganizerEventsListSection(),
-            SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
-          ],
+              const OrganizerEventsListSection(),
+              SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
+            ],
+          ),
         ),
       ),
     );

@@ -37,7 +37,8 @@ class ActiveEventCard extends StatelessWidget {
     );
 
     final progress = totalTickets > 0 ? soldTickets / totalTickets : 0.0;
-    final statusColor = OrganizerEventUtils.getStatusColor(event.status);
+    final statusColor =
+        OrganizerEventUtils.getStatusColor(context, event.status);
 
     return GestureDetector(
       onTap: onTap,

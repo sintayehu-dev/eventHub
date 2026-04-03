@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/theme/app_theme.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_bloc.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_event.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_state.dart';
@@ -93,10 +94,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    // Force dark theme for splash screen
+    final darkTheme = AppTheme.darkTheme();
+    final colorScheme = darkTheme.colorScheme;
     
-    return BlocProvider(
+    return Theme(
+      data: darkTheme,
+      child: BlocProvider(
       create: (context) {
         final splashBloc = SplashBloc();
         Future.delayed(
@@ -195,7 +199,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                           children: [
                                             TextSpan(
                                               text: 'Event ',
-                                              style: theme
+                                                style: darkTheme
                                                   .textTheme.displayMedium
                                                   ?.copyWith(
                                                 color: colorScheme.onSurface,
@@ -204,7 +208,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                             ),
                                             TextSpan(
                                               text: 'Hub',
-                                              style: theme
+                                                style: darkTheme
                                                   .textTheme.displayMedium
                                                   ?.copyWith(
                                                 fontWeight: FontWeight.bold,
@@ -226,7 +230,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                       SizedBox(height: 12.h),
                                       Text(
                                         'WHERE EXPERIENCES CONNECT',
-                                        style: theme.textTheme.labelMedium
+                                          style: darkTheme.textTheme.labelMedium
                                             ?.copyWith(
                                           color: colorScheme.onSurface
                                               .withValues(alpha: 0.7),
@@ -254,7 +258,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               // Loading Text
                               Text(
                                 'Syncing your universe',
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  style:
+                                      darkTheme.textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.8),
                                 ),
@@ -314,7 +319,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               // Premium Access
                               Text(
                                 'PREMIUM ACCESS',
-                                style: theme.textTheme.labelSmall?.copyWith(
+                                  style:
+                                      darkTheme.textTheme.labelSmall?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                   letterSpacing: 2,
@@ -335,12 +341,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           ),
         ),
       ),
+      ),
     );
   }
 
   Widget _buildFeatureIcon(IconData icon, String label) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final darkTheme = AppTheme.darkTheme();
+    final colorScheme = darkTheme.colorScheme;
     
     return Column(
       children: [
@@ -360,7 +367,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         SizedBox(height: 4.h),
         Text(
           label,
-          style: theme.textTheme.labelSmall?.copyWith(
+          style: darkTheme.textTheme.labelSmall?.copyWith(
             color: colorScheme.onSurface.withValues(alpha: 0.6),
             fontWeight: FontWeight.w500,
           ),

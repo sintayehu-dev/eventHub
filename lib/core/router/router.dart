@@ -40,7 +40,7 @@ import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticke
 // Organizer screens
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_home_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_events_screen.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_analytics_screen.dart';
+import 'package:eventhub/features/organizer/analytics/presentation/pages/organizer_analytics_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/create_event_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/edit_event_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/pages/organizer_event_detail_screen.dart';

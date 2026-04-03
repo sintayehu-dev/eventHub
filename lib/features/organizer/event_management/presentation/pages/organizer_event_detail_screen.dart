@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
@@ -55,8 +56,13 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         }
       },
       builder: (context, state) {
+        final colorScheme = Theme.of(context).colorScheme;
+        
         if (state.isLoading) {
-          return const EventDetailShimmer();
+          return Scaffold(
+            backgroundColor: colorScheme.surface,
+            body: const EventDetailShimmer(),
+          );
         }
 
         if (state.hasError && state.errorMessage.isNotEmpty) {
@@ -81,35 +87,39 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          EventDetailHeader(
-            event: event,
-            onEdit: () => _editEvent(context, event),
-            onMore: () => _showMoreOptions(context, event),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EventPerformanceMetrics(event: event),
-                  SizedBox(height: 32.h),
-                  EventDetailActions(
-                    event: event,
-                    onViewAttendees: () => _viewAllAttendees(context, event.id),
-                    onBroadcast: () => _broadcastMessage(context, event),
-                    onCancel: () => _cancelEvent(context, event),
-                  ),
-                  SizedBox(height: 24.h),
-                  EventInfoSection(event: event),
-                  SizedBox(height: 20.h),
-                ],
+      body: SafeArea(
+        top: false, // Let SliverAppBar handle the top safe area
+        child: CustomScrollView(
+          slivers: [
+            EventDetailHeader(
+              event: event,
+              onEdit: () => _editEvent(context, event),
+              onMore: () => _showMoreOptions(context, event),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EventPerformanceMetrics(event: event),
+                    SizedBox(height: 32.h),
+                    EventDetailActions(
+                      event: event,
+                      onViewAttendees: () =>
+                          _viewAllAttendees(context, event.id),
+                      onBroadcast: () => _broadcastMessage(context, event),
+                      onCancel: () => _cancelEvent(context, event),
+                    ),
+                    SizedBox(height: 24.h),
+                    EventInfoSection(event: event),
+                    SizedBox(height: 20.h),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -166,13 +176,16 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
+    // Capture the bloc reference before showing the bottom sheet
+    final eventManagementBloc = context.read<EventManagementBloc>();
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: colorScheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
-      builder: (context) => Container(
+      builder: (bottomSheetContext) => Container(
         padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -187,30 +200,36 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             ),
             SizedBox(height: 20.h),
             _buildBottomSheetOption(
+              bottomSheetContext,
               'Duplicate Event',
               Icons.copy_outlined,
               () => _duplicateEvent(context, event),
             ),
             _buildBottomSheetOption(
+              bottomSheetContext,
               'Share Event',
               Icons.share_outlined,
               () => _shareEvent(context, event),
             ),
             _buildBottomSheetOption(
+              bottomSheetContext,
               'Export Data',
               Icons.download_outlined,
               () => _exportData(context, event),
             ),
             _buildBottomSheetOption(
+              bottomSheetContext,
               'Event Settings',
               Icons.settings_outlined,
               () => _eventSettings(context, event),
             ),
             if (event.status != EventStatus.cancelled)
               _buildBottomSheetOption(
+                bottomSheetContext,
                 'Delete Event',
                 Icons.delete_outline,
-                () => _deleteEvent(context, event),
+                () => _deleteEventFromBottomSheet(
+                    context, event, eventManagementBloc),
                 isDestructive: true,
               ),
             SizedBox(height: 20.h),
@@ -221,6 +240,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }
 
   Widget _buildBottomSheetOption(
+    BuildContext bottomSheetContext,
     String title,
     IconData icon,
     VoidCallback onTap, {
@@ -231,7 +251,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pop();
+        Navigator.of(bottomSheetContext).pop();
         onTap();
       },
       child: Container(
@@ -386,13 +406,14 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         context, 'Settings functionality coming soon...');
   }
 
-  void _deleteEvent(BuildContext context, EventEntity event) {
+  void _deleteEventFromBottomSheet(BuildContext context, EventEntity event,
+      EventManagementBloc eventManagementBloc) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: colorScheme.surfaceContainerHighest,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
@@ -410,7 +431,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
               style: theme.textTheme.labelLarge?.copyWith(
@@ -420,13 +441,20 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
           ),
           TextButton(
             onPressed: () {
-              context.read<EventManagementBloc>().add(
-                    EventManagementEvent.deleteEvent(
-                      eventId: event.id,
-                      organizerId: event.organizerId,
+              // Close the dialog first
+              Navigator.of(dialogContext).pop();
+
+              // Add the delete event
+              eventManagementBloc.add(
+                EventManagementEvent.deleteEvent(
+                  eventId: event.id,
+                  organizerId: event.organizerId,
                 ),
               );
-              Navigator.of(context).pop();
+              
+              // Listen for the delete completion and handle navigation
+              _handleDeleteCompletion(
+                  context, eventManagementBloc, event.title);
             },
             child: Text(
               'Delete',
@@ -438,5 +466,40 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         ],
       ),
     );
+  }
+
+  void _handleDeleteCompletion(
+      BuildContext context, EventManagementBloc bloc, String eventTitle) {
+    // Listen to the bloc stream for completion
+    late StreamSubscription subscription;
+    subscription = bloc.stream.listen((state) {
+      // If delete completed successfully (not deleting, no error, and event removed)
+      if (!state.isDeleting && !state.hasError) {
+        // Check if the current event is no longer in the events list
+        final eventStillExists =
+            state.events.any((event) => event.id == widget.eventId);
+        if (!eventStillExists) {
+          // Cancel the subscription
+          subscription.cancel();
+
+          // Show success message and navigate back
+          if (context.mounted) {
+            AppHelpers.showSuccessSnackBar(
+                context, 'Event "$eventTitle" deleted successfully');
+
+            // Navigate back to events page
+            // The events page will automatically refresh due to its BlocProvider setup
+            context.goNamed(RouteName.organizerEvents);
+          }
+        }
+      }
+
+      // If delete failed
+      if (!state.isDeleting && state.hasError) {
+        // Cancel the subscription
+        subscription.cancel();
+        // Error is already handled by the main BlocListener
+      }
+    });
   }
 }
