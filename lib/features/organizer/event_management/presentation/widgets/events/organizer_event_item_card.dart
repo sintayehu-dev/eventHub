@@ -115,7 +115,8 @@ class OrganizerEventItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final statusColor = OrganizerEventUtils.getStatusColor(event.status);
+    final statusColor =
+        OrganizerEventUtils.getStatusColor(context, event.status);
 
     final soldTickets = event.ticketTypes.fold<int>(
       0,

@@ -16,22 +16,24 @@ class TicketTypesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle('Ticket Types'),
+            _buildSectionTitle(context, 'Ticket Types'),
             TextButton.icon(
               onPressed: onAddTicketType,
-              icon: Icon(Icons.add, size: 18.sp, color: const Color(0xFF8B5CF6)),
+              icon: Icon(Icons.add, size: 18.sp, color: colorScheme.primary),
               label: Text(
                 'Add Type',
-                style: TextStyle(
-                  color: const Color(0xFF8B5CF6),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
-                  fontSize: 14.sp,
                 ),
               ),
             ),
@@ -47,12 +49,14 @@ class TicketTypesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Text(
       title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16.sp,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -60,13 +64,19 @@ class TicketTypesSection extends StatelessWidget {
 
   Widget _buildTicketTypeCard(
       BuildContext context, int index, TicketTypeData ticketType) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.3),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,17 +86,19 @@ class TicketTypesSection extends StatelessWidget {
             children: [
               Text(
                 'Ticket Type ${index + 1}',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12.sp,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               if (ticketTypes.length > 1)
                 IconButton(
                   onPressed: () => onRemoveTicketType(index),
-                  icon: Icon(Icons.delete_outline,
-                      color: Colors.red[400], size: 20.sp),
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: colorScheme.error,
+                    size: 20.sp,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -94,12 +106,14 @@ class TicketTypesSection extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           _buildTextField(
+            context,
             controller: ticketType.nameController,
             hintText: 'Ticket name (e.g. Early Bird, VIP)',
             label: 'Name',
           ),
           SizedBox(height: 12.h),
           _buildTextField(
+            context,
             controller: ticketType.descriptionController,
             hintText: 'What\'s included in this ticket?',
             label: 'Description',
@@ -110,6 +124,7 @@ class TicketTypesSection extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildTextField(
+                  context,
                   controller: ticketType.priceController,
                   hintText: '0.00',
                   label: 'Price (\$)',
@@ -119,6 +134,7 @@ class TicketTypesSection extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: _buildTextField(
+                  context,
                   controller: ticketType.quantityController,
                   hintText: '100',
                   label: 'Quantity',
@@ -132,37 +148,59 @@ class TicketTypesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     required String label,
     int maxLines = 1,
     TextInputType? keyboardType,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12.sp,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
         SizedBox(height: 4.h),
         TextFormField(
           controller: controller,
-          style: TextStyle(color: Colors.white, fontSize: 14.sp),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface,
+          ),
           maxLines: maxLines,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
             filled: true,
-            fillColor: const Color(0xFF1A0B2E),
+            fillColor: colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(
+                color: colorScheme.outline.withValues(alpha: 0.3),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(
+                color: colorScheme.outline.withValues(alpha: 0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+                width: 2,
+              ),
             ),
             contentPadding:
                 EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),

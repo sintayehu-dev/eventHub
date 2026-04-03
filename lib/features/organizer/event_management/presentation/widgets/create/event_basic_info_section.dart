@@ -22,9 +22,10 @@ class EventBasicInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Event Title'),
+        _buildSectionTitle(context, 'Event Title'),
         SizedBox(height: 8.h),
         _buildTextField(
+          context,
           controller: titleController,
           hintText: 'Enter event title',
           validator: (value) {
@@ -36,14 +37,15 @@ class EventBasicInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 24.h),
 
-        _buildSectionTitle('Event Category'),
+        _buildSectionTitle(context, 'Event Category'),
         SizedBox(height: 8.h),
-        _buildCategoryDropdown(),
+        _buildCategoryDropdown(context),
         SizedBox(height: 24.h),
 
-        _buildSectionTitle('Description'),
+        _buildSectionTitle(context, 'Description'),
         SizedBox(height: 8.h),
         _buildTextField(
+          context,
           controller: descriptionController,
           hintText: 'Describe your event',
           maxLines: 4,
@@ -58,81 +60,112 @@ class EventBasicInfoSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Text(
       title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16.sp,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
       ),
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return TextFormField(
       controller: controller,
-      style: const TextStyle(color: Colors.white),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: colorScheme.onSurface,
+      ),
       maxLines: maxLines,
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400]),
+        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        ),
         filled: true,
-        fillColor: const Color(0xFF2A1B3D),
+        fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFF8B5CF6), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1),
+          borderSide: BorderSide(color: colorScheme.error, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       ),
     );
   }
 
-  Widget _buildCategoryDropdown() {
+  Widget _buildCategoryDropdown(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.3),
+          width: 1,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: selectedCategory,
           hint: Text(
             'Select a category',
-            style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
           ),
-          dropdownColor: const Color(0xFF2A1B3D),
+          dropdownColor: colorScheme.surfaceContainerHighest,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-          style: const TextStyle(color: Colors.white),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface,
+          ),
           items: categories.map((String category) {
             return DropdownMenuItem<String>(
               value: category,
-              child: Text(category),
+              child: Text(
+                category,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
             );
           }).toList(),
           onChanged: onCategoryChanged,

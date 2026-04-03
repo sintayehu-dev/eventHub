@@ -19,34 +19,42 @@ class EventBannerSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Event Banner'),
+        _buildSectionTitle(context, 'Event Banner'),
         SizedBox(height: 8.h),
         _buildImagePicker(context),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Text(
       title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 16.sp,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: colorScheme.onSurface,
         fontWeight: FontWeight.w600,
       ),
     );
   }
 
   Widget _buildImagePicker(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return GestureDetector(
       onTap: () => _selectImage(context),
       child: Container(
         width: double.infinity,
         height: 200.h,
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
         child: selectedImagePath != null
             ? Stack(
@@ -68,12 +76,12 @@ class EventBannerSection extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.all(4.w),
                         decoration: BoxDecoration(
-                          color: Colors.black54,
+                          color: colorScheme.scrim.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Icon(
                           Icons.close,
-                          color: Colors.white,
+                          color: colorScheme.onInverseSurface,
                           size: 16.sp,
                         ),
                       ),
@@ -86,24 +94,23 @@ class EventBannerSection extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.add_photo_alternate_outlined,
-                    color: Colors.grey[400],
+                    color: colorScheme.onSurfaceVariant,
                     size: 48.sp,
                   ),
                   SizedBox(height: 12.h),
                   Text(
                     'Add Event Banner',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 16.sp,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     'Tap to select an image',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 12.sp,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

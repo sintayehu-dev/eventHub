@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditEventHeader extends StatelessWidget {
   final bool hasChanges;
@@ -15,18 +14,20 @@ class EditEventHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
         onPressed: onBack,
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
       ),
       title: Text(
         'Edit Event',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18.sp,
+        style: theme.textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurface,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -36,9 +37,8 @@ class EditEventHeader extends StatelessWidget {
             onPressed: onSave,
             child: Text(
               'Save',
-              style: TextStyle(
-                color: const Color(0xFF8B5CF6),
-                fontSize: 16.sp,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
