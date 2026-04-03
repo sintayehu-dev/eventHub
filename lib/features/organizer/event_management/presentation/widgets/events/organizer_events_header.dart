@@ -16,7 +16,7 @@ class OrganizerEventsHeader extends StatelessWidget {
       children: [
         Text(
           'My Events',
-          style: theme.textTheme.headlineMedium?.copyWith(
+          style: theme.textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),

@@ -123,76 +123,76 @@ class _AttendeesViewState extends State<AttendeesView> {
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              AttendeesHeaderWidget(onRefresh: _onRefresh),
-              SizedBox(height: 24.h),
-              
-              // Search Bar
-              AttendeesSearchWidget(
-                controller: _searchController,
-                onSearch: _onSearch,
-              ),
-              SizedBox(height: 16.h),
-              
-              // Stats Section
-              BlocBuilder<AttendeeManagementBloc, AttendeeManagementState>(
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(
+            20.w, 20.w + MediaQuery.of(context).padding.top, 20.w, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            AttendeesHeaderWidget(onRefresh: _onRefresh),
+            SizedBox(height: 24.h),
+
+            // Search Bar
+            AttendeesSearchWidget(
+              controller: _searchController,
+              onSearch: _onSearch,
+            ),
+            SizedBox(height: 16.h),
+
+            // Stats Section
+            BlocBuilder<AttendeeManagementBloc, AttendeeManagementState>(
+              builder: (context, state) {
+                if (state.isLoadingStats) {
+                  return const StatsShimmer();
+                }
+
+                if (state.stats != null) {
+                  return AttendeesStatsWidget(stats: state.stats!);
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
+            SizedBox(height: 24.h),
+
+            // Filter Tabs
+            AttendeesFilterTabsWidget(
+              selectedStatus: _selectedStatus,
+              onStatusFilter: _onStatusFilter,
+            ),
+            SizedBox(height: 24.h),
+
+            // Attendees List
+            Expanded(
+              child:
+                  BlocConsumer<AttendeeManagementBloc, AttendeeManagementState>(
+                listener: (context, state) {
+                  if (state.hasError && state.errorMessage.isNotEmpty) {
+                    AppHelpers.showErrorSnackBar(context, state.errorMessage);
+                  }
+                },
                 builder: (context, state) {
-                  if (state.isLoadingStats) {
+                  if (state.isLoading) {
                     return const AttendeesShimmer();
                   }
-                  
-                  if (state.stats != null) {
-                    return AttendeesStatsWidget(stats: state.stats!);
+
+                  if (state.hasError && state.attendees.isEmpty) {
+                    return AppErrorRetryWidget(
+                      errorMessage: state.errorMessage,
+                      onRetry: _onRetry,
+                    );
                   }
-                  
-                  return const SizedBox.shrink();
+
+                  return AttendeesListWidget(
+                    attendees: state.attendees,
+                    searchQuery: _searchController.text,
+                    onManualCheckIn: _onManualCheckIn,
+                  );
                 },
               ),
-              SizedBox(height: 24.h),
-              
-              // Filter Tabs
-              AttendeesFilterTabsWidget(
-                selectedStatus: _selectedStatus,
-                onStatusFilter: _onStatusFilter,
-              ),
-              SizedBox(height: 24.h),
-              
-              // Attendees List
-              Expanded(
-                child: BlocConsumer<AttendeeManagementBloc, AttendeeManagementState>(
-                  listener: (context, state) {
-                    if (state.hasError && state.errorMessage.isNotEmpty) {
-                      AppHelpers.showErrorSnackBar(context, state.errorMessage);
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const AttendeesShimmer();
-                    }
-                    
-                    if (state.hasError && state.attendees.isEmpty) {
-                      return AppErrorRetryWidget(
-                        errorMessage: state.errorMessage,
-                        onRetry: _onRetry,
-                      );
-                    }
-                    
-                    return AttendeesListWidget(
-                      attendees: state.attendees,
-                      searchQuery: _searchController.text,
-                      onManualCheckIn: _onManualCheckIn,
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

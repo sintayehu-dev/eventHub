@@ -13,10 +13,6 @@ class ReportsShimmer extends StatelessWidget {
         const MetricsShimmer(),
         SizedBox(height: 32.h),
         
-        // Chart Shimmer
-        const ChartShimmer(),
-        SizedBox(height: 32.h),
-        
         // Staff Performance Shimmer
         const StaffPerformanceShimmer(),
         SizedBox(height: 32.h),
@@ -96,67 +92,6 @@ class MetricsShimmer extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class ChartShimmer extends StatelessWidget {
-  const ChartShimmer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShimmerText(
-            width: 120.w,
-            height: 18.h,
-          ),
-          SizedBox(height: 16.h),
-          _buildChartBarsShimmer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChartBarsShimmer() {
-    return SizedBox(
-      height: 120.h,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(8, (index) {
-          // Vary the height for realistic chart appearance
-          final heights = [60.h, 80.h, 45.h, 90.h, 70.h, 55.h, 85.h, 40.h];
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ShimmerBox(
-                width: 16.w,
-                height: heights[index],
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-              SizedBox(height: 4.h),
-              ShimmerText(
-                width: 20.w,
-                height: 12.h,
-              ),
-            ],
-          );
-        }),
-      ),
     );
   }
 }

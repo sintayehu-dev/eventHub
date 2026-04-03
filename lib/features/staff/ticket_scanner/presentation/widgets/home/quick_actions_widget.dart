@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:eventhub/debug_ticket_helper.dart';
-import 'package:eventhub/debug_organizer_helper.dart';
 import 'package:eventhub/features/staff/event_assignment/application/staff_event_assignment/bloc/staff_event_assignment_bloc.dart';
-import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
 
 class QuickActionsWidget extends StatelessWidget {
-  final StaffEventAssignmentEntity? selectedEvent;
   final String staffId;
 
   const QuickActionsWidget({
     super.key,
-    this.selectedEvent,
     required this.staffId,
   });
 
@@ -22,7 +16,7 @@ class QuickActionsWidget extends StatelessWidget {
     final theme = Theme.of(context);
     
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildQuickActionButton(
           icon: Icons.refresh,
@@ -32,26 +26,6 @@ class QuickActionsWidget extends StatelessWidget {
                   StaffEventAssignmentEvent.loadStaffEvents(staffId: staffId),
                 );
           },
-          theme: theme,
-        ),
-        _buildQuickActionButton(
-          icon: Icons.add_circle,
-          label: 'Test Ticket',
-          onTap: () => _createTestTicket(),
-          theme: theme,
-        ),
-        _buildQuickActionButton(
-          icon: Icons.person_pin,
-          label: 'Fix Organizers',
-          onTap: () => _fixOrganizerNames(),
-          theme: theme,
-        ),
-        _buildQuickActionButton(
-          icon: Icons.people_outline,
-          label: 'Attendees',
-          onTap: selectedEvent != null
-              ? () => _navigateToAttendees(context, selectedEvent!)
-              : null,
           theme: theme,
         ),
       ],
@@ -101,28 +75,5 @@ class QuickActionsWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _createTestTicket() async {
-    try {
-      await DebugTicketHelper.createTestTicket();
-    } catch (e) {
-      // Handle error silently for now
-    }
-  }
-
-  void _fixOrganizerNames() async {
-    try {
-      await DebugOrganizerHelper.updateEventOrganizerNames();
-    } catch (e) {
-      // Handle error silently for now
-    }
-  }
-
-  void _navigateToAttendees(
-      BuildContext context, StaffEventAssignmentEntity selectedEvent) {
-    // Use path parameters instead of query parameters
-    final path = '/staff/attendees/${selectedEvent.eventId}/$staffId';
-    context.go(path);
   }
 }

@@ -13,6 +13,7 @@ import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home
 import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home/start_scanning_button.dart';
 import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home/quick_actions_widget.dart';
 import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home/no_events_state_widget.dart';
+import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home/staff_home_shimmer.dart';
 
 class StaffHomeScreen extends StatelessWidget {
   const StaffHomeScreen({super.key});
@@ -23,12 +24,7 @@ class StaffHomeScreen extends StatelessWidget {
     final currentUser = userService
         .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
-    return BlocProvider(
-      create: (context) => getIt<StaffEventAssignmentBloc>()
-        ..add(StaffEventAssignmentEvent.loadStaffEvents(
-            staffId: currentUser.uid)),
-      child: StaffHomeView(staffId: currentUser.uid),
-    );
+    return StaffHomeView(staffId: currentUser.uid);
   }
 }
 
@@ -59,8 +55,8 @@ class StaffHomeView extends StatelessWidget {
           },
           builder: (context, state) {
             return state.when(
-              initial: () => const Center(child: CircularProgressIndicator()),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              initial: () => const StaffHomeShimmer(),
+              loading: () => const StaffHomeShimmer(),
               eventsLoaded: (events, selectedEvent) => _buildContent(
                 context,
                 theme,
@@ -132,7 +128,6 @@ class StaffHomeView extends StatelessWidget {
 
           // Quick Actions
           QuickActionsWidget(
-            selectedEvent: selectedEvent,
             staffId: staffId,
           ),
         ],

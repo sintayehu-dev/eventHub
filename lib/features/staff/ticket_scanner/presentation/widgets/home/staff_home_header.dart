@@ -23,11 +23,8 @@ class StaffHomeHeader extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              Icons.arrow_back,
-              color: theme.colorScheme.onSurface,
-              size: 24.sp,
-            ),
+            // Empty space to balance the layout
+            SizedBox(width: 24.sp),
             Column(
               children: [
                 Text(

@@ -126,7 +126,7 @@ class EventDetailView extends StatelessWidget {
               EventDiscoveryEvent.loadEventDetails(
                 eventId: eventId,
                 userId: 'current_user_id', // TODO: Get from auth
-          ),
+              ),
             );
       },
     );
@@ -136,51 +136,54 @@ class EventDetailView extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return CustomScrollView(
-      slivers: [
-        EventDetailSliverAppBar(event: event),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCategoryBadge(context, event),
-                SizedBox(height: 16.h),
-                Text(
-                  event.title,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
+    return SafeArea(
+      top: false, // Let SliverAppBar handle the top safe area
+      child: CustomScrollView(
+        slivers: [
+          EventDetailSliverAppBar(event: event),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCategoryBadge(context, event),
+                  SizedBox(height: 16.h),
+                  Text(
+                    event.title,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
                   ),
-                ),
-                SizedBox(height: 24.h),
-                EventDetailInfoCard(
-                  icon: Icons.calendar_today,
-                  title: 'Date & Time',
-                  subtitle: _formatDateTime(event.dateTime),
-                ),
-                SizedBox(height: 16.h),
-                EventDetailInfoCard(
-                  icon: Icons.confirmation_number,
-                  title: 'Entry Price',
-                  subtitle: event.priceRange,
-                ),
-                SizedBox(height: 24.h),
-                _buildLocationSection(context, event),
-                SizedBox(height: 24.h),
-                _buildOrganizerSection(context, event),
-                SizedBox(height: 24.h),
-                EventDetailAboutSection(description: event.description),
-                SizedBox(height: 32.h),
-                EventDetailGetTicketsButton(event: event),
-                SizedBox(height: 20.h),
-              ],
+                  SizedBox(height: 24.h),
+                  EventDetailInfoCard(
+                    icon: Icons.calendar_today,
+                    title: 'Date & Time',
+                    subtitle: _formatDateTime(event.dateTime),
+                  ),
+                  SizedBox(height: 16.h),
+                  EventDetailInfoCard(
+                    icon: Icons.confirmation_number,
+                    title: 'Entry Price',
+                    subtitle: event.priceRange,
+                  ),
+                  SizedBox(height: 24.h),
+                  _buildLocationSection(context, event),
+                  SizedBox(height: 24.h),
+                  _buildOrganizerSection(context, event),
+                  SizedBox(height: 24.h),
+                  EventDetailAboutSection(description: event.description),
+                  SizedBox(height: 32.h),
+                  EventDetailGetTicketsButton(event: event),
+                  SizedBox(height: 20.h),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

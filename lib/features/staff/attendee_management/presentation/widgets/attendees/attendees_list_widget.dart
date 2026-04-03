@@ -50,6 +50,7 @@ class AttendeesListWidget extends StatelessWidget {
     }
 
     return ListView.separated(
+      padding: EdgeInsets.only(bottom: 90.h),
       itemCount: attendees.length,
       separatorBuilder: (context, index) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {

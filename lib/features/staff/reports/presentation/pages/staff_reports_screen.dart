@@ -8,37 +8,15 @@ import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/staff/reports/application/staff_reports/bloc/staff_reports_bloc.dart';
 import 'package:eventhub/features/staff/reports/domain/entities/staff_report_entity.dart';
 import 'package:eventhub/features/staff/reports/presentation/widgets/reports_shimmer.dart';
+import 'package:eventhub/features/staff/event_assignment/application/staff_event_assignment/bloc/staff_event_assignment_bloc.dart';
 
 class StaffReportsScreen extends StatelessWidget {
   const StaffReportsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-    final staffId = currentUser?.uid ?? 'unknown_staff';
-
     return BlocProvider(
-      create: (_) => getIt<StaffReportsBloc>()
-        ..add(StaffReportsEvent.loadRealTimeMetrics(
-          eventId: '1774346204603_176467', // Using the test event ID
-          staffId: staffId,
-        ))
-        ..add(StaffReportsEvent.loadReport(
-          eventId: '1774346204603_176467',
-          staffId: staffId,
-          timePeriod: ReportTimePeriod.today,
-        ))
-        ..add(StaffReportsEvent.loadCheckInAnalytics(
-          eventId: '1774346204603_176467',
-          startDate: DateTime.now().subtract(const Duration(hours: 24)),
-          endDate: DateTime.now(),
-        ))
-        ..add(StaffReportsEvent.loadStaffPerformance(
-          eventId: '1774346204603_176467',
-          startDate: DateTime.now().subtract(const Duration(hours: 24)),
-          endDate: DateTime.now(),
-        )),
+      create: (_) => getIt<StaffReportsBloc>(),
       child: const StaffReportsView(),
     );
   }
@@ -55,75 +33,116 @@ class _StaffReportsViewState extends State<StaffReportsView> {
   ReportTimePeriod _selectedPeriod = ReportTimePeriod.today;
 
   @override
+  void initState() {
+    super.initState();
+    _loadReportsData();
+  }
+
+  void _loadReportsData() {
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser();
+    final staffId = currentUser?.uid ?? 'unknown_staff';
+
+    // Get the current event from staff event assignment bloc
+    final staffEventBloc = context.read<StaffEventAssignmentBloc>();
+    final staffEventState = staffEventBloc.state;
+
+    String? eventId;
+
+    // Extract event ID from different state types
+    staffEventState.when(
+      initial: () => eventId = null,
+      loading: () => eventId = null,
+      eventsLoaded: (events, selectedEvent) {
+        if (selectedEvent != null) {
+          eventId = selectedEvent.eventId;
+        } else if (events.isNotEmpty) {
+          eventId = events.first.eventId;
+        }
+      },
+      eventSelected: (events, selectedEvent) => eventId = selectedEvent.eventId,
+      accessGranted: (events, selectedEvent, permissions) =>
+          eventId = selectedEvent.eventId,
+      accessDenied: (message) => eventId = null,
+      assignmentsRefreshed: (events, selectedEvent) {
+        if (selectedEvent != null) {
+          eventId = selectedEvent.eventId;
+        } else if (events.isNotEmpty) {
+          eventId = events.first.eventId;
+        }
+      },
+      error: (message) => eventId = null,
+    );
+
+    // Use fallback event ID if no assignment found
+    final finalEventId = eventId ?? '1774346204603_176467';
+
+    // Load all reports data
+    context.read<StaffReportsBloc>()
+      ..add(StaffReportsEvent.loadRealTimeMetrics(
+        eventId: finalEventId,
+        staffId: staffId,
+      ))
+      ..add(StaffReportsEvent.loadReport(
+        eventId: finalEventId,
+        staffId: staffId,
+        timePeriod: ReportTimePeriod.today,
+      ))
+      ..add(StaffReportsEvent.loadCheckInAnalytics(
+        eventId: finalEventId,
+        startDate: DateTime.now().subtract(const Duration(hours: 24)),
+        endDate: DateTime.now(),
+      ))
+      ..add(StaffReportsEvent.loadStaffPerformance(
+        eventId: finalEventId,
+        startDate: DateTime.now().subtract(const Duration(hours: 24)),
+        endDate: DateTime.now(),
+      ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: BlocConsumer<StaffReportsBloc, StaffReportsState>(
-          listener: (context, state) {
-            if (state.hasError && state.errorMessage.isNotEmpty) {
-              AppHelpers.showErrorSnackBar(
-                  context, 'Error loading reports: ${state.errorMessage}');
-            }
-          },
-          builder: (context, state) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                final userService = getIt<UserService>();
-                final currentUser = userService.getCurrentUser();
-                final staffId = currentUser?.uid ?? 'unknown_staff';
+      body: BlocConsumer<StaffReportsBloc, StaffReportsState>(
+        listener: (context, state) {
+          if (state.hasError && state.errorMessage.isNotEmpty) {
+            AppHelpers.showErrorSnackBar(
+                context, 'Error loading reports: ${state.errorMessage}');
+          }
+        },
+        builder: (context, state) {
+          return RefreshIndicator(
+            onRefresh: () async {
+              _loadReportsData();
+            },
+            color: colorScheme.primary,
+            backgroundColor: colorScheme.surfaceContainerHighest,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(20.w,
+                  20.w + MediaQuery.of(context).padding.top, 20.w, 20.w + 90.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  _buildHeader(),
+                  SizedBox(height: 24.h),
 
-                // Load all data on refresh
-                context.read<StaffReportsBloc>()
-                  ..add(StaffReportsEvent.loadRealTimeMetrics(
-                    eventId: '1774346204603_176467',
-                    staffId: staffId,
-                  ))
-                  ..add(StaffReportsEvent.loadReport(
-                    eventId: '1774346204603_176467',
-                    staffId: staffId,
-                    timePeriod: _selectedPeriod,
-                  ))
-                  ..add(StaffReportsEvent.loadCheckInAnalytics(
-                    eventId: '1774346204603_176467',
-                    startDate:
-                        DateTime.now().subtract(const Duration(hours: 24)),
-                    endDate: DateTime.now(),
-                  ))
-                  ..add(StaffReportsEvent.loadStaffPerformance(
-                    eventId: '1774346204603_176467',
-                    startDate:
-                        DateTime.now().subtract(const Duration(hours: 24)),
-                    endDate: DateTime.now(),
-                  ));
-              },
-              color: colorScheme.primary,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    _buildHeader(),
-                    SizedBox(height: 24.h),
+                  // Time Period Selector
+                  _buildTimePeriodSelector(),
+                  SizedBox(height: 24.h),
 
-                    // Time Period Selector
-                    _buildTimePeriodSelector(),
-                    SizedBox(height: 24.h),
-
-                    // Content based on state
-                    _buildContent(state),
-                  ],
-                ),
+                  // Content based on state
+                  _buildContent(state),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -217,8 +236,9 @@ class _StaffReportsViewState extends State<StaffReportsView> {
               onTap: () {
                 // Get current state to check if loading
                 final currentState = context.read<StaffReportsBloc>().state;
-                if (currentState.isLoading)
+                if (currentState.isLoading) {
                   return; // Prevent changes while loading
+                }
                 
                 setState(() {
                   _selectedPeriod = period;
@@ -268,17 +288,6 @@ class _StaffReportsViewState extends State<StaffReportsView> {
         _buildKeyMetrics(metrics),
         SizedBox(height: 32.h),
         
-        // Show chart shimmer if analytics are loading
-        BlocBuilder<StaffReportsBloc, StaffReportsState>(
-          builder: (context, state) {
-            if (state.isLoadingAnalytics) {
-              return const ChartShimmer();
-            }
-            return _buildCheckInChart();
-          },
-        ),
-        SizedBox(height: 32.h),
-        
         // Show staff performance shimmer if loading
         BlocBuilder<StaffReportsBloc, StaffReportsState>(
           builder: (context, state) {
@@ -296,17 +305,6 @@ class _StaffReportsViewState extends State<StaffReportsView> {
     return Column(
       children: [
         _buildKeyMetrics(report.metrics),
-        SizedBox(height: 32.h),
-        
-        // Show chart shimmer if analytics are loading, otherwise show chart with data
-        BlocBuilder<StaffReportsBloc, StaffReportsState>(
-          builder: (context, state) {
-            if (state.isLoadingAnalytics) {
-              return const ChartShimmer();
-            }
-            return _buildCheckInChart(hourlyData: report.hourlyData);
-          },
-        ),
         SizedBox(height: 32.h),
         
         // Show staff performance shimmer if loading, otherwise show data
@@ -463,126 +461,6 @@ class _StaffReportsViewState extends State<StaffReportsView> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCheckInChart({List<HourlyCheckInData>? hourlyData}) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Check-in Activity',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          if (hourlyData != null && hourlyData.isNotEmpty)
-            _buildHourlyChart(hourlyData)
-          else
-            _buildPlaceholderChart(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHourlyChart(List<HourlyCheckInData> hourlyData) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final maxCheckIns =
-        hourlyData.map((e) => e.checkIns).reduce((a, b) => a > b ? a : b);
-
-    return SizedBox(
-      height: 120.h,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children:
-            hourlyData.where((data) => data.checkIns > 0).take(12).map((data) {
-          final height =
-              maxCheckIns > 0 ? (data.checkIns / maxCheckIns) * 100.h : 0.0;
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                width: 16.w,
-                height: height,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      colorScheme.primary.withValues(alpha: 0.8),
-                      colorScheme.primary.withValues(alpha: 0.4),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                '${data.hour}h',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderChart() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      height: 120.h,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colorScheme.primary.withValues(alpha: 0.3),
-            colorScheme.primary.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.bar_chart,
-              color: colorScheme.primary,
-              size: 32.sp,
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Check-in Timeline',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

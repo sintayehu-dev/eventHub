@@ -262,7 +262,7 @@ class FirebaseStaffReportsDataSource {
       }
 
       final checkInCount = checkIns.length;
-      final averageWaitTime = 2.3; // Mock wait time
+      const averageWaitTime = 2.3; // Mock wait time
       final lastActivity = checkIns.isNotEmpty 
           ? (checkIns.last['checkInTime'] as Timestamp).toDate()
           : DateTime.now().subtract(const Duration(hours: 1));

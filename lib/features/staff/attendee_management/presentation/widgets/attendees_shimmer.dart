@@ -16,6 +16,7 @@ class AttendeesShimmer extends StatelessWidget {
     final itemCount = isSearching ? 3 : 8;
     
     return ListView.separated(
+      padding: EdgeInsets.only(bottom: 90.h),
       itemCount: itemCount,
       separatorBuilder: (context, index) => SizedBox(height: 12.h),
       itemBuilder: (context, index) => AttendeeCardShimmer(
