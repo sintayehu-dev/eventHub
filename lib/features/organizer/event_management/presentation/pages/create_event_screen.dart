@@ -129,7 +129,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     final currentUser = userService.getCurrentUser();
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
       child: Form(
         key: _formKey,
         child: Column(

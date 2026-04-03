@@ -66,7 +66,7 @@ class OrganizerHomeView extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+          padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

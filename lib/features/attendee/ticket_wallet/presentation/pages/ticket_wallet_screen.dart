@@ -51,7 +51,7 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
       backgroundColor: colorScheme.surface,
       body: Padding(
         padding: EdgeInsets.fromLTRB(
-            0, MediaQuery.of(context).padding.top + 20.h, 0, 100.h),
+            0, MediaQuery.of(context).padding.top + 20.h, 0, 90.h),
         child: Column(
           children: [
             Padding(

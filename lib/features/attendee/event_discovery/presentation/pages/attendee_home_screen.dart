@@ -45,7 +45,7 @@ class AttendeeHomeView extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.fromLTRB(
-                20.w, MediaQuery.of(context).padding.top + 20.h, 20.w, 100.h),
+                20.w, MediaQuery.of(context).padding.top + 20.h, 20.w, 90.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

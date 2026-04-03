@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
+import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
+import 'package:eventhub/core/theme/app_theme.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_bloc.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_event.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_state.dart';
@@ -24,9 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill with test credentials for development
-    _emailController.text = 'enter your email';
-    _passwordController.text = 'enter your password';
+    // Clear any pre-filled credentials for production
   }
 
   @override
@@ -38,10 +38,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    // Force dark theme for login screen
+    final darkTheme = AppTheme.darkTheme();
+    final colorScheme = darkTheme.colorScheme;
     
-    return Scaffold(
+    return Theme(
+      data: darkTheme,
+      child: Scaffold(
       backgroundColor: colorScheme.surface,
       body: Container(
         width: double.infinity,
@@ -118,7 +121,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       // App Name
                       Text(
                         'Event Hub',
-                        style: theme.textTheme.displaySmall?.copyWith(
+                          style: darkTheme.textTheme.displaySmall?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
@@ -129,7 +132,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       // Tagline
                       Text(
                         'Elevate your experience. Enter the arena.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                          style: darkTheme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
@@ -143,7 +146,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Text(
                             'Email Address',
-                            style: theme.textTheme.titleSmall?.copyWith(
+                              style: darkTheme.textTheme.titleSmall?.copyWith(
                               color:
                                   colorScheme.onSurface.withValues(alpha: 0.8),
                             ),
@@ -163,12 +166,13 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              style: theme.textTheme.bodyLarge?.copyWith(
+                                style: darkTheme.textTheme.bodyLarge?.copyWith(
                                 color: colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'name@company.com',
-                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  hintStyle:
+                                      darkTheme.textTheme.bodyLarge?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                 ),
@@ -211,7 +215,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             children: [
                               Text(
                                 'Password',
-                                style: theme.textTheme.titleSmall?.copyWith(
+                                  style:
+                                      darkTheme.textTheme.titleSmall?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.8),
                                 ),
@@ -224,7 +229,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                 },
                                 child: Text(
                                   'Forgot password?',
-                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    style: darkTheme.textTheme.labelMedium
+                                        ?.copyWith(
                                     color: colorScheme.primary,
                                   ),
                                 ),
@@ -246,12 +252,13 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: TextFormField(
                               controller: _passwordController,
                               obscureText: !state.showPassword,
-                              style: theme.textTheme.bodyLarge?.copyWith(
+                                style: darkTheme.textTheme.bodyLarge?.copyWith(
                                 color: colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
                                 hintText: '••••••••',
-                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  hintStyle:
+                                      darkTheme.textTheme.bodyLarge?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                 ),
@@ -319,13 +326,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           child: state.isLoading
-                              ? SizedBox(
-                                  width: 24.w,
-                                  height: 24.w,
-                                  child: CircularProgressIndicator(
+                                ? SpinKitLoadingWidget(
                                     color: colorScheme.onPrimary,
-                                    strokeWidth: 2,
-                                  ),
+                                    size: 24.w,
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -333,7 +336,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                     Text(
                                       'Login to Hub',
                                       style:
-                                          theme.textTheme.titleMedium?.copyWith(
+                                          darkTheme.textTheme.titleMedium
+                                            ?.copyWith(
                                         color: colorScheme.onPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -363,7 +367,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: Text(
                               'OR',
-                              style: theme.textTheme.labelMedium?.copyWith(
+                                style:
+                                    darkTheme.textTheme.labelMedium?.copyWith(
                                 color: colorScheme.onSurface
                                     .withValues(alpha: 0.6),
                               ),
@@ -423,7 +428,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: theme.textTheme.bodyMedium?.copyWith(
+                              style: darkTheme.textTheme.bodyMedium?.copyWith(
                               color:
                                   colorScheme.onSurface.withValues(alpha: 0.9),
                             ),
@@ -434,7 +439,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             },
                             child: Text(
                               'Create Account',
-                              style: theme.textTheme.bodyMedium?.copyWith(
+                                style: darkTheme.textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -452,6 +457,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -460,8 +466,8 @@ class _SignInScreenState extends State<SignInScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final darkTheme = AppTheme.darkTheme();
+    final colorScheme = darkTheme.colorScheme;
     
     return GestureDetector(
       onTap: onTap,

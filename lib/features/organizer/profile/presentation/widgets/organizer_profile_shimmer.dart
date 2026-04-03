@@ -8,7 +8,7 @@ class OrganizerProfileShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
       child: Column(
         children: [
           // Profile Header Shimmer

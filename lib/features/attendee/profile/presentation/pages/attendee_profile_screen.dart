@@ -196,7 +196,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   Widget _buildProfileContent(UserProfileEntity profile) {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
-          20.w, 20.w, 20.w, 100.h), // Added bottom padding for nav bar
+          20.w, 20.w, 20.w, 90.h), // Added bottom padding for nav bar
       child: Column(
         children: [
           AttendeeProfileHeader(profile: profile),

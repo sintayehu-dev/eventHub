@@ -365,7 +365,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
 
     return ListView.builder(
       padding: EdgeInsets.fromLTRB(
-          20.w, 0, 20.w, 100.h), // Added bottom padding for nav bar
+          20.w, 0, 20.w, 90.h), // Added bottom padding for nav bar
       itemCount: filteredAttendees.length,
       itemBuilder: (context, index) {
         final attendee = filteredAttendees[index];

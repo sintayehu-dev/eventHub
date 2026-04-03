@@ -51,7 +51,7 @@ import 'package:eventhub/features/organizer/profile/presentation/pages/organizer
 // Staff screens
 import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/staff_home_screen.dart';
 import 'package:eventhub/features/staff/ticket_scanner/presentation/pages/qr_scanner_screen.dart';
-import 'package:eventhub/features/staff/attendee_management/presentation/pages/attendees_screen.dart';
+import 'package:eventhub/features/staff/attendee_management/presentation/pages/staff_attendees_screen.dart';
 import 'package:eventhub/features/staff/reports/presentation/pages/staff_reports_screen.dart';
 import 'package:eventhub/features/staff/profile/presentation/pages/staff_profile_screen.dart';
 
@@ -254,7 +254,17 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Staff Reports Branch (index 1)
+        // Staff Attendees Branch (index 1)
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              name: RouteName.staffAttendees,
+              path: '/staff/attendees',
+              builder: (context, state) => const StaffAttendeesScreen(),
+            ),
+          ],
+        ),
+        // Staff Reports Branch (index 2)
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -264,7 +274,7 @@ final router = GoRouter(
             ),
           ],
         ),
-        // Staff Profile Branch (index 2)
+        // Staff Profile Branch (index 3)
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -277,21 +287,6 @@ final router = GoRouter(
       ],
     ),
 
-    // Staff Attendees - Outside shell to allow parameters
-    GoRoute(
-      name: RouteName.staffAttendees,
-      path: '/staff/attendees/:eventId/:staffId',
-      builder: (context, state) {
-        final eventId = state.pathParameters['eventId'] ?? '';
-        final staffId = state.pathParameters['staffId'] ?? '';
-        print(
-            'Router - eventId: "$eventId", staffId: "$staffId"'); // Debug log
-        return AttendeesScreen(
-          eventId: eventId,
-          staffId: staffId,
-        );
-      },
-    ),
 
     // QR Scanner Screen (separate from shell navigation)
     GoRoute(

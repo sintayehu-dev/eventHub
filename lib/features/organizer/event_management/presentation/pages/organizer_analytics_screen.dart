@@ -89,7 +89,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
       color: colorScheme.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+        padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -135,7 +135,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
   Widget _buildShimmerContent(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 100.h),
+      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

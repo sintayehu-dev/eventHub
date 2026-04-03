@@ -52,7 +52,7 @@ class _DiscoverViewState extends State<DiscoverView> {
         physics: const AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-              0, MediaQuery.of(context).padding.top + 20.h, 0, 100.h),
+              0, MediaQuery.of(context).padding.top + 20.h, 0, 90.h),
           child: Column(
             children: [
               // Header

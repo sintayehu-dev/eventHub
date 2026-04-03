@@ -91,7 +91,7 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
               ),
             ),
             const OrganizerEventsListSection(),
-            SliverPadding(padding: EdgeInsets.only(bottom: 100.h)),
+            SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
           ],
         ),
       ),
