@@ -137,8 +137,8 @@ lib/
 
 ### 🔄 Architecture Layers
 
-1. **Presentation Layer** - UI components, pages, and BLoC state management
-2. **Application Layer** - Use cases and business logic coordination
+1. **Presentation Layer** - UI components, pages, and widgets
+2. **Application Layer** - BLoC state management
 3. **Domain Layer** - Core business entities and repository contracts
 4. **Infrastructure Layer** - External data sources and service implementations
 
@@ -432,16 +432,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🌟 **About This Project**
 
-*EventHub demonstrates production-ready Flutter development skills, showcasing advanced architecture patterns, comprehensive testing, and modern development practices. Built as a portfolio piece to highlight expertise in mobile app development, backend integration, and software engineering excellence.*
-
----
-
-### 📞 **Connect With Me**
-
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=google-chrome&logoColor=white)](https://yourportfolio.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/yourprofile)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourusername)
-[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:your.email@example.com)
+*EventHub demonstrates production-ready Flutter development skills, showcasing advanced architecture patterns, comprehensive testing, and modern development practices.*
 
 ---
 
