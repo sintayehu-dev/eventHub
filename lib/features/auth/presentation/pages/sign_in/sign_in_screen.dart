@@ -394,8 +394,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             icon: Icons.g_mobiledata,
                             color: const Color(0xFFDB4437),
                             onTap: () {
-                              context.read<LoginBloc>().add(
-                                const LoginEvent.googleSignInSubmitted(),
+                                AppHelpers.showInfoSnackBar(
+                                    context, 'Feature to be implemented soon'
                               );
                             },
                           ),
@@ -405,7 +405,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             icon: Icons.facebook,
                             color: const Color(0xFF1877F2),
                             onTap: () {
-                              // TODO: Implement Facebook sign in
+                                AppHelpers.showInfoSnackBar(
+                                    context, 'Feature to be implemented soon');
                             },
                           ),
                           
@@ -414,7 +415,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             icon: Icons.alternate_email,
                             color: const Color(0xFF1DA1F2),
                             onTap: () {
-                              // TODO: Implement Twitter sign in
+                                AppHelpers.showInfoSnackBar(
+                                    context, 'Feature to be implemented soon');
                             },
                           ),
                         ],
