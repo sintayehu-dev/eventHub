@@ -29,7 +29,8 @@ class OrganizerStatsSection extends StatelessWidget {
           return _buildStatsContent(context, [state.selectedEvent!]);
         }
 
-        return _buildLoadingStats(context);
+        // Show empty state when no events and not loading
+        return _buildEmptyStats(context);
       },
     );
   }
@@ -110,6 +111,66 @@ class OrganizerStatsSection extends StatelessWidget {
     );
   }
 
+  Widget _buildEmptyStats(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                title: 'Total Revenue',
+                value: '\$0',
+                change: 'No events yet',
+                isPositive: true,
+                color: colorScheme.primary,
+                icon: Icons.attach_money,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: _StatCard(
+                title: 'Active Events',
+                value: '0',
+                change: 'Create your first event',
+                isPositive: true,
+                color: colorScheme.tertiary,
+                icon: Icons.event,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                title: 'Tickets Sold',
+                value: '0',
+                change: 'Start selling tickets',
+                isPositive: true,
+                color: colorScheme.secondary,
+                icon: Icons.confirmation_number,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: _StatCard(
+                title: 'Avg. Attendance',
+                value: '0%',
+                change: 'Build your audience',
+                isPositive: true,
+                color: colorScheme.tertiary,
+                icon: Icons.people,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildLoadingStats(BuildContext context) {
     return Column(
       children: [
@@ -170,6 +231,12 @@ class _StatCard extends StatelessWidget {
     required this.color,
     required this.icon,
   });
+
+  bool get _isEmptyState =>
+      change.contains('No events') ||
+      change.contains('Create your') ||
+      change.contains('Start selling') ||
+      change.contains('Build your');
 
   @override
   Widget build(BuildContext context) {
@@ -238,25 +305,38 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: isPositive
-                  ? colorScheme.tertiary.withValues(alpha: 0.1)
-                  : colorScheme.error.withValues(alpha: 0.1),
+              color: _isEmptyState
+                  ? colorScheme.surfaceContainerHighest
+                  : isPositive
+                      ? colorScheme.tertiary.withValues(alpha: 0.1)
+                      : colorScheme.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6.r),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  isPositive ? Icons.trending_up : Icons.trending_down,
-                  color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                  size: 14.sp,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  change,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: isPositive ? colorScheme.tertiary : colorScheme.error,
-                    fontWeight: FontWeight.bold,
+                if (!_isEmptyState) ...[
+                  Icon(
+                    isPositive ? Icons.trending_up : Icons.trending_down,
+                    color:
+                        isPositive ? colorScheme.tertiary : colorScheme.error,
+                    size: 14.sp,
+                  ),
+                  SizedBox(width: 4.w),
+                ],
+                Flexible(
+                  child: Text(
+                    change,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: _isEmptyState
+                          ? colorScheme.onSurfaceVariant
+                          : isPositive
+                              ? colorScheme.tertiary
+                              : colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
