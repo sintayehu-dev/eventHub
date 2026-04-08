@@ -11,7 +11,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
-import 'package:google_sign_in/google_sign_in.dart' as _i116;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../../features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart'
@@ -168,7 +167,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i59.FirebaseAuth>(() => firebaseModule.firebaseAuth);
     gh.lazySingleton<_i974.FirebaseFirestore>(
         () => firebaseModule.firebaseFirestore);
-    gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
     gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
     gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
         _i409.FirebaseStaffManagementDataSource(
@@ -229,11 +227,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i818.EventDiscoveryRepository>(() =>
         _i872.EventDiscoveryRepositoryImpl(
             gh<_i191.FirebaseEventDiscoveryDataSource>()));
-    gh.factory<_i413.FirebaseAuthDataSource>(
-        () => _i413.FirebaseAuthDataSourceImpl(
-              gh<_i59.FirebaseAuth>(),
-              gh<_i116.GoogleSignIn>(),
-            ));
     gh.factory<_i1005.TicketRepository>(() =>
         _i699.TicketRepositoryImpl(gh<_i1021.FirebaseTicketDataSource>()));
     gh.factory<_i776.FirebaseTicketWalletDataSource>(() =>
@@ -252,8 +245,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i253.TicketScannerRepository>(() =>
         _i807.TicketScannerRepositoryImpl(
             dataSource: gh<_i967.FirebaseTicketScannerDataSource>()));
-    gh.factory<_i787.AuthRepository>(
-        () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
+    gh.factory<_i413.FirebaseAuthDataSource>(
+        () => _i413.FirebaseAuthDataSourceImpl(gh<_i59.FirebaseAuth>()));
     gh.factory<_i805.TicketPurchaseRepository>(() =>
         _i683.TicketPurchaseRepositoryImpl(
             gh<_i1021.FirebaseTicketDataSource>()));
@@ -262,18 +255,6 @@ extension GetItInjectableX on _i174.GetIt {
             gh<_i531.AttendeeManagementRepository>()));
     gh.factory<_i106.AnalyticsRepository>(() =>
         _i908.AnalyticsRepositoryImpl(gh<_i41.FirebaseAnalyticsDataSource>()));
-    gh.factory<_i17.GetCurrentUserUseCase>(
-        () => _i17.GetCurrentUserUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i91.GoogleSignInUseCase>(
-        () => _i91.GoogleSignInUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i876.PasswordResetUseCase>(
-        () => _i876.PasswordResetUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i941.RegisterUseCase>(
-        () => _i941.RegisterUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i259.SignInUseCase>(
-        () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i915.SignOutUseCase>(
-        () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
     gh.lazySingleton<_i75.UserProfileRepository>(() =>
         _i920.UserProfileRepositoryImpl(
             gh<_i607.FirebaseUserProfileDataSource>()));
@@ -290,6 +271,37 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i837.CloudinaryService>(),
               gh<_i395.StaffCreationService>(),
             ));
+    gh.factory<_i190.AnalyticsBloc>(
+        () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
+    gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
+        repository: gh<_i805.TicketPurchaseRepository>()));
+    gh.factory<_i37.StaffQRScannerService>(
+        () => _i158.FirebaseStaffQRScannerService(
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i395.StaffCreationService>(),
+            ));
+    gh.factory<_i984.TicketScannerBloc>(() => _i984.TicketScannerBloc(
+        repository: gh<_i253.TicketScannerRepository>()));
+    gh.factory<_i787.AuthRepository>(
+        () => _i446.AuthRepositoryImpl(gh<_i413.FirebaseAuthDataSource>()));
+    gh.factory<_i520.EventRepository>(
+        () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
+    gh.factory<_i263.EventManagementBloc>(
+        () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
+    gh.factory<_i17.GetCurrentUserUseCase>(
+        () => _i17.GetCurrentUserUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i91.GoogleSignInUseCase>(
+        () => _i91.GoogleSignInUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i876.PasswordResetUseCase>(
+        () => _i876.PasswordResetUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i941.RegisterUseCase>(
+        () => _i941.RegisterUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i259.SignInUseCase>(
+        () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i915.SignOutUseCase>(
+        () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i112.TicketWalletBloc>(() =>
+        _i112.TicketWalletBloc(repository: gh<_i743.TicketWalletRepository>()));
     gh.factory<_i364.AuthStatusBloc>(() => _i364.AuthStatusBloc(
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
@@ -306,23 +318,6 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
         ));
-    gh.factory<_i190.AnalyticsBloc>(
-        () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
-    gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
-        repository: gh<_i805.TicketPurchaseRepository>()));
-    gh.factory<_i37.StaffQRScannerService>(
-        () => _i158.FirebaseStaffQRScannerService(
-              gh<_i974.FirebaseFirestore>(),
-              gh<_i395.StaffCreationService>(),
-            ));
-    gh.factory<_i984.TicketScannerBloc>(() => _i984.TicketScannerBloc(
-        repository: gh<_i253.TicketScannerRepository>()));
-    gh.factory<_i520.EventRepository>(
-        () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
-    gh.factory<_i263.EventManagementBloc>(
-        () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
-    gh.factory<_i112.TicketWalletBloc>(() =>
-        _i112.TicketWalletBloc(repository: gh<_i743.TicketWalletRepository>()));
     return this;
   }
 }

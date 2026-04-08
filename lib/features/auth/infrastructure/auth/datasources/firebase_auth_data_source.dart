@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/features/auth/domain/entities/firebase_user_entity.dart';
 
@@ -16,9 +15,8 @@ abstract class FirebaseAuthDataSource {
 @Injectable(as: FirebaseAuthDataSource)
 class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
   final FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
 
-  FirebaseAuthDataSourceImpl(this._firebaseAuth, this._googleSignIn);
+  FirebaseAuthDataSourceImpl(this._firebaseAuth);
 
   @override
   Future<FirebaseUserEntity> signInWithEmailAndPassword(String email, String password) async {
@@ -68,40 +66,13 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
 
   @override
   Future<void> signOut() async {
-    await Future.wait([
-      _firebaseAuth.signOut(),
-      _googleSignIn.signOut(),
-    ]);
+    await _firebaseAuth.signOut();
   }
 
+  // TODO: Implement Google Sign-In when needed
   @override
   Future<FirebaseUserEntity> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    
-    if (googleUser == null) {
-      throw FirebaseAuthException(
-        code: 'google-sign-in-cancelled',
-        message: 'Google sign in was cancelled',
-      );
-    }
-
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    final userCredential = await _firebaseAuth.signInWithCredential(credential);
-    
-    if (userCredential.user == null) {
-      throw FirebaseAuthException(
-        code: 'google-sign-in-failed',
-        message: 'Failed to sign in with Google',
-      );
-    }
-    
-    return FirebaseUserEntity.fromFirebaseUser(userCredential.user!);
+    throw UnimplementedError('Google Sign-In not implemented yet');
   }
 
   @override
