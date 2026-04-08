@@ -1,121 +1,96 @@
 name: Flutter Release Build
 
 # Trigger when code is pushed to the dev branch
+
 on:
-  push:
-    branches:
-      - dev
+push:
+branches:
+- dev
 
 jobs:
-  build-and-release:
-    name: Build APK and Create Release
-    runs-on: ubuntu-latest
+build-and-release:
+name: Build APK and Create Release
+runs-on: ubuntu-latest
+
+```
+steps:
+  # Step 1: Checkout the repository code
+  - name: Checkout Repository
+    uses: actions/checkout@v4
     
-    steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+  # Step 2: Set up Java (required for Android builds)
+  - name: Set up Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: 'zulu'
+      java-version: '17'
+      
+  # Step 3: Install Flutter (latest stable version) with caching
+  - name: Install Flutter
+    uses: subosito/flutter-action@v2
+    with:
+      channel: 'stable'
+      cache: true
+      
+  # Step 4: Cache Flutter dependencies for faster builds
+  - name: Cache Flutter Dependencies
+    uses: actions/cache@v4
+    with:
+      path: |
+        ~/.pub-cache
+        .dart_tool
+      key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+      restore-keys: |
+        ${{ runner.os }}-flutter-
         
-      # Step 2: Set up Java (required for Android builds)
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-          
-      # Step 3: Install Flutter (latest stable version) with caching
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-          
-      # Step 4: Cache Flutter dependencies for faster builds
-      - name: Cache Flutter Dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-            
-      # Step 5: Verify Flutter installation
-      - name: Verify Flutter Installation
-        run: flutter doctor -v
+  # Step 5: Verify Flutter installation
+  - name: Verify Flutter Installation
+    run: flutter doctor -v
+    
+  # Step 6: Clean previous build cache
+  - name: Clean Build Cache
+    run: flutter clean
+    
+  # Step 7: Install dependencies
+  - name: Install Dependencies
+    run: flutter pub get
+    
+  # Step 8: Generate code (REQUIRED for Freezed, JSON, etc.)
+  - name: Generate Code
+    run: flutter pub run build_runner build --delete-conflicting-outputs
+    
+  # Step 9: Build release APK
+  - name: Build Release APK
+    run: flutter build apk --release
+    
+  # Step 10: Verify APK was created
+  - name: Verify APK Build
+    run: |
+      if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+        echo "✅ APK built successfully"
+        ls -lh build/app/outputs/flutter-apk/app-release.apk
+      else
+        echo "❌ APK build failed"
+        exit 1
+      fi
+      
+  # Step 11: Create GitHub Release and upload APK
+  - name: Create Release and Upload APK
+    uses: softprops/action-gh-release@v1
+    with:
+      name: Dev Build ${{ github.sha }}
+      tag_name: dev-build-${{ github.run_number }}
+      generate_release_notes: true
+      files: build/app/outputs/flutter-apk/app-release.apk
+      draft: false
+      prerelease: true
+      body: |
+        🚀 Automated Dev Build
         
-      # Step 6: Get Flutter dependencies with upgrade if needed
-      - name: Install Dependencies
-        run: |
-          flutter pub get || flutter pub upgrade --major-versions
-          
-      # Step 7: Generate code (freezed, json_serializable, etc.)
-      - name: Generate Code
-        run: |
-          # Clean all generated files
-          find . -name "*.freezed.dart" -delete
-          find . -name "*.g.dart" -delete
-          find . -name "*.config.dart" -delete
-          # Regenerate code
-          dart run build_runner build --delete-conflicting-outputs
+        Commit: ${{ github.sha }}
+        Branch: dev
         
-      # Step 8: Build release APK
-      - name: Clean Build Cache
-        run: flutter clean
-          
-      - name: Build Release APK
-        run: flutter build apk --release --android-skip-build-dependency-validation
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}
-        
-      # Step 9: Verify APK was created and get file info
-      - name: Verify APK Build
-        run: |
-          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
-            echo "✅ APK built successfully"
-            echo "📱 APK Details:"
-            ls -lh build/app/outputs/flutter-apk/app-release.apk
-            echo "📂 Build directory contents:"
-            ls -la build/app/outputs/flutter-apk/
-          else
-            echo "❌ APK build failed - file not found"
-            echo "📂 Available files in build directory:"
-            find build -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
-            exit 1
-          fi
-          
-      # Step 10: Create GitHub Release and upload APK
-      - name: Create Release and Upload APK
-        uses: softprops/action-gh-release@v1
-        with:
-          # Use commit SHA as the release name since we're not using tags
-          name: Dev Build ${{ github.sha }}
-          # Use commit SHA as tag name for the release
-          tag_name: dev-build-${{ github.run_number }}
-          # Generate release notes automatically from commits
-          generate_release_notes: true
-          # Upload the APK file as a release asset
-          files: build/app/outputs/flutter-apk/app-release.apk
-          # Release configuration
-          draft: false
-          # Mark as prerelease since it's from dev branch
-          prerelease: true
-          # Add release body with build information
-          body: |
-            🚀 **Automated Dev Build**
-            
-            📱 **APK Information:**
-            - Built from dev branch
-            - Commit: ${{ github.sha }}
-            - Built with Flutter (stable channel)
-            - Release build optimized for production
-            
-            📥 **Download:**
-            Download the `app-release.apk` file below to install on your Android device.
-            
-            ⚠️ **Installation Note:**
-            This is a development build. You may need to enable "Install from unknown sources" in your device settings.
-        env:
-          # Use GitHub's built-in token for authentication
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        Download the APK below to install.
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
