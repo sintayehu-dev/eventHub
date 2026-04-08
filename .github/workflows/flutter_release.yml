@@ -75,6 +75,8 @@ jobs:
       # Step 9: Build release APK
       - name: Build Release APK
         run: flutter build apk --release
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.18-8/x64
         
       # Step 10: Verify APK was created
       - name: Verify APK Build
