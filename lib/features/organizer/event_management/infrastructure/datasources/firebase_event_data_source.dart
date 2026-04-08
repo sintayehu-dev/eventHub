@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/services/cloudinary_service.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_statistics_entity.dart';
+import 'package:eventhub/features/organizer/event_management/domain/services/staff_creation_service.dart';
 
 abstract class FirebaseEventDataSource {
   Future<EventEntity> createEvent({
@@ -86,9 +87,14 @@ abstract class FirebaseEventDataSource {
 class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
   final FirebaseFirestore _firestore;
   final CloudinaryService _cloudinaryService;
+  final StaffCreationService _staffCreationService;
   final Random _random = Random();
 
-  FirebaseEventDataSourceImpl(this._firestore, this._cloudinaryService);
+  FirebaseEventDataSourceImpl(
+    this._firestore,
+    this._cloudinaryService,
+    this._staffCreationService,
+  );
 
   static const String _eventsCollection = 'events';
   static const String _usersCollection = 'users'; // For organizer names
@@ -211,6 +217,26 @@ class FirebaseEventDataSourceImpl implements FirebaseEventDataSource {
           .collection(_eventsCollection)
           .doc(eventId)
           .set(eventData);
+
+      // Create staff members if provided
+      if (request.staffMembers.isNotEmpty) {
+        final staffResult = await _staffCreationService.createEventStaff(
+          eventId: eventId,
+          organizerId: organizerId,
+          staffMembers: request.staffMembers,
+        );
+
+        staffResult.fold(
+          (failure) {
+            print('Warning: Failed to create staff members: $failure');
+            // Don't fail the entire event creation, just log the warning
+          },
+          (staffMembers) {
+            print(
+                'Successfully created ${staffMembers.length} staff users for event $eventId');
+          },
+        );
+      }
 
       return event;
     } catch (e) {

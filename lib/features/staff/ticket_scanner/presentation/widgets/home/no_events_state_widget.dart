@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/features/staff/event_assignment/application/staff_event_assignment/bloc/staff_event_assignment_bloc.dart';
+import 'package:eventhub/features/staff/ticket_scanner/presentation/widgets/home/join_event_qr_scanner_widget.dart';
 
 class NoEventsStateWidget extends StatelessWidget {
   final String staffId;
@@ -172,6 +173,10 @@ class NoEventsStateWidget extends StatelessWidget {
                     ),
 
                     SizedBox(height: 32.h),
+
+                    // Join Event QR Scanner
+                    const JoinEventQRScannerWidget(),
+                    SizedBox(height: 24.h),
 
                     // Action cards
                     Row(

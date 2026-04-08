@@ -7,7 +7,7 @@ import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
-import 'package:eventhub/features/organizer/event_management/presentation/widgets/home/staff_assignment_widget.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/staff_creation_widget.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_basic_info_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_banner_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_location_date_time_section.dart';
@@ -50,8 +50,8 @@ class _CreateEventViewState extends State<CreateEventView> {
   // Ticket Types Management
   final List<TicketTypeData> _ticketTypes = [];
 
-  // Staff Assignment Management
-  final List<StaffAssignmentData> _staffAssignments = [];
+  // Staff Creation Management
+  final List<StaffCreationData> _staffMembers = [];
 
   @override
   void initState() {
@@ -124,8 +124,6 @@ class _CreateEventViewState extends State<CreateEventView> {
   Widget _buildForm(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
@@ -175,13 +173,12 @@ class _CreateEventViewState extends State<CreateEventView> {
             ),
             SizedBox(height: 24.h),
 
-            StaffAssignmentWidget(
-              initialAssignments: _staffAssignments,
-              organizerId: currentUser?.uid ?? '',
-              onAssignmentsChanged: (assignments) {
+            StaffCreationWidget(
+              initialStaffMembers: _staffMembers,
+              onStaffMembersChanged: (staffMembers) {
                 setState(() {
-                  _staffAssignments.clear();
-                  _staffAssignments.addAll(assignments);
+                  _staffMembers.clear();
+                  _staffMembers.addAll(staffMembers);
                 });
               },
             ),
@@ -329,12 +326,24 @@ class _CreateEventViewState extends State<CreateEventView> {
       }
     }
 
-    // Validate staff assignments
-    for (int i = 0; i < _staffAssignments.length; i++) {
-      final assignment = _staffAssignments[i];
-      if (assignment.staffId.trim().isEmpty) {
+    // Validate staff members
+    for (int i = 0; i < _staffMembers.length; i++) {
+      final staffMember = _staffMembers[i];
+      if (staffMember.name.trim().isEmpty) {
         AppHelpers.showErrorSnackBar(
-            context, 'Please select a staff member for assignment ${i + 1}');
+            context, 'Please enter name for staff member ${i + 1}');
+        return;
+      }
+      if (staffMember.email.trim().isEmpty) {
+        AppHelpers.showErrorSnackBar(
+            context, 'Please enter email for staff member ${i + 1}');
+        return;
+      }
+      // Basic email validation
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+          .hasMatch(staffMember.email.trim())) {
+        AppHelpers.showErrorSnackBar(
+            context, 'Please enter a valid email for staff member ${i + 1}');
         return;
       }
     }
@@ -356,6 +365,16 @@ class _CreateEventViewState extends State<CreateEventView> {
       );
     }).toList();
 
+    final staffMemberRequests = _staffMembers.map((staffMember) {
+      return CreateStaffMemberRequest(
+        name: staffMember.name.trim(),
+        email: staffMember.email.trim(),
+        password: staffMember.password,
+        role: staffMember.role.name,
+        permissions: staffMember.permissions.map((p) => p.name).toList(),
+      );
+    }).toList();
+
     final request = CreateEventRequest(
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
@@ -365,6 +384,7 @@ class _CreateEventViewState extends State<CreateEventView> {
       category: _selectedCategory!,
       ticketTypes: ticketTypeRequests,
       maxCapacity: int.tryParse(_capacityController.text) ?? 0,
+      staffMembers: staffMemberRequests,
     );
 
     // Create the event first

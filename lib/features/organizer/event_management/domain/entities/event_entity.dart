@@ -264,6 +264,7 @@ class CreateEventRequest with _$CreateEventRequest {
     required EventCategory category,
     required List<CreateTicketTypeRequest> ticketTypes,
     required int maxCapacity,
+    @Default([]) List<CreateStaffMemberRequest> staffMembers,
     Map<String, dynamic>? metadata,
   }) = _CreateEventRequest;
 
@@ -285,6 +286,21 @@ class CreateTicketTypeRequest with _$CreateTicketTypeRequest {
 
   factory CreateTicketTypeRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateTicketTypeRequestFromJson(json);
+}
+
+@freezed
+class CreateStaffMemberRequest with _$CreateStaffMemberRequest {
+  const factory CreateStaffMemberRequest({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+    required List<String> permissions,
+    Map<String, dynamic>? metadata,
+  }) = _CreateStaffMemberRequest;
+
+  factory CreateStaffMemberRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateStaffMemberRequestFromJson(json);
 }
 
 @freezed

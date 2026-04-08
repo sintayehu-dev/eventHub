@@ -82,10 +82,14 @@ import '../../features/organizer/event_management/application/event_management/b
     as _i263;
 import '../../features/organizer/event_management/domain/repositories/event_repository.dart'
     as _i520;
+import '../../features/organizer/event_management/domain/services/staff_creation_service.dart'
+    as _i395;
 import '../../features/organizer/event_management/infrastructure/datasources/firebase_event_data_source.dart'
     as _i912;
 import '../../features/organizer/event_management/infrastructure/repositories/event_repository_impl.dart'
     as _i413;
+import '../../features/organizer/event_management/infrastructure/services/firebase_staff_user_creation_service.dart'
+    as _i656;
 import '../../features/organizer/staff_management/application/staff_management/bloc/staff_management_bloc.dart'
     as _i479;
 import '../../features/organizer/staff_management/domain/repositories/staff_management_repository.dart'
@@ -138,10 +142,14 @@ import '../../features/staff/ticket_scanner/application/ticket_scanner/bloc/tick
     as _i984;
 import '../../features/staff/ticket_scanner/domain/repositories/ticket_scanner_repository.dart'
     as _i253;
+import '../../features/staff/ticket_scanner/domain/services/staff_qr_scanner_service.dart'
+    as _i37;
 import '../../features/staff/ticket_scanner/infrastructure/datasources/firebase_ticket_scanner_data_source.dart'
     as _i967;
 import '../../features/staff/ticket_scanner/infrastructure/repositories/ticket_scanner_repository_impl.dart'
     as _i807;
+import '../../features/staff/ticket_scanner/infrastructure/services/firebase_staff_qr_scanner_service.dart'
+    as _i158;
 import '../services/cloudinary_service.dart' as _i837;
 import 'firebase_module.dart' as _i616;
 
@@ -208,11 +216,6 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i271.StaffReportsBloc(gh<_i1043.StaffReportsRepository>()));
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
-    gh.factory<_i912.FirebaseEventDataSource>(
-        () => _i912.FirebaseEventDataSourceImpl(
-              gh<_i974.FirebaseFirestore>(),
-              gh<_i837.CloudinaryService>(),
-            ));
     gh.factory<_i1021.FirebaseTicketDataSource>(() =>
         _i1021.FirebaseTicketDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i516.UserService>(
@@ -241,6 +244,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i795.StaffEventAssignmentBloc>(() =>
         _i795.StaffEventAssignmentBloc(
             gh<_i170.StaffEventAssignmentRepository>()));
+    gh.factory<_i395.StaffCreationService>(
+        () => _i656.FirebaseStaffUserCreationService(
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i59.FirebaseAuth>(),
+            ));
     gh.lazySingleton<_i253.TicketScannerRepository>(() =>
         _i807.TicketScannerRepositoryImpl(
             dataSource: gh<_i967.FirebaseTicketScannerDataSource>()));
@@ -252,12 +260,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1063.AttendeeManagementBloc>(() =>
         _i1063.AttendeeManagementBloc(
             gh<_i531.AttendeeManagementRepository>()));
-    gh.factory<_i520.EventRepository>(
-        () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
     gh.factory<_i106.AnalyticsRepository>(() =>
         _i908.AnalyticsRepositoryImpl(gh<_i41.FirebaseAnalyticsDataSource>()));
-    gh.factory<_i263.EventManagementBloc>(
-        () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
     gh.factory<_i17.GetCurrentUserUseCase>(
         () => _i17.GetCurrentUserUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i91.GoogleSignInUseCase>(
@@ -280,6 +284,12 @@ extension GetItInjectableX on _i174.GetIt {
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));
     gh.factory<_i350.EventDiscoveryBloc>(() => _i350.EventDiscoveryBloc(
         repository: gh<_i818.EventDiscoveryRepository>()));
+    gh.factory<_i912.FirebaseEventDataSource>(
+        () => _i912.FirebaseEventDataSourceImpl(
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i837.CloudinaryService>(),
+              gh<_i395.StaffCreationService>(),
+            ));
     gh.factory<_i364.AuthStatusBloc>(() => _i364.AuthStatusBloc(
           gh<_i787.AuthRepository>(),
           gh<_i516.UserService>(),
@@ -300,8 +310,17 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i190.AnalyticsBloc(gh<_i106.AnalyticsRepository>()));
     gh.factory<_i939.TicketPurchaseBloc>(() => _i939.TicketPurchaseBloc(
         repository: gh<_i805.TicketPurchaseRepository>()));
+    gh.factory<_i37.StaffQRScannerService>(
+        () => _i158.FirebaseStaffQRScannerService(
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i395.StaffCreationService>(),
+            ));
     gh.factory<_i984.TicketScannerBloc>(() => _i984.TicketScannerBloc(
         repository: gh<_i253.TicketScannerRepository>()));
+    gh.factory<_i520.EventRepository>(
+        () => _i413.EventRepositoryImpl(gh<_i912.FirebaseEventDataSource>()));
+    gh.factory<_i263.EventManagementBloc>(
+        () => _i263.EventManagementBloc(gh<_i520.EventRepository>()));
     gh.factory<_i112.TicketWalletBloc>(() =>
         _i112.TicketWalletBloc(repository: gh<_i743.TicketWalletRepository>()));
     return this;
