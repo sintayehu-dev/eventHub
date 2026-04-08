@@ -1,0 +1,105 @@
+name: Flutter Release Build
+
+# Trigger when code is pushed to the dev branch
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-release:
+    name: Build APK and Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      # Step 2: Set up Java (required for Android builds)
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      # Step 3: Install Flutter (latest stable version) with caching
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          
+      # Step 4: Cache Flutter dependencies for faster builds
+      - name: Cache Flutter Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+            
+      # Step 5: Verify Flutter installation
+      - name: Verify Flutter Installation
+        run: flutter doctor -v
+        
+      # Step 6: Get Flutter dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+        
+      # Step 7: Build release APK
+      - name: Build Release APK
+        run: flutter build apk --release
+        
+      # Step 8: Verify APK was created and get file info
+      - name: Verify APK Build
+        run: |
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            echo "✅ APK built successfully"
+            echo "📱 APK Details:"
+            ls -lh build/app/outputs/flutter-apk/app-release.apk
+            echo "📂 Build directory contents:"
+            ls -la build/app/outputs/flutter-apk/
+          else
+            echo "❌ APK build failed - file not found"
+            echo "📂 Available files in build directory:"
+            find build -name "*.apk" -type f 2>/dev/null || echo "No APK files found"
+            exit 1
+          fi
+          
+      # Step 9: Create GitHub Release and upload APK
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          # Use commit SHA as the release name since we're not using tags
+          name: Dev Build ${{ github.sha }}
+          # Use commit SHA as tag name for the release
+          tag_name: dev-build-${{ github.run_number }}
+          # Generate release notes automatically from commits
+          generate_release_notes: true
+          # Upload the APK file as a release asset
+          files: build/app/outputs/flutter-apk/app-release.apk
+          # Release configuration
+          draft: false
+          # Mark as prerelease since it's from dev branch
+          prerelease: true
+          # Add release body with build information
+          body: |
+            🚀 **Automated Dev Build**
+            
+            📱 **APK Information:**
+            - Built from dev branch
+            - Commit: ${{ github.sha }}
+            - Built with Flutter (stable channel)
+            - Release build optimized for production
+            
+            📥 **Download:**
+            Download the `app-release.apk` file below to install on your Android device.
+            
+            ⚠️ **Installation Note:**
+            This is a development build. You may need to enable "Install from unknown sources" in your device settings.
+        env:
+          # Use GitHub's built-in token for authentication
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
