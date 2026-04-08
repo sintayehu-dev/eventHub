@@ -50,9 +50,16 @@ jobs:
         run: |
           flutter pub get || flutter pub upgrade --major-versions
         
-      # Step 7: Build release APK
+      # Step 7: Clean and build release APK
+      - name: Clean Build Cache
+        run: |
+          flutter clean
+          cd android && ./gradlew clean && cd ..
+          
       - name: Build Release APK
         run: flutter build apk --release
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
         
       # Step 8: Verify APK was created and get file info
       - name: Verify APK Build
