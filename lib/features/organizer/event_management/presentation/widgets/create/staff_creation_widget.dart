@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/utils/password_generator.dart';
 import 'package:eventhub/features/staff/event_assignment/domain/entities/staff_event_assignment_entity.dart';
 
 class StaffCreationWidget extends StatefulWidget {
@@ -40,10 +41,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
   }
 
   String _generatePassword() {
-    // Generate a simple 8-character password
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final random = DateTime.now().millisecondsSinceEpoch;
-    return List.generate(8, (index) => chars[(random + index) % chars.length]).join();
+    // Generate a secure password using the password generator utility
+    return PasswordGenerator.generateStaffPassword();
   }
 
   void _removeStaffMember(int index) {

@@ -88,9 +88,30 @@ class _CreateEventViewState extends State<CreateEventView> {
     final colorScheme = theme.colorScheme;
 
     return BlocListener<EventManagementBloc, EventManagementState>(
+      listenWhen: (previous, current) {
+        // Listen for error states
+        if (current.hasError && current.errorMessage.isNotEmpty) {
+          return true;
+        }
+        // Listen for successful event creation
+        if (previous.isCreating &&
+            !current.isCreating &&
+            !current.hasError &&
+            current.selectedEvent != null) {
+          return true;
+        }
+        return false;
+      },
       listener: (context, state) {
         if (state.hasError && state.errorMessage.isNotEmpty) {
           AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        } else if (!state.isCreating &&
+            state.selectedEvent != null &&
+            !state.hasError) {
+          // Event created successfully, navigate back and show success message
+          AppHelpers.showSuccessSnackBar(
+              context, 'Event created successfully!');
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(
