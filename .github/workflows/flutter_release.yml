@@ -72,6 +72,13 @@ jobs:
       - name: Generate Code
         run: flutter pub run build_runner build --delete-conflicting-outputs
         
+      # Step 8.5: Clean Gradle cache to avoid Java version conflicts
+      - name: Clean Gradle Cache
+        run: |
+          cd android
+          ./gradlew clean
+          rm -rf ~/.gradle/caches/
+        
       # Step 9: Build release APK
       - name: Build Release APK
         run: flutter build apk --release
