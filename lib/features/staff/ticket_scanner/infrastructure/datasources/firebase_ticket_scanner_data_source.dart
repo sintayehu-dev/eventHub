@@ -8,8 +8,8 @@ class FirebaseTicketScannerDataSource {
   final FirebaseFirestore _firestore;
 
   FirebaseTicketScannerDataSource({
-    FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+    required FirebaseFirestore firestore,
+  }) : _firestore = firestore;
 
   /// Validate a scanned QR code
   Future<TicketValidationResult> validateTicket({

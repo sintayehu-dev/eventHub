@@ -182,9 +182,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i964.FirebaseStaffReportsDataSource>(() =>
         _i964.FirebaseStaffReportsDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
-    gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
-        _i967.FirebaseTicketScannerDataSource(
-            firestore: gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i202.StaffManagementRepository>(() =>
         _i279.StaffManagementRepositoryImpl(
             gh<_i414.FirebaseStaffManagementDataSource>()));
@@ -216,6 +213,9 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i271.StaffReportsBloc(gh<_i1043.StaffReportsRepository>()));
     gh.factory<_i470.UserFirestoreDataSource>(
         () => _i470.UserFirestoreDataSourceImpl(gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i967.FirebaseTicketScannerDataSource>(() =>
+        _i967.FirebaseTicketScannerDataSource(
+            firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i1021.FirebaseTicketDataSource>(() =>
         _i1021.FirebaseTicketDataSourceImpl(gh<_i974.FirebaseFirestore>()));
     gh.factory<_i516.UserService>(
