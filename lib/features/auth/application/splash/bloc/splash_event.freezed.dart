@@ -105,7 +105,7 @@ class _$CheckUserStatusImpl
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty('type', 'SplashEvent.checkUserStatus'));
+    properties..add(DiagnosticsProperty('type', 'SplashEvent.checkUserStatus'));
   }
 
   @override

@@ -50,6 +50,10 @@ jobs:
       - name: Clean Build Cache
         run: flutter clean
         
+      # Step 6.5: Create missing directories
+      - name: Create Assets Directory
+        run: mkdir -p assets/images
+        
       # Step 7: Install dependencies with conflict resolution
       - name: Install Dependencies
         run: |
