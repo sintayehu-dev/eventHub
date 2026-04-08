@@ -47,7 +47,7 @@ steps:
   - name: Verify Flutter Installation
     run: flutter doctor -v
     
-  # Step 6: Clean previous build cache
+  # Step 6: Clean previous build cachem
   - name: Clean Build Cache
     run: flutter clean
     
