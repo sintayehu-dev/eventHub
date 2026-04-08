@@ -45,9 +45,10 @@ jobs:
       - name: Verify Flutter Installation
         run: flutter doctor -v
         
-      # Step 6: Get Flutter dependencies
+      # Step 6: Get Flutter dependencies with upgrade if needed
       - name: Install Dependencies
-        run: flutter pub get
+        run: |
+          flutter pub get || flutter pub upgrade --major-versions
         
       # Step 7: Build release APK
       - name: Build Release APK
