@@ -52,7 +52,13 @@ jobs:
           
       # Step 7: Generate code (freezed, json_serializable, etc.)
       - name: Generate Code
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: |
+          # Clean all generated files
+          find . -name "*.freezed.dart" -delete
+          find . -name "*.g.dart" -delete
+          find . -name "*.config.dart" -delete
+          # Regenerate code
+          dart run build_runner build --delete-conflicting-outputs
         
       # Step 8: Build release APK
       - name: Clean Build Cache
