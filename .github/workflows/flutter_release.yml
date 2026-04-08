@@ -50,11 +50,9 @@ jobs:
         run: |
           flutter pub get || flutter pub upgrade --major-versions
         
-      # Step 7: Clean and build release APK
+      # Step 7: Build release APK
       - name: Clean Build Cache
-        run: |
-          flutter clean
-          cd android && ./gradlew clean && cd ..
+        run: flutter clean
           
       - name: Build Release APK
         run: flutter build apk --release
