@@ -28,6 +28,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.24.x'
           cache: true
           
       # Step 4: Cache Flutter dependencies for faster builds
@@ -49,9 +50,19 @@ jobs:
       - name: Clean Build Cache
         run: flutter clean
         
-      # Step 7: Install dependencies
+      # Step 7: Install dependencies with conflict resolution
       - name: Install Dependencies
-        run: flutter pub get
+        run: |
+          # Try normal pub get first
+          flutter pub get || {
+            echo "Normal pub get failed, trying with major version upgrades..."
+            flutter pub upgrade --major-versions || {
+              echo "Major version upgrade failed, cleaning and retrying..."
+              flutter clean
+              rm -f pubspec.lock
+              flutter pub get
+            }
+          }
         
       # Step 8: Generate code (REQUIRED for Freezed, JSON, etc.)
       - name: Generate Code
