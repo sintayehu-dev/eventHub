@@ -23,12 +23,12 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
           
-      # Step 3: Install Flutter (latest stable version) with caching
+      # Step 3: Install Flutter (matching local version)
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: '3.24.x'
+          flutter-version: '3.27.4'
           cache: true
           
       # Step 4: Cache Flutter dependencies for faster builds
