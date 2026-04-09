@@ -6,6 +6,18 @@ on:
     branches: [ ft/clean ]          # Auto-build on push to ft/clean branch
   pull_request:
     branches: [ ft/clean ]          # Build APK for PR testing
+  workflow_dispatch:               # Manual trigger for releases
+    inputs:
+      create_release:
+        description: 'Create GitHub Release'
+        required: false
+        default: false
+        type: boolean
+      release_notes:
+        description: 'Release notes (optional)'
+        required: false
+        default: 'Latest build from ft/clean branch'
+        type: string
 
 # Environment variables - matches local development setup
 env:
@@ -131,3 +143,90 @@ jobs:
             repo: context.repo.repo,
             body: comment
           });
+
+  release:
+    name: Create GitHub Release
+    needs: build                   # Wait for build job to complete
+    runs-on: ubuntu-latest
+    # Create release on push to ft/clean OR when manually requested
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/ft/clean') || github.event.inputs.create_release == 'true'
+    
+    steps:
+    # Step 1: Get source code for release info
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Step 2: Download the built APK from build job
+    - name: Download APK artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: eventhub-ft-clean-release-${{ github.run_number }}
+        path: release-files/
+        
+    # Step 3: Get version from pubspec.yaml
+    - name: Get version info
+      id: version
+      run: |
+        VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+        APP_VERSION=${VERSION%+*}
+        BUILD_NUMBER=${VERSION#*+}
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "APP_VERSION=$APP_VERSION" >> $GITHUB_OUTPUT
+        echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+        
+    # Step 4: Generate changelog
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Use manual release notes if provided, otherwise generate from commits
+        if [[ "${{ github.event.inputs.release_notes }}" != "" ]]; then
+          CHANGELOG="${{ github.event.inputs.release_notes }}"
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s" --since="24 hours ago" | head -10)
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="- Latest build from ft/clean branch"
+          fi
+        fi
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    # Step 5: Create GitHub release
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: build-${{ github.run_number }}
+        name: EventHub Build #${{ github.run_number }}
+        body: |
+          ## EventHub Build #${{ github.run_number }}
+          
+          ### 📱 Download
+          - **APK**: `eventhub-ft-clean-release-${{ github.run_number }}.apk`
+          
+          ### 🆕 What's New
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ### 📋 Installation Instructions
+          1. Download the APK file to your Android device
+          2. Enable "Install from unknown sources" in Settings → Security
+          3. Tap the APK file to install
+          4. Grant necessary permissions when prompted
+          
+          ### ⚙️ Build Information
+          - **Version**: ${{ steps.version.outputs.VERSION }}
+          - **Flutter**: ${{ env.FLUTTER_VERSION }}
+          - **Java**: ${{ env.JAVA_VERSION }}
+          - **Branch**: ft/clean
+          - **Commit**: ${{ github.sha }}
+          - **Build Time**: ${{ github.run_id }}
+          
+          ---
+          **🐛 Found an issue?** Report it on [GitHub Issues](../../issues)
+          
+          **💬 Need help?** Check our [documentation](../../wiki)
+        files: |
+          release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk
+        draft: false
+        prerelease: true  # Mark as pre-release since it's from development branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
