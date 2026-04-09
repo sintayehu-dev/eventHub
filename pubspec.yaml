@@ -61,7 +61,6 @@ flutter:
   generate: true
   assets:
     - assets/
-    - assets/images/
 
 flutter_launcher_icons:
   android: "launcher_icon"
