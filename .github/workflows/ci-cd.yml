@@ -168,16 +168,22 @@ jobs:
       run: |
         echo "Contents of release-files directory:"
         ls -la release-files/
-        # Find the APK file (it might be directly in release-files or in a subdirectory)
+        # Find the APK file (it should be directly in release-files)
         APK_FILE=$(find release-files/ -name "*.apk" -type f | head -1)
         if [ -z "$APK_FILE" ]; then
           echo "Error: No APK file found in release-files/"
           exit 1
         fi
         echo "Found APK file: $APK_FILE"
-        # Copy to expected location if needed
-        cp "$APK_FILE" "release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
-        echo "APK prepared for release"
+        # Check if it's already named correctly
+        EXPECTED_NAME="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
+        if [ "$APK_FILE" != "$EXPECTED_NAME" ]; then
+          echo "Renaming APK file to expected name..."
+          mv "$APK_FILE" "$EXPECTED_NAME"
+          echo "APK renamed to: $EXPECTED_NAME"
+        else
+          echo "APK file already has correct name: $APK_FILE"
+        fi
         
     # Step 3: Get version from pubspec.yaml
     - name: Get version info
