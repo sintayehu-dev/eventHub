@@ -36,6 +36,20 @@ jobs:
         distribution: 'temurin'    # Use Eclipse Temurin (OpenJDK)
         java-version: ${{ env.JAVA_VERSION }}  # Java 17 to match local setup
         
+    # Step 2.1: Set JAVA_HOME environment variable
+    - name: Set JAVA_HOME
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+        echo "Java Home: $JAVA_HOME"
+        java -version
+        
+    # Step 2.2: Setup Android SDK path
+    - name: Setup Android SDK
+      run: |
+        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+        echo "Android SDK: $ANDROID_HOME"
+        
     # Step 3: Setup Flutter SDK
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
@@ -47,6 +61,7 @@ jobs:
     # Step 4: Verify Flutter installation and show environment info
     - name: Verify Flutter installation
       run: |
+        flutter config --no-analytics  # Disable analytics to avoid prompts
         flutter --version         # Show Flutter version for debugging
         flutter doctor -v         # Show detailed Flutter environment info
         
@@ -56,12 +71,20 @@ jobs:
       
     # Step 6: Generate code (freezed, json_serializable, injectable, etc.)
     - name: Generate code
-      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      run: |
+        # Clean previous generated files
+        flutter packages pub run build_runner clean
+        # Generate new files including dependency injection
+        flutter packages pub run build_runner build --delete-conflicting-outputs
       # Generates: *.freezed.dart, *.g.dart, *.config.dart files
       
     # Step 7: Build release APK (for production/distribution)
     - name: Build Release APK
-      run: flutter build apk --release
+      run: |
+        # Set Gradle properties for proper Java home
+        echo "org.gradle.java.home=$JAVA_HOME" >> android/gradle.properties
+        # Build the release APK
+        flutter build apk --release
       # Creates: build/app/outputs/flutter-apk/app-release.apk
       
     # Step 8: Prepare artifacts with proper naming
