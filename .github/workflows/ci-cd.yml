@@ -3,9 +3,9 @@ name: EventHub CI/CD Pipeline
 # Workflow triggers - when this pipeline runs
 on:
   push:
-    branches: [ ft/clean ]          # Auto-build on push to ft/clean branch
+    branches: [ master ]            # Auto-build on push to master branch
   pull_request:
-    branches: [ ft/clean ]          # Build APK for PR testing
+    branches: [ master ]            # Build APK for PR testing
   workflow_dispatch:               # Manual trigger for releases
     inputs:
       create_release:
@@ -16,271 +16,103 @@ on:
       release_notes:
         description: 'Release notes (optional)'
         required: false
-        default: 'Latest build from ft/clean branch'
+        default: 'Latest build from master branch'
         type: string
 
-# Environment variables - matches local development setup
+# Environment variables
 env:
-  FLUTTER_VERSION: '3.27.4'       # Same as local Flutter version
-  JAVA_VERSION: '17'              # Same as local Java version
+  FLUTTER_VERSION: '3.27.4'
+  JAVA_VERSION: '17'
 
 # Permissions for GitHub token
 permissions:
-  contents: write                  # Required to create releases
-  actions: read                    # Required to download artifacts
-
-# NOTE: Code analysis and tests have been removed from this workflow
-# to avoid build failures. The workflow builds release APK and will only fail on:
-# - Dependency resolution issues
-# - Code generation failures  
-# - Build compilation errors
-# Tests and code analysis can still be run locally during development
+  contents: write
+  actions: read
 
 jobs:
   build:
     name: Build APK
-    runs-on: ubuntu-latest         # Use Ubuntu runner for consistent Linux environment
-    
-    steps:
-    # Step 1: Get the source code from repository
-    - name: Checkout code
-      uses: actions/checkout@v4    # Download repository files to runner
-      
-    # Step 2: Setup Java environment (required for Android builds)
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'    # Use Eclipse Temurin (OpenJDK)
-        java-version: ${{ env.JAVA_VERSION }}  # Java 17 to match local setup
-        
-    # Step 2.1: Set JAVA_HOME environment variable
-    - name: Set JAVA_HOME
-      run: |
-        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-        echo "Java Home: $JAVA_HOME"
-        java -version
-        
-    # Step 2.2: Setup Android SDK path
-    - name: Setup Android SDK
-      run: |
-        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-        echo "Android SDK: $ANDROID_HOME"
-        
-    # Step 3: Setup Flutter SDK
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}  # Flutter 3.27.4 to match local
-        channel: 'stable'         # Use stable channel for reliability
-        cache: true               # Cache Flutter SDK for faster builds
-        
-    # Step 4: Verify Flutter installation and show environment info
-    - name: Verify Flutter installation
-      run: |
-        flutter config --no-analytics  # Disable analytics to avoid prompts
-        flutter --version         # Show Flutter version for debugging
-        flutter doctor -v         # Show detailed Flutter environment info
-        
-    # Step 5: Download project dependencies from pub.dev
-    - name: Get dependencies
-      run: flutter pub get       # Download packages listed in pubspec.yaml
-      
-    # Step 6: Generate code (freezed, json_serializable, injectable, etc.)
-    - name: Generate code
-      run: |
-        # Clean previous generated files
-        flutter packages pub run build_runner clean
-        # Generate new files including dependency injection
-        flutter packages pub run build_runner build --delete-conflicting-outputs
-      # Generates: *.freezed.dart, *.g.dart, *.config.dart files
-      
-    # Step 7: Build release APK (for production/distribution)
-    - name: Build Release APK
-      run: |
-        # Set Gradle properties for proper Java home
-        echo "org.gradle.java.home=$JAVA_HOME" >> android/gradle.properties
-        # Build the release APK
-        flutter build apk --release
-      # Creates: build/app/outputs/flutter-apk/app-release.apk
-      
-    # Step 8: Prepare artifacts with proper naming
-    - name: Prepare artifacts
-      run: |
-        mkdir -p artifacts        # Create artifacts directory
-        # Copy and rename release APK with run number
-        cp build/app/outputs/flutter-apk/app-release.apk artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
-        
-    # Step 9: Upload release APK as GitHub artifact
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: eventhub-ft-clean-release-${{ github.run_number }}  # Unique artifact name
-        path: artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
-        retention-days: 7         # Keep for 7 days (release builds)
-        
-    # Step 10: Add comment to PR with APK download instructions
-    - name: Comment on PR with APK download
-      if: github.event_name == 'pull_request'  # Only run for pull requests
-      uses: actions/github-script@v7
-      with:
-        script: |
-          // Create helpful comment with download instructions
-          const runNumber = context.runNumber;
-          const artifactName = `eventhub-ft-clean-release-${runNumber}`;
-          const comment = `🚀 **Build completed successfully!**
-          
-          📱 **Release APK is ready for testing:**
-          - Artifact: \`${artifactName}.apk\`
-          - Download from [Actions](${context.payload.repository.html_url}/actions/runs/${context.runId})
-          
-          ✅ **Build info:**
-          - Flutter: ${process.env.FLUTTER_VERSION}
-          - Java: ${process.env.JAVA_VERSION}
-          - Commit: ${context.sha.substring(0, 7)}
-          
-          **Installation:** Download APK → Enable unknown sources → Install`;
-          
-          // Post comment to PR
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
-
-  release:
-    name: Create GitHub Release
-    needs: build                   # Wait for build job to complete
     runs-on: ubuntu-latest
-    # Create release on push to ft/clean OR when manually requested
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/ft/clean') || github.event.inputs.create_release == 'true'
     
     steps:
-    # Step 1: Get source code for release info
     - name: Checkout code
       uses: actions/checkout@v4
       
-    # Step 2: Download the built APK from build job
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+        
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Generate code
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+    - name: Build Release APK
+      run: flutter build apk --release
+      
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: eventhub-master-release-${{ github.run_number }}
+        path: build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 7
+        
+
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event.inputs.create_release == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Download APK artifact
       uses: actions/download-artifact@v4
       with:
-        name: eventhub-ft-clean-release-${{ github.run_number }}
+        name: eventhub-master-release-${{ github.run_number }}
         path: release-files/
         
-    # Step 2.1: Check downloaded files and prepare for release
-    - name: Prepare release files
-      run: |
-        echo "Contents of release-files directory:"
-        ls -la release-files/
-        # Find the APK file (it should be directly in release-files)
-        APK_FILE=$(find release-files/ -name "*.apk" -type f | head -1)
-        if [ -z "$APK_FILE" ]; then
-          echo "Error: No APK file found in release-files/"
-          exit 1
-        fi
-        echo "Found APK file: $APK_FILE"
-        # Verify the expected file exists
-        EXPECTED_NAME="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
-        if [ ! -f "$EXPECTED_NAME" ]; then
-          echo "Error: Expected APK file not found at $EXPECTED_NAME"
-          echo "Available files:"
-          ls -la release-files/
-          exit 1
-        fi
-        echo "APK file confirmed: $EXPECTED_NAME"
-        
-    # Step 3: Get version from pubspec.yaml
     - name: Get version info
       id: version
       run: |
-        if [ ! -f "pubspec.yaml" ]; then
-          echo "Error: pubspec.yaml not found"
-          exit 1
-        fi
         VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-        if [ -z "$VERSION" ]; then
-          echo "Warning: Could not extract version from pubspec.yaml, using default"
-          VERSION="1.0.0+${{ github.run_number }}"
-        fi
-        APP_VERSION=${VERSION%+*}
-        BUILD_NUMBER=${VERSION#*+}
-        echo "Extracted version: $VERSION"
-        echo "App version: $APP_VERSION"
-        echo "Build number: $BUILD_NUMBER"
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-        echo "APP_VERSION=$APP_VERSION" >> $GITHUB_OUTPUT
-        echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
         
-    # Step 4: Generate changelog
-    - name: Generate changelog
-      id: changelog
-      run: |
-        echo "Generating changelog..."
-        # Use manual release notes if provided, otherwise generate from commits
-        if [[ "${{ github.event.inputs.release_notes }}" != "" ]]; then
-          CHANGELOG="${{ github.event.inputs.release_notes }}"
-          echo "Using manual release notes"
-        else
-          echo "Generating changelog from recent commits..."
-          CHANGELOG=$(git log --pretty=format:"- %s" --since="24 hours ago" | head -10)
-          if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="- Latest build from ft/clean branch"
-            echo "No recent commits found, using default changelog"
-          else
-            echo "Found recent commits for changelog"
-          fi
-        fi
-        echo "Changelog content:"
-        echo "$CHANGELOG"
-        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-        echo "$CHANGELOG" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-        
-    # Step 5: Create GitHub release
     - name: Create Release
       run: |
-        echo "Preparing to create GitHub release..."
-        echo "Checking release files:"
-        ls -la release-files/
+        APK_FILE="release-files/app-release.apk"
         
-        # Verify APK file exists
-        APK_FILE="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
-        if [ ! -f "$APK_FILE" ]; then
-          echo "Error: APK file not found at $APK_FILE"
-          exit 1
-        fi
-        echo "APK file confirmed: $APK_FILE"
-        
-        # Create the release using GitHub CLI
         gh release create "build-${{ github.run_number }}" \
           --title "EventHub Build #${{ github.run_number }}" \
           --notes "## EventHub Build #${{ github.run_number }}
 
         ### 📱 Download
-        - **APK**: \`eventhub-ft-clean-release-${{ github.run_number }}.apk\`
-
-        ### 🆕 What's New
-        ${{ steps.changelog.outputs.CHANGELOG }}
-
-        ### 📋 Installation Instructions
-        1. Download the APK file to your Android device
-        2. Enable \"Install from unknown sources\" in Settings → Security
-        3. Tap the APK file to install
-        4. Grant necessary permissions when prompted
+        - **APK**: \`app-release.apk\`
 
         ### ⚙️ Build Information
         - **Version**: ${{ steps.version.outputs.VERSION }}
         - **Flutter**: ${{ env.FLUTTER_VERSION }}
         - **Java**: ${{ env.JAVA_VERSION }}
-        - **Branch**: ft/clean
+        - **Branch**: master
         - **Commit**: ${{ github.sha }}
-        - **Build Time**: ${{ github.run_id }}
 
-        ---
-        **🐛 Found an issue?** Report it on [GitHub Issues](../../issues)
-
-        **💬 Need help?** Check our [documentation](../../wiki)" \
+        ### 📋 Installation Instructions
+        1. Download the APK file to your Android device
+        2. Enable \"Install from unknown sources\" in Settings → Security
+        3. Tap the APK file to install" \
           --prerelease \
           "$APK_FILE"
       env:

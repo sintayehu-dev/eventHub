@@ -121,7 +121,7 @@ jobs:
         - **Version**: ${{ steps.version.outputs.VERSION }}
         - **Flutter**: ${{ env.FLUTTER_VERSION }}
         - **Java**: ${{ env.JAVA_VERSION }}
-        - **Branch**: ft/clean
+        - **Branch**: master
         - **Commit**: ${{ github.sha }}
         - **Original Build**: #${{ github.event.inputs.build_number }}
 
