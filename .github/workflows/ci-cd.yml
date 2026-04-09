@@ -163,13 +163,40 @@ jobs:
         name: eventhub-ft-clean-release-${{ github.run_number }}
         path: release-files/
         
+    # Step 2.1: Check downloaded files and prepare for release
+    - name: Prepare release files
+      run: |
+        echo "Contents of release-files directory:"
+        ls -la release-files/
+        # Find the APK file (it might be directly in release-files or in a subdirectory)
+        APK_FILE=$(find release-files/ -name "*.apk" -type f | head -1)
+        if [ -z "$APK_FILE" ]; then
+          echo "Error: No APK file found in release-files/"
+          exit 1
+        fi
+        echo "Found APK file: $APK_FILE"
+        # Copy to expected location if needed
+        cp "$APK_FILE" "release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
+        echo "APK prepared for release"
+        
     # Step 3: Get version from pubspec.yaml
     - name: Get version info
       id: version
       run: |
+        if [ ! -f "pubspec.yaml" ]; then
+          echo "Error: pubspec.yaml not found"
+          exit 1
+        fi
         VERSION=$(grep '^version:' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+        if [ -z "$VERSION" ]; then
+          echo "Warning: Could not extract version from pubspec.yaml, using default"
+          VERSION="1.0.0+${{ github.run_number }}"
+        fi
         APP_VERSION=${VERSION%+*}
         BUILD_NUMBER=${VERSION#*+}
+        echo "Extracted version: $VERSION"
+        echo "App version: $APP_VERSION"
+        echo "Build number: $BUILD_NUMBER"
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "APP_VERSION=$APP_VERSION" >> $GITHUB_OUTPUT
         echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
@@ -178,55 +205,72 @@ jobs:
     - name: Generate changelog
       id: changelog
       run: |
+        echo "Generating changelog..."
         # Use manual release notes if provided, otherwise generate from commits
         if [[ "${{ github.event.inputs.release_notes }}" != "" ]]; then
           CHANGELOG="${{ github.event.inputs.release_notes }}"
+          echo "Using manual release notes"
         else
+          echo "Generating changelog from recent commits..."
           CHANGELOG=$(git log --pretty=format:"- %s" --since="24 hours ago" | head -10)
           if [ -z "$CHANGELOG" ]; then
             CHANGELOG="- Latest build from ft/clean branch"
+            echo "No recent commits found, using default changelog"
+          else
+            echo "Found recent commits for changelog"
           fi
         fi
+        echo "Changelog content:"
+        echo "$CHANGELOG"
         echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
         echo "$CHANGELOG" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
         
     # Step 5: Create GitHub release
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: build-${{ github.run_number }}
-        name: EventHub Build #${{ github.run_number }}
-        body: |
-          ## EventHub Build #${{ github.run_number }}
-          
-          ### 📱 Download
-          - **APK**: `eventhub-ft-clean-release-${{ github.run_number }}.apk`
-          
-          ### 🆕 What's New
-          ${{ steps.changelog.outputs.CHANGELOG }}
-          
-          ### 📋 Installation Instructions
-          1. Download the APK file to your Android device
-          2. Enable "Install from unknown sources" in Settings → Security
-          3. Tap the APK file to install
-          4. Grant necessary permissions when prompted
-          
-          ### ⚙️ Build Information
-          - **Version**: ${{ steps.version.outputs.VERSION }}
-          - **Flutter**: ${{ env.FLUTTER_VERSION }}
-          - **Java**: ${{ env.JAVA_VERSION }}
-          - **Branch**: ft/clean
-          - **Commit**: ${{ github.sha }}
-          - **Build Time**: ${{ github.run_id }}
-          
-          ---
-          **🐛 Found an issue?** Report it on [GitHub Issues](../../issues)
-          
-          **💬 Need help?** Check our [documentation](../../wiki)
-        files: |
-          release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk
-        draft: false
-        prerelease: true  # Mark as pre-release since it's from development branch
+      run: |
+        echo "Preparing to create GitHub release..."
+        echo "Checking release files:"
+        ls -la release-files/
+        
+        # Verify APK file exists
+        APK_FILE="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
+        if [ ! -f "$APK_FILE" ]; then
+          echo "Error: APK file not found at $APK_FILE"
+          exit 1
+        fi
+        echo "APK file confirmed: $APK_FILE"
+        
+        # Create the release using GitHub CLI
+        gh release create "build-${{ github.run_number }}" \
+          --title "EventHub Build #${{ github.run_number }}" \
+          --notes "## EventHub Build #${{ github.run_number }}
+
+        ### 📱 Download
+        - **APK**: \`eventhub-ft-clean-release-${{ github.run_number }}.apk\`
+
+        ### 🆕 What's New
+        ${{ steps.changelog.outputs.CHANGELOG }}
+
+        ### 📋 Installation Instructions
+        1. Download the APK file to your Android device
+        2. Enable \"Install from unknown sources\" in Settings → Security
+        3. Tap the APK file to install
+        4. Grant necessary permissions when prompted
+
+        ### ⚙️ Build Information
+        - **Version**: ${{ steps.version.outputs.VERSION }}
+        - **Flutter**: ${{ env.FLUTTER_VERSION }}
+        - **Java**: ${{ env.JAVA_VERSION }}
+        - **Branch**: ft/clean
+        - **Commit**: ${{ github.sha }}
+        - **Build Time**: ${{ github.run_id }}
+
+        ---
+        **🐛 Found an issue?** Report it on [GitHub Issues](../../issues)
+
+        **💬 Need help?** Check our [documentation](../../wiki)" \
+          --prerelease \
+          "$APK_FILE"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
