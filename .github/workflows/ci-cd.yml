@@ -24,6 +24,11 @@ env:
   FLUTTER_VERSION: '3.27.4'       # Same as local Flutter version
   JAVA_VERSION: '17'              # Same as local Java version
 
+# Permissions for GitHub token
+permissions:
+  contents: write                  # Required to create releases
+  actions: read                    # Required to download artifacts
+
 # NOTE: Code analysis and tests have been removed from this workflow
 # to avoid build failures. The workflow builds release APK and will only fail on:
 # - Dependency resolution issues
