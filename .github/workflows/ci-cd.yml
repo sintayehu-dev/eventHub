@@ -175,15 +175,15 @@ jobs:
           exit 1
         fi
         echo "Found APK file: $APK_FILE"
-        # Check if it's already named correctly
+        # Verify the expected file exists
         EXPECTED_NAME="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
-        if [ "$APK_FILE" != "$EXPECTED_NAME" ]; then
-          echo "Renaming APK file to expected name..."
-          mv "$APK_FILE" "$EXPECTED_NAME"
-          echo "APK renamed to: $EXPECTED_NAME"
-        else
-          echo "APK file already has correct name: $APK_FILE"
+        if [ ! -f "$EXPECTED_NAME" ]; then
+          echo "Error: Expected APK file not found at $EXPECTED_NAME"
+          echo "Available files:"
+          ls -la release-files/
+          exit 1
         fi
+        echo "APK file confirmed: $EXPECTED_NAME"
         
     # Step 3: Get version from pubspec.yaml
     - name: Get version info
