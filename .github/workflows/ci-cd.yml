@@ -255,32 +255,7 @@ jobs:
         # Create the release using GitHub CLI
         gh release create "build-${{ github.run_number }}" \
           --title "EventHub Build #${{ github.run_number }}" \
-          --notes "## EventHub Build #${{ github.run_number }}
-
-        ### 📱 Download
-        - **APK**: \`eventhub-ft-clean-release-${{ github.run_number }}.apk\`
-
-        ### 🆕 What's New
-        ${{ steps.changelog.outputs.CHANGELOG }}
-
-        ### 📋 Installation Instructions
-        1. Download the APK file to your Android device
-        2. Enable \"Install from unknown sources\" in Settings → Security
-        3. Tap the APK file to install
-        4. Grant necessary permissions when prompted
-
-        ### ⚙️ Build Information
-        - **Version**: ${{ steps.version.outputs.VERSION }}
-        - **Flutter**: ${{ env.FLUTTER_VERSION }}
-        - **Java**: ${{ env.JAVA_VERSION }}
-        - **Branch**: master
-        - **Commit**: ${{ github.sha }}
-        - **Build Time**: ${{ github.run_id }}
-
-        ---
-        **🐛 Found an issue?** Report it on [GitHub Issues](../../issues)
-
-        **💬 Need help?** Check our [documentation](../../wiki)" \
+          --notes "📱 **APK**: \`eventhub-ft-clean-release-${{ github.run_number }}.apk\`" \
           --prerelease \
           "$APK_FILE"
       env:
