@@ -32,6 +32,7 @@ mixin _$ValueFailure<T> {
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -49,6 +50,7 @@ mixin _$ValueFailure<T> {
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -66,6 +68,7 @@ mixin _$ValueFailure<T> {
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -84,6 +87,7 @@ mixin _$ValueFailure<T> {
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -101,6 +105,7 @@ mixin _$ValueFailure<T> {
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -118,6 +123,7 @@ mixin _$ValueFailure<T> {
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -260,6 +266,7 @@ class _$ShortAccountNumberImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return shortAccountNumber(failedValue);
   }
@@ -280,6 +287,7 @@ class _$ShortAccountNumberImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return shortAccountNumber?.call(failedValue);
   }
@@ -300,6 +308,7 @@ class _$ShortAccountNumberImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (shortAccountNumber != null) {
@@ -324,6 +333,7 @@ class _$ShortAccountNumberImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return shortAccountNumber(this);
   }
@@ -344,6 +354,7 @@ class _$ShortAccountNumberImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return shortAccountNumber?.call(this);
   }
@@ -364,6 +375,7 @@ class _$ShortAccountNumberImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (shortAccountNumber != null) {
@@ -493,6 +505,7 @@ class _$ExceedingLengthImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return exceedingLength(failedValue, max);
   }
@@ -513,6 +526,7 @@ class _$ExceedingLengthImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return exceedingLength?.call(failedValue, max);
   }
@@ -533,6 +547,7 @@ class _$ExceedingLengthImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (exceedingLength != null) {
@@ -557,6 +572,7 @@ class _$ExceedingLengthImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return exceedingLength(this);
   }
@@ -577,6 +593,7 @@ class _$ExceedingLengthImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return exceedingLength?.call(this);
   }
@@ -597,6 +614,7 @@ class _$ExceedingLengthImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (exceedingLength != null) {
@@ -716,6 +734,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return empty(failedValue);
   }
@@ -736,6 +755,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return empty?.call(failedValue);
   }
@@ -756,6 +776,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (empty != null) {
@@ -780,6 +801,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return empty(this);
   }
@@ -800,6 +822,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return empty?.call(this);
   }
@@ -820,6 +843,7 @@ class _$EmptyImpl<T> with DiagnosticableTreeMixin implements Empty<T> {
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (empty != null) {
@@ -936,6 +960,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return multiline(failedValue);
   }
@@ -956,6 +981,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return multiline?.call(failedValue);
   }
@@ -976,6 +1002,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (multiline != null) {
@@ -1000,6 +1027,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return multiline(this);
   }
@@ -1020,6 +1048,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return multiline?.call(this);
   }
@@ -1040,6 +1069,7 @@ class _$MultilineImpl<T> with DiagnosticableTreeMixin implements Multiline<T> {
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (multiline != null) {
@@ -1168,6 +1198,7 @@ class _$NumberTooLargeImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return numberTooLarge(failedValue, max);
   }
@@ -1188,6 +1219,7 @@ class _$NumberTooLargeImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return numberTooLarge?.call(failedValue, max);
   }
@@ -1208,6 +1240,7 @@ class _$NumberTooLargeImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (numberTooLarge != null) {
@@ -1232,6 +1265,7 @@ class _$NumberTooLargeImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return numberTooLarge(this);
   }
@@ -1252,6 +1286,7 @@ class _$NumberTooLargeImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return numberTooLarge?.call(this);
   }
@@ -1272,6 +1307,7 @@ class _$NumberTooLargeImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (numberTooLarge != null) {
@@ -1403,6 +1439,7 @@ class _$ListTooLongImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return listTooLong(failedValue, max);
   }
@@ -1423,6 +1460,7 @@ class _$ListTooLongImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return listTooLong?.call(failedValue, max);
   }
@@ -1443,6 +1481,7 @@ class _$ListTooLongImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (listTooLong != null) {
@@ -1467,6 +1506,7 @@ class _$ListTooLongImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return listTooLong(this);
   }
@@ -1487,6 +1527,7 @@ class _$ListTooLongImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return listTooLong?.call(this);
   }
@@ -1507,6 +1548,7 @@ class _$ListTooLongImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (listTooLong != null) {
@@ -1629,6 +1671,7 @@ class _$InvalidEmailImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return invalidEmail(failedValue);
   }
@@ -1649,6 +1692,7 @@ class _$InvalidEmailImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return invalidEmail?.call(failedValue);
   }
@@ -1669,6 +1713,7 @@ class _$InvalidEmailImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidEmail != null) {
@@ -1693,6 +1738,7 @@ class _$InvalidEmailImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return invalidEmail(this);
   }
@@ -1713,6 +1759,7 @@ class _$InvalidEmailImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return invalidEmail?.call(this);
   }
@@ -1733,6 +1780,7 @@ class _$InvalidEmailImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidEmail != null) {
@@ -1853,6 +1901,7 @@ class _$ShortPasswordImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return shortPassword(failedValue);
   }
@@ -1873,6 +1922,7 @@ class _$ShortPasswordImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return shortPassword?.call(failedValue);
   }
@@ -1893,6 +1943,7 @@ class _$ShortPasswordImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (shortPassword != null) {
@@ -1917,6 +1968,7 @@ class _$ShortPasswordImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return shortPassword(this);
   }
@@ -1937,6 +1989,7 @@ class _$ShortPasswordImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return shortPassword?.call(this);
   }
@@ -1957,6 +2010,7 @@ class _$ShortPasswordImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (shortPassword != null) {
@@ -2077,6 +2131,7 @@ class _$InvalidPhotoUrlImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return invalidPhotoUrl(failedValue);
   }
@@ -2097,6 +2152,7 @@ class _$InvalidPhotoUrlImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return invalidPhotoUrl?.call(failedValue);
   }
@@ -2117,6 +2173,7 @@ class _$InvalidPhotoUrlImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidPhotoUrl != null) {
@@ -2141,6 +2198,7 @@ class _$InvalidPhotoUrlImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return invalidPhotoUrl(this);
   }
@@ -2161,6 +2219,7 @@ class _$InvalidPhotoUrlImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return invalidPhotoUrl?.call(this);
   }
@@ -2181,6 +2240,7 @@ class _$InvalidPhotoUrlImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidPhotoUrl != null) {
@@ -2301,6 +2361,7 @@ class _$PasswordMismatchImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return passwordMismatch(failedValue);
   }
@@ -2321,6 +2382,7 @@ class _$PasswordMismatchImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return passwordMismatch?.call(failedValue);
   }
@@ -2341,6 +2403,7 @@ class _$PasswordMismatchImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (passwordMismatch != null) {
@@ -2365,6 +2428,7 @@ class _$PasswordMismatchImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return passwordMismatch(this);
   }
@@ -2385,6 +2449,7 @@ class _$PasswordMismatchImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return passwordMismatch?.call(this);
   }
@@ -2405,6 +2470,7 @@ class _$PasswordMismatchImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (passwordMismatch != null) {
@@ -2525,6 +2591,7 @@ class _$InvalidNameImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return invalidName(failedValue);
   }
@@ -2545,6 +2612,7 @@ class _$InvalidNameImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return invalidName?.call(failedValue);
   }
@@ -2565,6 +2633,7 @@ class _$InvalidNameImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidName != null) {
@@ -2589,6 +2658,7 @@ class _$InvalidNameImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return invalidName(this);
   }
@@ -2609,6 +2679,7 @@ class _$InvalidNameImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return invalidName?.call(this);
   }
@@ -2629,6 +2700,7 @@ class _$InvalidNameImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidName != null) {
@@ -2749,6 +2821,7 @@ class _$InvalidPhoneNumberImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return invalidPhoneNumber(failedValue);
   }
@@ -2769,6 +2842,7 @@ class _$InvalidPhoneNumberImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return invalidPhoneNumber?.call(failedValue);
   }
@@ -2789,6 +2863,7 @@ class _$InvalidPhoneNumberImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidPhoneNumber != null) {
@@ -2813,6 +2888,7 @@ class _$InvalidPhoneNumberImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return invalidPhoneNumber(this);
   }
@@ -2833,6 +2909,7 @@ class _$InvalidPhoneNumberImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return invalidPhoneNumber?.call(this);
   }
@@ -2853,6 +2930,7 @@ class _$InvalidPhoneNumberImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidPhoneNumber != null) {
@@ -2973,6 +3051,7 @@ class _$InvalidAmountImpl<T>
     required TResult Function(T failedValue) invalidName,
     required TResult Function(T failedValue) invalidPhoneNumber,
     required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
   }) {
     return invalidAmount(failedValue);
   }
@@ -2993,6 +3072,7 @@ class _$InvalidAmountImpl<T>
     TResult? Function(T failedValue)? invalidName,
     TResult? Function(T failedValue)? invalidPhoneNumber,
     TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
   }) {
     return invalidAmount?.call(failedValue);
   }
@@ -3013,6 +3093,7 @@ class _$InvalidAmountImpl<T>
     TResult Function(T failedValue)? invalidName,
     TResult Function(T failedValue)? invalidPhoneNumber,
     TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidAmount != null) {
@@ -3037,6 +3118,7 @@ class _$InvalidAmountImpl<T>
     required TResult Function(InvalidName<T> value) invalidName,
     required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
     required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
   }) {
     return invalidAmount(this);
   }
@@ -3057,6 +3139,7 @@ class _$InvalidAmountImpl<T>
     TResult? Function(InvalidName<T> value)? invalidName,
     TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
   }) {
     return invalidAmount?.call(this);
   }
@@ -3077,6 +3160,7 @@ class _$InvalidAmountImpl<T>
     TResult Function(InvalidName<T> value)? invalidName,
     TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
     TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
     required TResult orElse(),
   }) {
     if (invalidAmount != null) {
@@ -3098,5 +3182,235 @@ abstract class InvalidAmount<T> implements ValueFailure<T> {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$InvalidAmountImplCopyWith<T, _$InvalidAmountImpl<T>> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$InvalidRoleImplCopyWith<T, $Res>
+    implements $ValueFailureCopyWith<T, $Res> {
+  factory _$$InvalidRoleImplCopyWith(_$InvalidRoleImpl<T> value,
+          $Res Function(_$InvalidRoleImpl<T>) then) =
+      __$$InvalidRoleImplCopyWithImpl<T, $Res>;
+  @override
+  @useResult
+  $Res call({T failedValue});
+}
+
+/// @nodoc
+class __$$InvalidRoleImplCopyWithImpl<T, $Res>
+    extends _$ValueFailureCopyWithImpl<T, $Res, _$InvalidRoleImpl<T>>
+    implements _$$InvalidRoleImplCopyWith<T, $Res> {
+  __$$InvalidRoleImplCopyWithImpl(
+      _$InvalidRoleImpl<T> _value, $Res Function(_$InvalidRoleImpl<T>) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ValueFailure
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? failedValue = freezed,
+  }) {
+    return _then(_$InvalidRoleImpl<T>(
+      failedValue: freezed == failedValue
+          ? _value.failedValue
+          : failedValue // ignore: cast_nullable_to_non_nullable
+              as T,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$InvalidRoleImpl<T>
+    with DiagnosticableTreeMixin
+    implements InvalidRole<T> {
+  const _$InvalidRoleImpl({required this.failedValue});
+
+  @override
+  final T failedValue;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ValueFailure<$T>.invalidRole(failedValue: $failedValue)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ValueFailure<$T>.invalidRole'))
+      ..add(DiagnosticsProperty('failedValue', failedValue));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$InvalidRoleImpl<T> &&
+            const DeepCollectionEquality()
+                .equals(other.failedValue, failedValue));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(failedValue));
+
+  /// Create a copy of ValueFailure
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$InvalidRoleImplCopyWith<T, _$InvalidRoleImpl<T>> get copyWith =>
+      __$$InvalidRoleImplCopyWithImpl<T, _$InvalidRoleImpl<T>>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(T failedValue) shortAccountNumber,
+    required TResult Function(T failedValue, int max) exceedingLength,
+    required TResult Function(T failedValue) empty,
+    required TResult Function(T failedValue) multiline,
+    required TResult Function(T failedValue, num max) numberTooLarge,
+    required TResult Function(T failedValue, int max) listTooLong,
+    required TResult Function(T failedValue) invalidEmail,
+    required TResult Function(T failedValue) shortPassword,
+    required TResult Function(T failedValue) invalidPhotoUrl,
+    required TResult Function(T failedValue) passwordMismatch,
+    required TResult Function(T failedValue) invalidName,
+    required TResult Function(T failedValue) invalidPhoneNumber,
+    required TResult Function(T failedValue) invalidAmount,
+    required TResult Function(T failedValue) invalidRole,
+  }) {
+    return invalidRole(failedValue);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(T failedValue)? shortAccountNumber,
+    TResult? Function(T failedValue, int max)? exceedingLength,
+    TResult? Function(T failedValue)? empty,
+    TResult? Function(T failedValue)? multiline,
+    TResult? Function(T failedValue, num max)? numberTooLarge,
+    TResult? Function(T failedValue, int max)? listTooLong,
+    TResult? Function(T failedValue)? invalidEmail,
+    TResult? Function(T failedValue)? shortPassword,
+    TResult? Function(T failedValue)? invalidPhotoUrl,
+    TResult? Function(T failedValue)? passwordMismatch,
+    TResult? Function(T failedValue)? invalidName,
+    TResult? Function(T failedValue)? invalidPhoneNumber,
+    TResult? Function(T failedValue)? invalidAmount,
+    TResult? Function(T failedValue)? invalidRole,
+  }) {
+    return invalidRole?.call(failedValue);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(T failedValue)? shortAccountNumber,
+    TResult Function(T failedValue, int max)? exceedingLength,
+    TResult Function(T failedValue)? empty,
+    TResult Function(T failedValue)? multiline,
+    TResult Function(T failedValue, num max)? numberTooLarge,
+    TResult Function(T failedValue, int max)? listTooLong,
+    TResult Function(T failedValue)? invalidEmail,
+    TResult Function(T failedValue)? shortPassword,
+    TResult Function(T failedValue)? invalidPhotoUrl,
+    TResult Function(T failedValue)? passwordMismatch,
+    TResult Function(T failedValue)? invalidName,
+    TResult Function(T failedValue)? invalidPhoneNumber,
+    TResult Function(T failedValue)? invalidAmount,
+    TResult Function(T failedValue)? invalidRole,
+    required TResult orElse(),
+  }) {
+    if (invalidRole != null) {
+      return invalidRole(failedValue);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ShortAccountNumber<T> value) shortAccountNumber,
+    required TResult Function(ExceedingLength<T> value) exceedingLength,
+    required TResult Function(Empty<T> value) empty,
+    required TResult Function(Multiline<T> value) multiline,
+    required TResult Function(NumberTooLarge<T> value) numberTooLarge,
+    required TResult Function(ListTooLong<T> value) listTooLong,
+    required TResult Function(InvalidEmail<T> value) invalidEmail,
+    required TResult Function(ShortPassword<T> value) shortPassword,
+    required TResult Function(InvalidPhotoUrl<T> value) invalidPhotoUrl,
+    required TResult Function(PasswordMismatch<T> value) passwordMismatch,
+    required TResult Function(InvalidName<T> value) invalidName,
+    required TResult Function(InvalidPhoneNumber<T> value) invalidPhoneNumber,
+    required TResult Function(InvalidAmount<T> value) invalidAmount,
+    required TResult Function(InvalidRole<T> value) invalidRole,
+  }) {
+    return invalidRole(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ShortAccountNumber<T> value)? shortAccountNumber,
+    TResult? Function(ExceedingLength<T> value)? exceedingLength,
+    TResult? Function(Empty<T> value)? empty,
+    TResult? Function(Multiline<T> value)? multiline,
+    TResult? Function(NumberTooLarge<T> value)? numberTooLarge,
+    TResult? Function(ListTooLong<T> value)? listTooLong,
+    TResult? Function(InvalidEmail<T> value)? invalidEmail,
+    TResult? Function(ShortPassword<T> value)? shortPassword,
+    TResult? Function(InvalidPhotoUrl<T> value)? invalidPhotoUrl,
+    TResult? Function(PasswordMismatch<T> value)? passwordMismatch,
+    TResult? Function(InvalidName<T> value)? invalidName,
+    TResult? Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
+    TResult? Function(InvalidAmount<T> value)? invalidAmount,
+    TResult? Function(InvalidRole<T> value)? invalidRole,
+  }) {
+    return invalidRole?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ShortAccountNumber<T> value)? shortAccountNumber,
+    TResult Function(ExceedingLength<T> value)? exceedingLength,
+    TResult Function(Empty<T> value)? empty,
+    TResult Function(Multiline<T> value)? multiline,
+    TResult Function(NumberTooLarge<T> value)? numberTooLarge,
+    TResult Function(ListTooLong<T> value)? listTooLong,
+    TResult Function(InvalidEmail<T> value)? invalidEmail,
+    TResult Function(ShortPassword<T> value)? shortPassword,
+    TResult Function(InvalidPhotoUrl<T> value)? invalidPhotoUrl,
+    TResult Function(PasswordMismatch<T> value)? passwordMismatch,
+    TResult Function(InvalidName<T> value)? invalidName,
+    TResult Function(InvalidPhoneNumber<T> value)? invalidPhoneNumber,
+    TResult Function(InvalidAmount<T> value)? invalidAmount,
+    TResult Function(InvalidRole<T> value)? invalidRole,
+    required TResult orElse(),
+  }) {
+    if (invalidRole != null) {
+      return invalidRole(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class InvalidRole<T> implements ValueFailure<T> {
+  const factory InvalidRole({required final T failedValue}) =
+      _$InvalidRoleImpl<T>;
+
+  @override
+  T get failedValue;
+
+  /// Create a copy of ValueFailure
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$InvalidRoleImplCopyWith<T, _$InvalidRoleImpl<T>> get copyWith =>
       throw _privateConstructorUsedError;
 }

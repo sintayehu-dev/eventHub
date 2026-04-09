@@ -6,5 +6,7 @@ class LocalStorageKey {
   static const refreshToken = 'refreshToken';
   static const themeMode = 'themeMode';
   static const userData = 'userData';
+  static const firebaseUserData = 'firebaseUserData';
   static const isFirstTime = 'isFirstTime';
+  static const isAuthenticated = 'isAuthenticated';
 }

@@ -18,14 +18,11 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$RegistrationEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -33,14 +30,11 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -48,14 +42,11 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -64,15 +55,12 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -82,14 +70,11 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -98,14 +83,11 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -134,409 +116,6 @@ class _$RegistrationEventCopyWithImpl<$Res, $Val extends RegistrationEvent>
 
   /// Create a copy of RegistrationEvent
   /// with the given fields replaced by the non-null parameter values.
-}
-
-/// @nodoc
-abstract class _$$FirstNameChangedImplCopyWith<$Res> {
-  factory _$$FirstNameChangedImplCopyWith(_$FirstNameChangedImpl value,
-          $Res Function(_$FirstNameChangedImpl) then) =
-      __$$FirstNameChangedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String firstName});
-}
-
-/// @nodoc
-class __$$FirstNameChangedImplCopyWithImpl<$Res>
-    extends _$RegistrationEventCopyWithImpl<$Res, _$FirstNameChangedImpl>
-    implements _$$FirstNameChangedImplCopyWith<$Res> {
-  __$$FirstNameChangedImplCopyWithImpl(_$FirstNameChangedImpl _value,
-      $Res Function(_$FirstNameChangedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? firstName = null,
-  }) {
-    return _then(_$FirstNameChangedImpl(
-      null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$FirstNameChangedImpl implements FirstNameChanged {
-  const _$FirstNameChangedImpl(this.firstName);
-
-  @override
-  final String firstName;
-
-  @override
-  String toString() {
-    return 'RegistrationEvent.firstNameChanged(firstName: $firstName)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$FirstNameChangedImpl &&
-            (identical(other.firstName, firstName) ||
-                other.firstName == firstName));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, firstName);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$FirstNameChangedImplCopyWith<_$FirstNameChangedImpl> get copyWith =>
-      __$$FirstNameChangedImplCopyWithImpl<_$FirstNameChangedImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
-    required TResult Function(String email) emailChanged,
-    required TResult Function(String password) passwordChanged,
-    required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
-    required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
-    required TResult Function() toggleShowPassword,
-    required TResult Function() toggleShowConfirmPassword,
-    required TResult Function() registrationSubmitted,
-  }) {
-    return firstNameChanged(firstName);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
-    TResult? Function(String email)? emailChanged,
-    TResult? Function(String password)? passwordChanged,
-    TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
-    TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
-    TResult? Function()? toggleShowPassword,
-    TResult? Function()? toggleShowConfirmPassword,
-    TResult? Function()? registrationSubmitted,
-  }) {
-    return firstNameChanged?.call(firstName);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
-    TResult Function(String email)? emailChanged,
-    TResult Function(String password)? passwordChanged,
-    TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
-    TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
-    TResult Function()? toggleShowPassword,
-    TResult Function()? toggleShowConfirmPassword,
-    TResult Function()? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (firstNameChanged != null) {
-      return firstNameChanged(firstName);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
-    required TResult Function(EmailChanged value) emailChanged,
-    required TResult Function(PasswordChanged value) passwordChanged,
-    required TResult Function(ConfirmPasswordChanged value)
-        confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
-    required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
-    required TResult Function(ToggleShowPassword value) toggleShowPassword,
-    required TResult Function(ToggleShowConfirmPassword value)
-        toggleShowConfirmPassword,
-    required TResult Function(RegistrationSubmitted value)
-        registrationSubmitted,
-  }) {
-    return firstNameChanged(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
-    TResult? Function(EmailChanged value)? emailChanged,
-    TResult? Function(PasswordChanged value)? passwordChanged,
-    TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult? Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult? Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult? Function(RegistrationSubmitted value)? registrationSubmitted,
-  }) {
-    return firstNameChanged?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
-    TResult Function(EmailChanged value)? emailChanged,
-    TResult Function(PasswordChanged value)? passwordChanged,
-    TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult Function(RegistrationSubmitted value)? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (firstNameChanged != null) {
-      return firstNameChanged(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class FirstNameChanged implements RegistrationEvent {
-  const factory FirstNameChanged(final String firstName) =
-      _$FirstNameChangedImpl;
-
-  String get firstName;
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$FirstNameChangedImplCopyWith<_$FirstNameChangedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$LastNameChangedImplCopyWith<$Res> {
-  factory _$$LastNameChangedImplCopyWith(_$LastNameChangedImpl value,
-          $Res Function(_$LastNameChangedImpl) then) =
-      __$$LastNameChangedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String lastName});
-}
-
-/// @nodoc
-class __$$LastNameChangedImplCopyWithImpl<$Res>
-    extends _$RegistrationEventCopyWithImpl<$Res, _$LastNameChangedImpl>
-    implements _$$LastNameChangedImplCopyWith<$Res> {
-  __$$LastNameChangedImplCopyWithImpl(
-      _$LastNameChangedImpl _value, $Res Function(_$LastNameChangedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? lastName = null,
-  }) {
-    return _then(_$LastNameChangedImpl(
-      null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$LastNameChangedImpl implements LastNameChanged {
-  const _$LastNameChangedImpl(this.lastName);
-
-  @override
-  final String lastName;
-
-  @override
-  String toString() {
-    return 'RegistrationEvent.lastNameChanged(lastName: $lastName)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$LastNameChangedImpl &&
-            (identical(other.lastName, lastName) ||
-                other.lastName == lastName));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, lastName);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$LastNameChangedImplCopyWith<_$LastNameChangedImpl> get copyWith =>
-      __$$LastNameChangedImplCopyWithImpl<_$LastNameChangedImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
-    required TResult Function(String email) emailChanged,
-    required TResult Function(String password) passwordChanged,
-    required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
-    required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
-    required TResult Function() toggleShowPassword,
-    required TResult Function() toggleShowConfirmPassword,
-    required TResult Function() registrationSubmitted,
-  }) {
-    return lastNameChanged(lastName);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
-    TResult? Function(String email)? emailChanged,
-    TResult? Function(String password)? passwordChanged,
-    TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
-    TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
-    TResult? Function()? toggleShowPassword,
-    TResult? Function()? toggleShowConfirmPassword,
-    TResult? Function()? registrationSubmitted,
-  }) {
-    return lastNameChanged?.call(lastName);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
-    TResult Function(String email)? emailChanged,
-    TResult Function(String password)? passwordChanged,
-    TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
-    TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
-    TResult Function()? toggleShowPassword,
-    TResult Function()? toggleShowConfirmPassword,
-    TResult Function()? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (lastNameChanged != null) {
-      return lastNameChanged(lastName);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
-    required TResult Function(EmailChanged value) emailChanged,
-    required TResult Function(PasswordChanged value) passwordChanged,
-    required TResult Function(ConfirmPasswordChanged value)
-        confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
-    required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
-    required TResult Function(ToggleShowPassword value) toggleShowPassword,
-    required TResult Function(ToggleShowConfirmPassword value)
-        toggleShowConfirmPassword,
-    required TResult Function(RegistrationSubmitted value)
-        registrationSubmitted,
-  }) {
-    return lastNameChanged(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
-    TResult? Function(EmailChanged value)? emailChanged,
-    TResult? Function(PasswordChanged value)? passwordChanged,
-    TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult? Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult? Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult? Function(RegistrationSubmitted value)? registrationSubmitted,
-  }) {
-    return lastNameChanged?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
-    TResult Function(EmailChanged value)? emailChanged,
-    TResult Function(PasswordChanged value)? passwordChanged,
-    TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult Function(RegistrationSubmitted value)? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (lastNameChanged != null) {
-      return lastNameChanged(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class LastNameChanged implements RegistrationEvent {
-  const factory LastNameChanged(final String lastName) = _$LastNameChangedImpl;
-
-  String get lastName;
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LastNameChangedImplCopyWith<_$LastNameChangedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -607,14 +186,11 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -625,14 +201,11 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -643,14 +216,11 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -665,15 +235,12 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -686,14 +253,11 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -705,14 +269,11 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -808,14 +369,11 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -826,14 +384,11 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -844,14 +399,11 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -866,15 +418,12 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -887,14 +436,11 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -906,14 +452,11 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1011,14 +554,11 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -1029,14 +569,11 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -1047,14 +584,11 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -1069,15 +603,12 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -1090,14 +621,11 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1109,14 +637,11 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1144,20 +669,20 @@ abstract class ConfirmPasswordChanged implements RegistrationEvent {
 }
 
 /// @nodoc
-abstract class _$$ReferralCodeChangedImplCopyWith<$Res> {
-  factory _$$ReferralCodeChangedImplCopyWith(_$ReferralCodeChangedImpl value,
-          $Res Function(_$ReferralCodeChangedImpl) then) =
-      __$$ReferralCodeChangedImplCopyWithImpl<$Res>;
+abstract class _$$UserRoleChangedImplCopyWith<$Res> {
+  factory _$$UserRoleChangedImplCopyWith(_$UserRoleChangedImpl value,
+          $Res Function(_$UserRoleChangedImpl) then) =
+      __$$UserRoleChangedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String referralCode});
+  $Res call({String role});
 }
 
 /// @nodoc
-class __$$ReferralCodeChangedImplCopyWithImpl<$Res>
-    extends _$RegistrationEventCopyWithImpl<$Res, _$ReferralCodeChangedImpl>
-    implements _$$ReferralCodeChangedImplCopyWith<$Res> {
-  __$$ReferralCodeChangedImplCopyWithImpl(_$ReferralCodeChangedImpl _value,
-      $Res Function(_$ReferralCodeChangedImpl) _then)
+class __$$UserRoleChangedImplCopyWithImpl<$Res>
+    extends _$RegistrationEventCopyWithImpl<$Res, _$UserRoleChangedImpl>
+    implements _$$UserRoleChangedImplCopyWith<$Res> {
+  __$$UserRoleChangedImplCopyWithImpl(
+      _$UserRoleChangedImpl _value, $Res Function(_$UserRoleChangedImpl) _then)
       : super(_value, _then);
 
   /// Create a copy of RegistrationEvent
@@ -1165,12 +690,12 @@ class __$$ReferralCodeChangedImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? referralCode = null,
+    Object? role = null,
   }) {
-    return _then(_$ReferralCodeChangedImpl(
-      null == referralCode
-          ? _value.referralCode
-          : referralCode // ignore: cast_nullable_to_non_nullable
+    return _then(_$UserRoleChangedImpl(
+      null == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -1178,92 +703,82 @@ class __$$ReferralCodeChangedImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ReferralCodeChangedImpl implements ReferralCodeChanged {
-  const _$ReferralCodeChangedImpl(this.referralCode);
+class _$UserRoleChangedImpl implements UserRoleChanged {
+  const _$UserRoleChangedImpl(this.role);
 
   @override
-  final String referralCode;
+  final String role;
 
   @override
   String toString() {
-    return 'RegistrationEvent.referralCodeChanged(referralCode: $referralCode)';
+    return 'RegistrationEvent.userRoleChanged(role: $role)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReferralCodeChangedImpl &&
-            (identical(other.referralCode, referralCode) ||
-                other.referralCode == referralCode));
+            other is _$UserRoleChangedImpl &&
+            (identical(other.role, role) || other.role == role));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, referralCode);
+  int get hashCode => Object.hash(runtimeType, role);
 
   /// Create a copy of RegistrationEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ReferralCodeChangedImplCopyWith<_$ReferralCodeChangedImpl> get copyWith =>
-      __$$ReferralCodeChangedImplCopyWithImpl<_$ReferralCodeChangedImpl>(
+  _$$UserRoleChangedImplCopyWith<_$UserRoleChangedImpl> get copyWith =>
+      __$$UserRoleChangedImplCopyWithImpl<_$UserRoleChangedImpl>(
           this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
   }) {
-    return referralCodeChanged(referralCode);
+    return userRoleChanged(role);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
   }) {
-    return referralCodeChanged?.call(referralCode);
+    return userRoleChanged?.call(role);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
     required TResult orElse(),
   }) {
-    if (referralCodeChanged != null) {
-      return referralCodeChanged(referralCode);
+    if (userRoleChanged != null) {
+      return userRoleChanged(role);
     }
     return orElse();
   }
@@ -1271,77 +786,67 @@ class _$ReferralCodeChangedImpl implements ReferralCodeChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
     required TResult Function(RegistrationSubmitted value)
         registrationSubmitted,
   }) {
-    return referralCodeChanged(this);
+    return userRoleChanged(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
     TResult? Function(RegistrationSubmitted value)? registrationSubmitted,
   }) {
-    return referralCodeChanged?.call(this);
+    return userRoleChanged?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
     TResult Function(RegistrationSubmitted value)? registrationSubmitted,
     required TResult orElse(),
   }) {
-    if (referralCodeChanged != null) {
-      return referralCodeChanged(this);
+    if (userRoleChanged != null) {
+      return userRoleChanged(this);
     }
     return orElse();
   }
 }
 
-abstract class ReferralCodeChanged implements RegistrationEvent {
-  const factory ReferralCodeChanged(final String referralCode) =
-      _$ReferralCodeChangedImpl;
+abstract class UserRoleChanged implements RegistrationEvent {
+  const factory UserRoleChanged(final String role) = _$UserRoleChangedImpl;
 
-  String get referralCode;
+  String get role;
 
   /// Create a copy of RegistrationEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ReferralCodeChangedImplCopyWith<_$ReferralCodeChangedImpl> get copyWith =>
+  _$$UserRoleChangedImplCopyWith<_$UserRoleChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1416,14 +921,11 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -1434,14 +936,11 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -1452,14 +951,11 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -1474,15 +970,12 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -1495,14 +988,11 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1514,14 +1004,11 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1546,208 +1033,6 @@ abstract class TermsAcceptedChanged implements RegistrationEvent {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TermsAcceptedChangedImplCopyWith<_$TermsAcceptedChangedImpl>
       get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$ProfilePhotoChangedImplCopyWith<$Res> {
-  factory _$$ProfilePhotoChangedImplCopyWith(_$ProfilePhotoChangedImpl value,
-          $Res Function(_$ProfilePhotoChangedImpl) then) =
-      __$$ProfilePhotoChangedImplCopyWithImpl<$Res>;
-  @useResult
-  $Res call({String? photoPath});
-}
-
-/// @nodoc
-class __$$ProfilePhotoChangedImplCopyWithImpl<$Res>
-    extends _$RegistrationEventCopyWithImpl<$Res, _$ProfilePhotoChangedImpl>
-    implements _$$ProfilePhotoChangedImplCopyWith<$Res> {
-  __$$ProfilePhotoChangedImplCopyWithImpl(_$ProfilePhotoChangedImpl _value,
-      $Res Function(_$ProfilePhotoChangedImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? photoPath = freezed,
-  }) {
-    return _then(_$ProfilePhotoChangedImpl(
-      freezed == photoPath
-          ? _value.photoPath
-          : photoPath // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$ProfilePhotoChangedImpl implements ProfilePhotoChanged {
-  const _$ProfilePhotoChangedImpl(this.photoPath);
-
-  @override
-  final String? photoPath;
-
-  @override
-  String toString() {
-    return 'RegistrationEvent.profilePhotoChanged(photoPath: $photoPath)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ProfilePhotoChangedImpl &&
-            (identical(other.photoPath, photoPath) ||
-                other.photoPath == photoPath));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, photoPath);
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ProfilePhotoChangedImplCopyWith<_$ProfilePhotoChangedImpl> get copyWith =>
-      __$$ProfilePhotoChangedImplCopyWithImpl<_$ProfilePhotoChangedImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
-    required TResult Function(String email) emailChanged,
-    required TResult Function(String password) passwordChanged,
-    required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
-    required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
-    required TResult Function() toggleShowPassword,
-    required TResult Function() toggleShowConfirmPassword,
-    required TResult Function() registrationSubmitted,
-  }) {
-    return profilePhotoChanged(photoPath);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
-    TResult? Function(String email)? emailChanged,
-    TResult? Function(String password)? passwordChanged,
-    TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
-    TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
-    TResult? Function()? toggleShowPassword,
-    TResult? Function()? toggleShowConfirmPassword,
-    TResult? Function()? registrationSubmitted,
-  }) {
-    return profilePhotoChanged?.call(photoPath);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
-    TResult Function(String email)? emailChanged,
-    TResult Function(String password)? passwordChanged,
-    TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
-    TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
-    TResult Function()? toggleShowPassword,
-    TResult Function()? toggleShowConfirmPassword,
-    TResult Function()? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (profilePhotoChanged != null) {
-      return profilePhotoChanged(photoPath);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
-    required TResult Function(EmailChanged value) emailChanged,
-    required TResult Function(PasswordChanged value) passwordChanged,
-    required TResult Function(ConfirmPasswordChanged value)
-        confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
-    required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
-    required TResult Function(ToggleShowPassword value) toggleShowPassword,
-    required TResult Function(ToggleShowConfirmPassword value)
-        toggleShowConfirmPassword,
-    required TResult Function(RegistrationSubmitted value)
-        registrationSubmitted,
-  }) {
-    return profilePhotoChanged(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
-    TResult? Function(EmailChanged value)? emailChanged,
-    TResult? Function(PasswordChanged value)? passwordChanged,
-    TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult? Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult? Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult? Function(RegistrationSubmitted value)? registrationSubmitted,
-  }) {
-    return profilePhotoChanged?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
-    TResult Function(EmailChanged value)? emailChanged,
-    TResult Function(PasswordChanged value)? passwordChanged,
-    TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
-    TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
-    TResult Function(ToggleShowPassword value)? toggleShowPassword,
-    TResult Function(ToggleShowConfirmPassword value)?
-        toggleShowConfirmPassword,
-    TResult Function(RegistrationSubmitted value)? registrationSubmitted,
-    required TResult orElse(),
-  }) {
-    if (profilePhotoChanged != null) {
-      return profilePhotoChanged(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class ProfilePhotoChanged implements RegistrationEvent {
-  const factory ProfilePhotoChanged(final String? photoPath) =
-      _$ProfilePhotoChangedImpl;
-
-  String? get photoPath;
-
-  /// Create a copy of RegistrationEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ProfilePhotoChangedImplCopyWith<_$ProfilePhotoChangedImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -1791,14 +1076,11 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -1809,14 +1091,11 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -1827,14 +1106,11 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -1849,15 +1125,12 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -1870,14 +1143,11 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1889,14 +1159,11 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -1959,14 +1226,11 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -1977,14 +1241,11 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -1995,14 +1256,11 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -2017,15 +1275,12 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -2038,14 +1293,11 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -2057,14 +1309,11 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -2125,14 +1374,11 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String firstName) firstNameChanged,
-    required TResult Function(String lastName) lastNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
-    required TResult Function(String referralCode) referralCodeChanged,
+    required TResult Function(String role) userRoleChanged,
     required TResult Function(bool accepted) termsAcceptedChanged,
-    required TResult Function(String? photoPath) profilePhotoChanged,
     required TResult Function() toggleShowPassword,
     required TResult Function() toggleShowConfirmPassword,
     required TResult Function() registrationSubmitted,
@@ -2143,14 +1389,11 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String firstName)? firstNameChanged,
-    TResult? Function(String lastName)? lastNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
-    TResult? Function(String referralCode)? referralCodeChanged,
+    TResult? Function(String role)? userRoleChanged,
     TResult? Function(bool accepted)? termsAcceptedChanged,
-    TResult? Function(String? photoPath)? profilePhotoChanged,
     TResult? Function()? toggleShowPassword,
     TResult? Function()? toggleShowConfirmPassword,
     TResult? Function()? registrationSubmitted,
@@ -2161,14 +1404,11 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String firstName)? firstNameChanged,
-    TResult Function(String lastName)? lastNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
-    TResult Function(String referralCode)? referralCodeChanged,
+    TResult Function(String role)? userRoleChanged,
     TResult Function(bool accepted)? termsAcceptedChanged,
-    TResult Function(String? photoPath)? profilePhotoChanged,
     TResult Function()? toggleShowPassword,
     TResult Function()? toggleShowConfirmPassword,
     TResult Function()? registrationSubmitted,
@@ -2183,15 +1423,12 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(FirstNameChanged value) firstNameChanged,
-    required TResult Function(LastNameChanged value) lastNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
         confirmPasswordChanged,
-    required TResult Function(ReferralCodeChanged value) referralCodeChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
     required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
-    required TResult Function(ProfilePhotoChanged value) profilePhotoChanged,
     required TResult Function(ToggleShowPassword value) toggleShowPassword,
     required TResult Function(ToggleShowConfirmPassword value)
         toggleShowConfirmPassword,
@@ -2204,14 +1441,11 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(FirstNameChanged value)? firstNameChanged,
-    TResult? Function(LastNameChanged value)? lastNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult? Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
     TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult? Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult? Function(ToggleShowPassword value)? toggleShowPassword,
     TResult? Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,
@@ -2223,14 +1457,11 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(FirstNameChanged value)? firstNameChanged,
-    TResult Function(LastNameChanged value)? lastNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
-    TResult Function(ReferralCodeChanged value)? referralCodeChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
     TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
-    TResult Function(ProfilePhotoChanged value)? profilePhotoChanged,
     TResult Function(ToggleShowPassword value)? toggleShowPassword,
     TResult Function(ToggleShowConfirmPassword value)?
         toggleShowConfirmPassword,

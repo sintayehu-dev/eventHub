@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/utils/permission_handler_util.dart';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'dart:async';
 
 /// A service class to handle image picking functionality
 class ImagePickerService {
@@ -126,11 +127,13 @@ class ImagePickerService {
     int imageQuality = 85,
   }) async {
     dev.log('ImagePickerService: Showing image source selection dialog');
-    String? result;
+    
+    final Completer<String?> completer = Completer<String?>();
+    bool optionSelected = false;
     
     await showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
@@ -148,30 +151,46 @@ class ImagePickerService {
                 leading: const Icon(Icons.camera_alt_rounded),
                 title: Text('Take a Photo', style: GoogleFonts.outfit()),
                 onTap: () async {
+                  if (optionSelected) return;
+                  optionSelected = true;
+                  
                   dev.log('ImagePickerService: Camera option selected');
-                  Navigator.pop(context);
-                  result = await takePhoto(
+                  Navigator.pop(dialogContext);
+
+                  final result = await takePhoto(
                     context,
                     maxWidth: maxWidth,
                     maxHeight: maxHeight,
                     imageQuality: imageQuality,
                   );
                   dev.log('ImagePickerService: Camera result: $result');
+                  
+                  if (!completer.isCompleted) {
+                    completer.complete(result);
+                  }
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_rounded),
                 title: Text('Choose from Gallery', style: GoogleFonts.outfit()),
                 onTap: () async {
+                  if (optionSelected) return;
+                  optionSelected = true;
+                  
                   dev.log('ImagePickerService: Gallery option selected');
-                  Navigator.pop(context);
-                  result = await chooseFromGallery(
+                  Navigator.pop(dialogContext);
+
+                  final result = await chooseFromGallery(
                     context,
                     maxWidth: maxWidth,
                     maxHeight: maxHeight,
                     imageQuality: imageQuality,
                   );
                   dev.log('ImagePickerService: Gallery result: $result');
+                  
+                  if (!completer.isCompleted) {
+                    completer.complete(result);
+                  }
                 },
               ),
               if (currentImagePath != null)
@@ -179,9 +198,15 @@ class ImagePickerService {
                   leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
                   title: Text('Remove Photo', style: GoogleFonts.outfit(color: Colors.red)),
                   onTap: () {
+                    if (optionSelected) return;
+                    optionSelected = true;
+                    
                     dev.log('ImagePickerService: Remove photo option selected');
-                    Navigator.pop(context);
-                    result = null;
+                    Navigator.pop(dialogContext);
+
+                    if (!completer.isCompleted) {
+                      completer.complete(null);
+                    }
                     dev.log('ImagePickerService: Photo removed (null result)');
                   },
                 ),
@@ -189,8 +214,15 @@ class ImagePickerService {
           ),
         );
       },
-    );
+    ).then((_) {
+      // Only complete with null if no option was selected
+      if (!optionSelected && !completer.isCompleted) {
+        dev.log('ImagePickerService: Dialog dismissed without selection');
+        completer.complete(null);
+      }
+    });
     
+    final result = await completer.future;
     dev.log('ImagePickerService: Dialog closed, final result: $result');
     return result;
   }

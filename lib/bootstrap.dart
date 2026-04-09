@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:eventhub/firebase_options.dart';
 import 'package:eventhub/core/utils/local_storage.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 
@@ -29,8 +32,13 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   };
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  // Initialize Firebase with proper options
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Configure Firebase Auth settings for development
+  await _configureFirebaseAuth();
 
   Bloc.observer = const AppBlocObserver();
 
@@ -41,4 +49,23 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   configureDependencies();
 
   runApp(await builder());
+}
+
+Future<void> _configureFirebaseAuth() async {
+  try {
+    // Configure Firebase Auth settings for development and testing
+    await FirebaseAuth.instance.setSettings(
+      appVerificationDisabledForTesting: true,
+    );
+
+    // Additional configuration for better debugging
+    if (kDebugMode) {
+      log('Firebase Auth configured for development mode');
+      log('Project ID: eventhub-d5812');
+      log('Auth domain: eventhub-d5812.firebaseapp.com');
+    }
+  } catch (e) {
+    log('Firebase Auth configuration error: $e');
+    // Don't throw error, just log it as the app can still function
+  }
 }

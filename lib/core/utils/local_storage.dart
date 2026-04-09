@@ -8,7 +8,6 @@ import 'package:eventhub/core/utils/local_storage_key.dart';
 class LocalStorage {
   LocalStorage._();
   static SharedPreferences? _preferences;
-  static LocalStorage? _localStorage;
   static final LocalStorage instance = LocalStorage._();
   
   static Future<void> ensureInitialized() async {
@@ -22,11 +21,6 @@ class LocalStorage {
       // Initialize with an empty instance to prevent further crashes
       _preferences = null;
     }
-  }
-
-  /// init shared preferences
-  Future<void> _init() async {
-    _preferences = await SharedPreferences.getInstance();
   }
 
   /// get is onboarding
@@ -141,7 +135,8 @@ class LocalStorage {
 
   bool getAppThemeMode() {
     log('getAppThemeMode ${_preferences?.getBool(LocalStorageKey.themeMode)}');
-    return _preferences?.getBool(LocalStorageKey.themeMode) ?? false;
+    return _preferences?.getBool(LocalStorageKey.themeMode) ??
+        true; // Default to dark mode
   }
 
   void deleteAppThemeMode() {
@@ -178,6 +173,42 @@ class LocalStorage {
     await _preferences?.remove(LocalStorageKey.userData);
   }
 
+  /// set Firebase user data
+  Future<void> setFirebaseUserData(Map<String, dynamic> userData) async {
+    if (_preferences == null) {
+      return;
+    }
+    final userDataString = jsonEncode(userData);
+    await _preferences?.setString(
+        LocalStorageKey.firebaseUserData, userDataString);
+  }
+
+  /// get Firebase user data
+  Map<String, dynamic>? getFirebaseUserData() {
+    if (_preferences == null) {
+      return null;
+    }
+    final userDataString =
+        _preferences?.getString(LocalStorageKey.firebaseUserData);
+    if (userDataString == null) {
+      return null;
+    }
+    return jsonDecode(userDataString) as Map<String, dynamic>;
+  }
+
+  /// delete Firebase user data
+  Future<void> deleteFirebaseUserData() async {
+    if (_preferences == null) {
+      return;
+    }
+    await _preferences?.remove(LocalStorageKey.firebaseUserData);
+  }
+
+  /// clear Firebase user data
+  Future<void> clearFirebaseUserData() async {
+    await deleteFirebaseUserData();
+  }
+
   /// clear user session (tokens and data)
   Future<void> clearUserSession() async {
     if (_preferences == null) {
@@ -186,5 +217,42 @@ class LocalStorage {
     await deleteAccessToken();
     await deleteRefreshToken();
     await deleteUserData();
+    await deleteFirebaseUserData();
+    await setIsAuthenticated(false);
+  }
+
+  /// set authentication status
+  Future<void> setIsAuthenticated(bool value) async {
+    if (_preferences == null) {
+      return;
+    }
+    await _preferences?.setBool(LocalStorageKey.isAuthenticated, value);
+    log('setIsAuthenticated: $value');
+  }
+
+  /// get authentication status
+  bool getIsAuthenticated() {
+    if (_preferences == null) {
+      return false;
+    }
+    final isAuthenticated =
+        _preferences?.getBool(LocalStorageKey.isAuthenticated) ?? false;
+    log('getIsAuthenticated: $isAuthenticated');
+    return isAuthenticated;
+  }
+
+  /// get user ID from Firebase user data
+  String? getUserId() {
+    final firebaseUserData = getFirebaseUserData();
+    return firebaseUserData?['uid'] as String?;
+  }
+
+  /// check if user data is available and valid
+  bool hasValidUserData() {
+    final isAuthenticated = getIsAuthenticated();
+    final firebaseUserData = getFirebaseUserData();
+    final userId = firebaseUserData?['uid'] as String?;
+
+    return isAuthenticated && userId != null && userId.isNotEmpty;
   }
 }

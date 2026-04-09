@@ -6,34 +6,39 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 /// A utility class to handle permissions throughout the app
 class PermissionHandlerUtil {
-  /// Check and request camera permission
+
   static Future<bool> requestCameraPermission(BuildContext context) async {
+    if (!context.mounted) return false;
+    
     PermissionStatus status = await Permission.camera.status;
     
     if (status.isGranted) {
       return true;
     }
-    
     if (status.isDenied) {
       status = await Permission.camera.request();
       return status.isGranted;
     }
     
     if (status.isPermanentlyDenied) {
-      _showPermissionDeniedDialog(
-        context,
-        'Camera access is required',
-        'Please enable camera access in your device settings to continue.',
-      );
+      if (context.mounted) {
+        _showPermissionDeniedDialog(
+          context,
+          'Camera access is required',
+          'Please enable camera access in your device settings to continue.',
+        );
+      }
       return false;
     }
     
     if (status.isRestricted || status.isLimited) {
-      _showPermissionDeniedDialog(
-        context,
-        'Camera access is restricted',
-        'Camera permissions are restricted on your device.',
-      );
+      if (context.mounted) {
+        _showPermissionDeniedDialog(
+          context,
+          'Camera access is restricted',
+          'Camera permissions are restricted on your device.',
+        );
+      }
       return false;
     }
     
@@ -42,6 +47,8 @@ class PermissionHandlerUtil {
   
   /// Check and request photo library/storage permission
   static Future<bool> requestPhotoLibraryPermission(BuildContext context) async {
+    if (!context.mounted) return false;
+    
     PermissionStatus status;
     
     if (Platform.isIOS) {
@@ -55,64 +62,66 @@ class PermissionHandlerUtil {
         status = await Permission.photos.request();
         return status.isGranted;
       }
-    } else {
-      // On Android, check Android version
-      if (Platform.isAndroid) {
-        // For Android 13 (API 33) and above, we need to request photos permission
-        if (await _isAndroid13OrAbove()) {
-          status = await Permission.photos.status;
-          
-          if (status.isGranted) {
-            return true;
-          }
-          
-          if (status.isDenied) {
-            status = await Permission.photos.request();
-            return status.isGranted;
-          }
-        } else {
-          // For older Android versions, use storage permission
-          status = await Permission.storage.status;
-          
-          if (status.isGranted) {
-            return true;
-          }
-          
-          if (status.isDenied) {
-            status = await Permission.storage.request();
-            return status.isGranted;
-          }
-        }
-      } else {
-        // Fallback for other platforms
-        status = await Permission.storage.status;
-        
+    } else if (Platform.isAndroid) {
+      // For Android 13 (API 33) and above, we need to request media permissions
+      if (await _isAndroid13OrAbove()) {
+        // Try READ_MEDIA_IMAGES permission for Android 13+
+        status = await Permission.mediaLibrary.status;
+
         if (status.isGranted) {
           return true;
         }
-        
+
+        if (status.isDenied) {
+          status = await Permission.mediaLibrary.request();
+          return status.isGranted;
+        }
+      } else {
+        // For older Android versions, use storage permission
+        status = await Permission.storage.status;
+
+        if (status.isGranted) {
+          return true;
+        }
+
         if (status.isDenied) {
           status = await Permission.storage.request();
           return status.isGranted;
         }
       }
+    } else {
+      // Fallback for other platforms
+      status = await Permission.storage.status;
+
+      if (status.isGranted) {
+        return true;
+      }
+
+      if (status.isDenied) {
+        status = await Permission.storage.request();
+        return status.isGranted;
+      }
     }
     
     if (status.isPermanentlyDenied) {
-      _showPermissionDeniedDialog(
-        context,
-        'Storage access is required',
-        'Please enable storage/photos access in your device settings to continue.',
-      );
+      if (context.mounted) {
+        _showPermissionDeniedDialog(
+          context,
+          'Storage access is required',
+          'Please enable storage/photos access in your device settings to continue.',
+        );
+      }
       return false;
     }
     
     if (status.isRestricted || status.isLimited) {
-      _showPermissionDeniedDialog(
-        context,
-        'Storage access is restricted',
-        'Storage/photos permissions are restricted on your device.',
-      );
+      if (context.mounted) {
+        _showPermissionDeniedDialog(
+          context,
+          'Storage access is restricted',
+          'Storage/photos permissions are restricted on your device.',
+        );
+      }
       return false;
     }
     
@@ -120,9 +129,13 @@ class PermissionHandlerUtil {
   }
 
   static Future<bool> requestMicPermission(BuildContext context) async {
+    if (!context.mounted) return false;
+    
     var status = await Permission.microphone.status;
     // If permission is undetermined (not granted, not denied, not permanently denied)
     if (!status.isGranted && !status.isDenied && !status.isPermanentlyDenied) {
+      if (!context.mounted) return false;
+      
       final proceed = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -166,11 +179,13 @@ class PermissionHandlerUtil {
       status = await Permission.microphone.request();
     }
     if (status.isPermanentlyDenied) {
-      _showPermissionDeniedDialog(
-        context,
-        'Microphone access is required',
-        'Please enable microphone access in your device settings to continue.',
-      );
+      if (context.mounted) {
+        _showPermissionDeniedDialog(
+          context,
+          'Microphone access is required',
+          'Please enable microphone access in your device settings to continue.',
+        );
+      }
       return false;
     }
     return status.isGranted;
@@ -270,6 +285,8 @@ class PermissionHandlerUtil {
 
   /// Check and request activity recognition and body sensors permissions for health data
   static Future<bool> requestHealthPermissions(BuildContext context) async {
+    if (!context.mounted) return false;
+    
     bool granted = true;
     // Request ACTIVITY_RECOGNITION
     var activityStatus = await Permission.activityRecognition.status;
@@ -277,11 +294,13 @@ class PermissionHandlerUtil {
       activityStatus = await Permission.activityRecognition.request();
       if (!activityStatus.isGranted) {
         granted = false;
-        showErrorDialog(
-          context,
-          'Activity Recognition Required',
-          'EventHub needs access to your physical activity to track event-related activities and provide insights.',
-        );
+        if (context.mounted) {
+          showErrorDialog(
+            context,
+            'Activity Recognition Required',
+            'EventHub needs access to your physical activity to track event-related activities and provide insights.',
+          );
+        }
       }
     }
     // Request BODY_SENSORS
@@ -290,11 +309,13 @@ class PermissionHandlerUtil {
       sensorsStatus = await Permission.sensors.request();
       if (!sensorsStatus.isGranted) {
         granted = false;
-        showErrorDialog(
-          context,
-          'Body Sensors Required',
-          'EventHub needs access to your device sensors to provide location-based event features.',
-        );
+        if (context.mounted) {
+          showErrorDialog(
+            context,
+            'Body Sensors Required',
+            'EventHub needs access to your device sensors to provide location-based event features.',
+          );
+        }
       }
     }
     return granted;

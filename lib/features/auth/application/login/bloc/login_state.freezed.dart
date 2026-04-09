@@ -16,13 +16,17 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$LoginState {
-  EmailAddress get email => throw _privateConstructorUsedError;
-  Password get password => throw _privateConstructorUsedError;
+  EmailAddress? get email => throw _privateConstructorUsedError;
+  Password? get password => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   String get errorMessage => throw _privateConstructorUsedError;
   bool get isLoginError => throw _privateConstructorUsedError;
   bool get showErrorMessages => throw _privateConstructorUsedError;
   bool get showPassword => throw _privateConstructorUsedError;
+  bool get isPasswordResetSent => throw _privateConstructorUsedError;
+  String get successMessage => throw _privateConstructorUsedError;
+  bool get isLoginSuccessful => throw _privateConstructorUsedError;
+  String? get routeName => throw _privateConstructorUsedError;
 
   /// Create a copy of LoginState
   /// with the given fields replaced by the non-null parameter values.
@@ -38,13 +42,17 @@ abstract class $LoginStateCopyWith<$Res> {
       _$LoginStateCopyWithImpl<$Res, LoginState>;
   @useResult
   $Res call(
-      {EmailAddress email,
-      Password password,
+      {EmailAddress? email,
+      Password? password,
       bool isLoading,
       String errorMessage,
       bool isLoginError,
       bool showErrorMessages,
-      bool showPassword});
+      bool showPassword,
+      bool isPasswordResetSent,
+      String successMessage,
+      bool isLoginSuccessful,
+      String? routeName});
 }
 
 /// @nodoc
@@ -62,23 +70,27 @@ class _$LoginStateCopyWithImpl<$Res, $Val extends LoginState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? email = null,
-    Object? password = null,
+    Object? email = freezed,
+    Object? password = freezed,
     Object? isLoading = null,
     Object? errorMessage = null,
     Object? isLoginError = null,
     Object? showErrorMessages = null,
     Object? showPassword = null,
+    Object? isPasswordResetSent = null,
+    Object? successMessage = null,
+    Object? isLoginSuccessful = null,
+    Object? routeName = freezed,
   }) {
     return _then(_value.copyWith(
-      email: null == email
+      email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as EmailAddress,
-      password: null == password
+              as EmailAddress?,
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as Password,
+              as Password?,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -99,6 +111,22 @@ class _$LoginStateCopyWithImpl<$Res, $Val extends LoginState>
           ? _value.showPassword
           : showPassword // ignore: cast_nullable_to_non_nullable
               as bool,
+      isPasswordResetSent: null == isPasswordResetSent
+          ? _value.isPasswordResetSent
+          : isPasswordResetSent // ignore: cast_nullable_to_non_nullable
+              as bool,
+      successMessage: null == successMessage
+          ? _value.successMessage
+          : successMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      isLoginSuccessful: null == isLoginSuccessful
+          ? _value.isLoginSuccessful
+          : isLoginSuccessful // ignore: cast_nullable_to_non_nullable
+              as bool,
+      routeName: freezed == routeName
+          ? _value.routeName
+          : routeName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -112,13 +140,17 @@ abstract class _$$LoginStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {EmailAddress email,
-      Password password,
+      {EmailAddress? email,
+      Password? password,
       bool isLoading,
       String errorMessage,
       bool isLoginError,
       bool showErrorMessages,
-      bool showPassword});
+      bool showPassword,
+      bool isPasswordResetSent,
+      String successMessage,
+      bool isLoginSuccessful,
+      String? routeName});
 }
 
 /// @nodoc
@@ -134,23 +166,27 @@ class __$$LoginStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? email = null,
-    Object? password = null,
+    Object? email = freezed,
+    Object? password = freezed,
     Object? isLoading = null,
     Object? errorMessage = null,
     Object? isLoginError = null,
     Object? showErrorMessages = null,
     Object? showPassword = null,
+    Object? isPasswordResetSent = null,
+    Object? successMessage = null,
+    Object? isLoginSuccessful = null,
+    Object? routeName = freezed,
   }) {
     return _then(_$LoginStateImpl(
-      email: null == email
+      email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
-              as EmailAddress,
-      password: null == password
+              as EmailAddress?,
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as Password,
+              as Password?,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -171,6 +207,22 @@ class __$$LoginStateImplCopyWithImpl<$Res>
           ? _value.showPassword
           : showPassword // ignore: cast_nullable_to_non_nullable
               as bool,
+      isPasswordResetSent: null == isPasswordResetSent
+          ? _value.isPasswordResetSent
+          : isPasswordResetSent // ignore: cast_nullable_to_non_nullable
+              as bool,
+      successMessage: null == successMessage
+          ? _value.successMessage
+          : successMessage // ignore: cast_nullable_to_non_nullable
+              as String,
+      isLoginSuccessful: null == isLoginSuccessful
+          ? _value.isLoginSuccessful
+          : isLoginSuccessful // ignore: cast_nullable_to_non_nullable
+              as bool,
+      routeName: freezed == routeName
+          ? _value.routeName
+          : routeName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -179,19 +231,23 @@ class __$$LoginStateImplCopyWithImpl<$Res>
 
 class _$LoginStateImpl extends _LoginState {
   const _$LoginStateImpl(
-      {required this.email,
-      required this.password,
+      {this.email,
+      this.password,
       this.isLoading = false,
       this.errorMessage = '',
       this.isLoginError = false,
       this.showErrorMessages = false,
-      this.showPassword = false})
+      this.showPassword = false,
+      this.isPasswordResetSent = false,
+      this.successMessage = '',
+      this.isLoginSuccessful = false,
+      this.routeName})
       : super._();
 
   @override
-  final EmailAddress email;
+  final EmailAddress? email;
   @override
-  final Password password;
+  final Password? password;
   @override
   @JsonKey()
   final bool isLoading;
@@ -207,10 +263,21 @@ class _$LoginStateImpl extends _LoginState {
   @override
   @JsonKey()
   final bool showPassword;
+  @override
+  @JsonKey()
+  final bool isPasswordResetSent;
+  @override
+  @JsonKey()
+  final String successMessage;
+  @override
+  @JsonKey()
+  final bool isLoginSuccessful;
+  @override
+  final String? routeName;
 
   @override
   String toString() {
-    return 'LoginState(email: $email, password: $password, isLoading: $isLoading, errorMessage: $errorMessage, isLoginError: $isLoginError, showErrorMessages: $showErrorMessages, showPassword: $showPassword)';
+    return 'LoginState(email: $email, password: $password, isLoading: $isLoading, errorMessage: $errorMessage, isLoginError: $isLoginError, showErrorMessages: $showErrorMessages, showPassword: $showPassword, isPasswordResetSent: $isPasswordResetSent, successMessage: $successMessage, isLoginSuccessful: $isLoginSuccessful, routeName: $routeName)';
   }
 
   @override
@@ -230,12 +297,31 @@ class _$LoginStateImpl extends _LoginState {
             (identical(other.showErrorMessages, showErrorMessages) ||
                 other.showErrorMessages == showErrorMessages) &&
             (identical(other.showPassword, showPassword) ||
-                other.showPassword == showPassword));
+                other.showPassword == showPassword) &&
+            (identical(other.isPasswordResetSent, isPasswordResetSent) ||
+                other.isPasswordResetSent == isPasswordResetSent) &&
+            (identical(other.successMessage, successMessage) ||
+                other.successMessage == successMessage) &&
+            (identical(other.isLoginSuccessful, isLoginSuccessful) ||
+                other.isLoginSuccessful == isLoginSuccessful) &&
+            (identical(other.routeName, routeName) ||
+                other.routeName == routeName));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, email, password, isLoading,
-      errorMessage, isLoginError, showErrorMessages, showPassword);
+  int get hashCode => Object.hash(
+      runtimeType,
+      email,
+      password,
+      isLoading,
+      errorMessage,
+      isLoginError,
+      showErrorMessages,
+      showPassword,
+      isPasswordResetSent,
+      successMessage,
+      isLoginSuccessful,
+      routeName);
 
   /// Create a copy of LoginState
   /// with the given fields replaced by the non-null parameter values.
@@ -248,19 +334,23 @@ class _$LoginStateImpl extends _LoginState {
 
 abstract class _LoginState extends LoginState {
   const factory _LoginState(
-      {required final EmailAddress email,
-      required final Password password,
+      {final EmailAddress? email,
+      final Password? password,
       final bool isLoading,
       final String errorMessage,
       final bool isLoginError,
       final bool showErrorMessages,
-      final bool showPassword}) = _$LoginStateImpl;
+      final bool showPassword,
+      final bool isPasswordResetSent,
+      final String successMessage,
+      final bool isLoginSuccessful,
+      final String? routeName}) = _$LoginStateImpl;
   const _LoginState._() : super._();
 
   @override
-  EmailAddress get email;
+  EmailAddress? get email;
   @override
-  Password get password;
+  Password? get password;
   @override
   bool get isLoading;
   @override
@@ -271,6 +361,14 @@ abstract class _LoginState extends LoginState {
   bool get showErrorMessages;
   @override
   bool get showPassword;
+  @override
+  bool get isPasswordResetSent;
+  @override
+  String get successMessage;
+  @override
+  bool get isLoginSuccessful;
+  @override
+  String? get routeName;
 
   /// Create a copy of LoginState
   /// with the given fields replaced by the non-null parameter values.

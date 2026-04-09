@@ -494,3 +494,192 @@ Either<ValueFailure<String?>, String?> validateProfilePhoto(String? input) {
   
   return right(input);
 }
+
+Either<ValueFailure<String>, String> validateUserRole(String input) {
+  // Trim the input to handle whitespace
+  final trimmedInput = input.trim();
+
+  // Check for empty or whitespace-only input
+  if (trimmedInput.isEmpty) {
+    return left(
+      const ValueFailure.invalidRole(
+        failedValue: 'Please select a role',
+      ),
+    );
+  }
+
+  // Define valid roles for EventHub
+  const validRoles = ['organizer', 'attendee', 'staff'];
+
+  // Check if the role is valid
+  if (!validRoles.contains(trimmedInput.toLowerCase())) {
+    return left(
+      const ValueFailure.invalidRole(
+        failedValue:
+            'Please select a valid role (Organizer, Attendee, or Staff)',
+      ),
+    );
+  }
+
+  return right(trimmedInput.toLowerCase());
+}
+
+// Event-related validators
+Either<ValueFailure<String>, String> validateEventTitle(String input) {
+  final trimmedInput = input.trim();
+
+  if (trimmedInput.isEmpty) {
+    return left(ValueFailure.empty(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length < 3) {
+    return left(ValueFailure.invalidName(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length > 100) {
+    return left(ValueFailure.exceedingLength(
+      failedValue: trimmedInput,
+      max: 100,
+    ));
+  }
+
+  return right(trimmedInput);
+}
+
+Either<ValueFailure<String>, String> validateEventDescription(String input) {
+  final trimmedInput = input.trim();
+
+  if (trimmedInput.isEmpty) {
+    return left(ValueFailure.empty(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length < 10) {
+    return left(ValueFailure.invalidName(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length > 1000) {
+    return left(ValueFailure.exceedingLength(
+      failedValue: trimmedInput,
+      max: 1000,
+    ));
+  }
+
+  return right(trimmedInput);
+}
+
+Either<ValueFailure<String>, String> validateEventLocation(String input) {
+  final trimmedInput = input.trim();
+
+  if (trimmedInput.isEmpty) {
+    return left(ValueFailure.empty(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length < 3) {
+    return left(ValueFailure.invalidName(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length > 200) {
+    return left(ValueFailure.exceedingLength(
+      failedValue: trimmedInput,
+      max: 200,
+    ));
+  }
+
+  return right(trimmedInput);
+}
+
+Either<ValueFailure<int>, int> validateEventCapacity(int input) {
+  if (input <= 0) {
+    return left(ValueFailure.numberTooLarge(
+      failedValue: input,
+      max: 1,
+    ));
+  }
+
+  if (input > 100000) {
+    return left(ValueFailure.numberTooLarge(
+      failedValue: input,
+      max: 100000,
+    ));
+  }
+
+  return right(input);
+}
+
+Either<ValueFailure<double>, double> validateTicketPrice(double input) {
+  if (input < 0) {
+    return left(ValueFailure.invalidAmount(
+      failedValue: input,
+    ));
+  }
+
+  if (input > 10000) {
+    return left(ValueFailure.invalidAmount(
+      failedValue: input,
+    ));
+  }
+
+  // Check for reasonable decimal places (maximum 2)
+  if ((input * 100) % 1 != 0) {
+    return left(ValueFailure.invalidAmount(
+      failedValue: input,
+    ));
+  }
+
+  return right(input);
+}
+
+Either<ValueFailure<int>, int> validateTicketQuantity(int input) {
+  if (input <= 0) {
+    return left(ValueFailure.numberTooLarge(
+      failedValue: input,
+      max: 1,
+    ));
+  }
+
+  if (input > 10000) {
+    return left(ValueFailure.numberTooLarge(
+      failedValue: input,
+      max: 10000,
+    ));
+  }
+
+  return right(input);
+}
+
+Either<ValueFailure<String>, String> validateTicketTypeName(String input) {
+  final trimmedInput = input.trim();
+
+  if (trimmedInput.isEmpty) {
+    return left(ValueFailure.empty(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length < 2) {
+    return left(ValueFailure.invalidName(
+      failedValue: trimmedInput,
+    ));
+  }
+
+  if (trimmedInput.length > 50) {
+    return left(ValueFailure.exceedingLength(
+      failedValue: trimmedInput,
+      max: 50,
+    ));
+  }
+
+  return right(trimmedInput);
+}
