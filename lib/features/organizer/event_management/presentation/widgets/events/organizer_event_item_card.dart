@@ -289,7 +289,7 @@ class OrganizerEventItemCard extends StatelessWidget {
             Text('Revenue', style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
             SizedBox(height: 4.h),
             Text(
-              revenue > 0 ? '\$${revenue.toStringAsFixed(0)}' : 'Free',
+              revenue > 0 ? '${revenue.toStringAsFixed(0)} Birr' : 'Free',
               style: theme.textTheme.labelLarge?.copyWith(color: statusColor, fontWeight: FontWeight.bold),
             ),
           ],

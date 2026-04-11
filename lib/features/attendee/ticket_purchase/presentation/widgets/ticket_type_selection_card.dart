@@ -61,7 +61,7 @@ class TicketTypeSelectionCard extends StatelessWidget {
                 Text(
                   ticketType.price == 0
                       ? 'Free'
-                      : '\$${ticketType.price.toStringAsFixed(0)}',
+                      : '${ticketType.price.toStringAsFixed(0)} Birr',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,

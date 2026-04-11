@@ -4,6 +4,8 @@ part 'registration_event.freezed.dart';
 
 @freezed
 class RegistrationEvent with _$RegistrationEvent {
+  const factory RegistrationEvent.fullNameChanged(String fullName) =
+      FullNameChanged;
   const factory RegistrationEvent.emailChanged(String email) = EmailChanged;
   const factory RegistrationEvent.passwordChanged(String password) = PasswordChanged;
   const factory RegistrationEvent.confirmPasswordChanged(

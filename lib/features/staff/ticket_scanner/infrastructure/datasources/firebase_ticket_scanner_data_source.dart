@@ -514,7 +514,7 @@ class FirebaseTicketScannerDataSource {
         'eventLocation': 'Demo Venue',
         'eventDateTime': Timestamp.fromDate(DateTime.now().add(const Duration(hours: 2))),
         'price': 50.0,
-        'currency': 'USD',
+        'currency': 'ETB',
         'status': 'active',
         'qrCode': 'TICKET_${ticketId}_EVENT_${eventId}_${DateTime.now().millisecondsSinceEpoch}',
         'createdAt': Timestamp.fromDate(DateTime.now()),
@@ -583,7 +583,7 @@ class FirebaseTicketScannerDataSource {
           'eventDateTime':
               Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
           'price': 199.0,
-          'currency': 'USD',
+          'currency': 'ETB',
           'status': 'active',
           'qrCode':
               'TICKET_${ticket['id']}_EVENT_${ticket['eventId']}_${DateTime.now().millisecondsSinceEpoch}',
@@ -624,7 +624,7 @@ class FirebaseTicketScannerDataSource {
         'eventDateTime':
             Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
         'price': 299.0,
-        'currency': 'USD',
+        'currency': 'ETB',
         'status': 'active',
         'qrCode':
             'TICKET_1774346550999_555624_EVENT_1774346204603_176467_1774346551000',

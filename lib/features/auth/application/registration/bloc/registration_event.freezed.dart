@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$RegistrationEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -30,6 +31,7 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -42,6 +44,7 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -55,6 +58,7 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -70,6 +74,7 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -83,6 +88,7 @@ mixin _$RegistrationEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -116,6 +122,195 @@ class _$RegistrationEventCopyWithImpl<$Res, $Val extends RegistrationEvent>
 
   /// Create a copy of RegistrationEvent
   /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+abstract class _$$FullNameChangedImplCopyWith<$Res> {
+  factory _$$FullNameChangedImplCopyWith(_$FullNameChangedImpl value,
+          $Res Function(_$FullNameChangedImpl) then) =
+      __$$FullNameChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String fullName});
+}
+
+/// @nodoc
+class __$$FullNameChangedImplCopyWithImpl<$Res>
+    extends _$RegistrationEventCopyWithImpl<$Res, _$FullNameChangedImpl>
+    implements _$$FullNameChangedImplCopyWith<$Res> {
+  __$$FullNameChangedImplCopyWithImpl(
+      _$FullNameChangedImpl _value, $Res Function(_$FullNameChangedImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of RegistrationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? fullName = null,
+  }) {
+    return _then(_$FullNameChangedImpl(
+      null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$FullNameChangedImpl implements FullNameChanged {
+  const _$FullNameChangedImpl(this.fullName);
+
+  @override
+  final String fullName;
+
+  @override
+  String toString() {
+    return 'RegistrationEvent.fullNameChanged(fullName: $fullName)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FullNameChangedImpl &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, fullName);
+
+  /// Create a copy of RegistrationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FullNameChangedImplCopyWith<_$FullNameChangedImpl> get copyWith =>
+      __$$FullNameChangedImplCopyWithImpl<_$FullNameChangedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
+    required TResult Function(String email) emailChanged,
+    required TResult Function(String password) passwordChanged,
+    required TResult Function(String confirmPassword) confirmPasswordChanged,
+    required TResult Function(String role) userRoleChanged,
+    required TResult Function(bool accepted) termsAcceptedChanged,
+    required TResult Function() toggleShowPassword,
+    required TResult Function() toggleShowConfirmPassword,
+    required TResult Function() registrationSubmitted,
+  }) {
+    return fullNameChanged(fullName);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
+    TResult? Function(String email)? emailChanged,
+    TResult? Function(String password)? passwordChanged,
+    TResult? Function(String confirmPassword)? confirmPasswordChanged,
+    TResult? Function(String role)? userRoleChanged,
+    TResult? Function(bool accepted)? termsAcceptedChanged,
+    TResult? Function()? toggleShowPassword,
+    TResult? Function()? toggleShowConfirmPassword,
+    TResult? Function()? registrationSubmitted,
+  }) {
+    return fullNameChanged?.call(fullName);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
+    TResult Function(String email)? emailChanged,
+    TResult Function(String password)? passwordChanged,
+    TResult Function(String confirmPassword)? confirmPasswordChanged,
+    TResult Function(String role)? userRoleChanged,
+    TResult Function(bool accepted)? termsAcceptedChanged,
+    TResult Function()? toggleShowPassword,
+    TResult Function()? toggleShowConfirmPassword,
+    TResult Function()? registrationSubmitted,
+    required TResult orElse(),
+  }) {
+    if (fullNameChanged != null) {
+      return fullNameChanged(fullName);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
+    required TResult Function(EmailChanged value) emailChanged,
+    required TResult Function(PasswordChanged value) passwordChanged,
+    required TResult Function(ConfirmPasswordChanged value)
+        confirmPasswordChanged,
+    required TResult Function(UserRoleChanged value) userRoleChanged,
+    required TResult Function(TermsAcceptedChanged value) termsAcceptedChanged,
+    required TResult Function(ToggleShowPassword value) toggleShowPassword,
+    required TResult Function(ToggleShowConfirmPassword value)
+        toggleShowConfirmPassword,
+    required TResult Function(RegistrationSubmitted value)
+        registrationSubmitted,
+  }) {
+    return fullNameChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
+    TResult? Function(EmailChanged value)? emailChanged,
+    TResult? Function(PasswordChanged value)? passwordChanged,
+    TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
+    TResult? Function(UserRoleChanged value)? userRoleChanged,
+    TResult? Function(TermsAcceptedChanged value)? termsAcceptedChanged,
+    TResult? Function(ToggleShowPassword value)? toggleShowPassword,
+    TResult? Function(ToggleShowConfirmPassword value)?
+        toggleShowConfirmPassword,
+    TResult? Function(RegistrationSubmitted value)? registrationSubmitted,
+  }) {
+    return fullNameChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
+    TResult Function(EmailChanged value)? emailChanged,
+    TResult Function(PasswordChanged value)? passwordChanged,
+    TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
+    TResult Function(UserRoleChanged value)? userRoleChanged,
+    TResult Function(TermsAcceptedChanged value)? termsAcceptedChanged,
+    TResult Function(ToggleShowPassword value)? toggleShowPassword,
+    TResult Function(ToggleShowConfirmPassword value)?
+        toggleShowConfirmPassword,
+    TResult Function(RegistrationSubmitted value)? registrationSubmitted,
+    required TResult orElse(),
+  }) {
+    if (fullNameChanged != null) {
+      return fullNameChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class FullNameChanged implements RegistrationEvent {
+  const factory FullNameChanged(final String fullName) = _$FullNameChangedImpl;
+
+  String get fullName;
+
+  /// Create a copy of RegistrationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$FullNameChangedImplCopyWith<_$FullNameChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -186,6 +381,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -201,6 +397,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -216,6 +413,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -235,6 +433,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -253,6 +452,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -269,6 +469,7 @@ class _$EmailChangedImpl implements EmailChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -369,6 +570,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -384,6 +586,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -399,6 +602,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -418,6 +622,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -436,6 +641,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -452,6 +658,7 @@ class _$PasswordChangedImpl implements PasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -554,6 +761,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -569,6 +777,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -584,6 +793,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -603,6 +813,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -621,6 +832,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -637,6 +849,7 @@ class _$ConfirmPasswordChangedImpl implements ConfirmPasswordChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -737,6 +950,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -752,6 +966,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -767,6 +982,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -786,6 +1002,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -804,6 +1021,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -820,6 +1038,7 @@ class _$UserRoleChangedImpl implements UserRoleChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -921,6 +1140,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -936,6 +1156,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -951,6 +1172,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -970,6 +1192,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -988,6 +1211,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1004,6 +1228,7 @@ class _$TermsAcceptedChangedImpl implements TermsAcceptedChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1076,6 +1301,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -1091,6 +1317,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -1106,6 +1333,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -1125,6 +1353,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -1143,6 +1372,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1159,6 +1389,7 @@ class _$ToggleShowPasswordImpl implements ToggleShowPassword {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1226,6 +1457,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -1241,6 +1473,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -1256,6 +1489,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -1275,6 +1509,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -1293,6 +1528,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1309,6 +1545,7 @@ class _$ToggleShowConfirmPasswordImpl implements ToggleShowConfirmPassword {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1374,6 +1611,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String fullName) fullNameChanged,
     required TResult Function(String email) emailChanged,
     required TResult Function(String password) passwordChanged,
     required TResult Function(String confirmPassword) confirmPasswordChanged,
@@ -1389,6 +1627,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String fullName)? fullNameChanged,
     TResult? Function(String email)? emailChanged,
     TResult? Function(String password)? passwordChanged,
     TResult? Function(String confirmPassword)? confirmPasswordChanged,
@@ -1404,6 +1643,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String fullName)? fullNameChanged,
     TResult Function(String email)? emailChanged,
     TResult Function(String password)? passwordChanged,
     TResult Function(String confirmPassword)? confirmPasswordChanged,
@@ -1423,6 +1663,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(FullNameChanged value) fullNameChanged,
     required TResult Function(EmailChanged value) emailChanged,
     required TResult Function(PasswordChanged value) passwordChanged,
     required TResult Function(ConfirmPasswordChanged value)
@@ -1441,6 +1682,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FullNameChanged value)? fullNameChanged,
     TResult? Function(EmailChanged value)? emailChanged,
     TResult? Function(PasswordChanged value)? passwordChanged,
     TResult? Function(ConfirmPasswordChanged value)? confirmPasswordChanged,
@@ -1457,6 +1699,7 @@ class _$RegistrationSubmittedImpl implements RegistrationSubmitted {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(FullNameChanged value)? fullNameChanged,
     TResult Function(EmailChanged value)? emailChanged,
     TResult Function(PasswordChanged value)? passwordChanged,
     TResult Function(ConfirmPasswordChanged value)? confirmPasswordChanged,

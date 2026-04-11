@@ -55,11 +55,12 @@ class FirebaseStaffUserCreationService implements StaffCreationService {
           await _firestore.collection(_usersCollection).doc(staffUserId).set({
             'uid': staffUserId,
             'email': staffMember.email,
-            'name': staffMember.name,
-            'role': 'staff', // Set role as staff
+            'displayName': staffMember.name,
+            'role': 'staff', // Set role as staff by default
             'createdAt': now.toIso8601String(),
             'updatedAt': now.toIso8601String(),
             'isActive': true,
+            'isEmailVerified': false,
             'staffData': {
               'role': staffMember.role,
               'permissions': staffMember.permissions,

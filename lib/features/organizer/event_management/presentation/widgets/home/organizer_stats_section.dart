@@ -61,7 +61,9 @@ class OrganizerStatsSection extends StatelessWidget {
             Expanded(
               child: _StatCard(
                 title: 'Total Revenue',
-                value: totalRevenue > 0 ? '\$${totalRevenue.toStringAsFixed(0)}' : '\$0',
+                value: totalRevenue > 0
+                    ? '${totalRevenue.toStringAsFixed(0)} Birr'
+                    : '0 Birr',
                 change: '+12%',
                 isPositive: true,
                 color: colorScheme.primary,
@@ -121,7 +123,7 @@ class OrganizerStatsSection extends StatelessWidget {
             Expanded(
               child: _StatCard(
                 title: 'Total Revenue',
-                value: '\$0',
+                value: '0 Birr',
                 change: 'No events yet',
                 isPositive: true,
                 color: colorScheme.primary,

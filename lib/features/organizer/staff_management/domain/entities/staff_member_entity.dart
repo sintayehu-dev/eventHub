@@ -90,92 +90,31 @@ class StaffMemberEntity with _$StaffMemberEntity {
   bool get isActive => status == StaffStatus.active;
   bool get isAssignedToEvent => currentEventId != null;
   bool get hasPermission => permissions.isNotEmpty;
-  bool get isManager => role == StaffRole.manager || role == StaffRole.admin;
+  bool get isManager => false; // No manager role anymore, all are staff
 }
 
 enum StaffRole {
-  admin,
-  manager,
-  coordinator,
-  scanner,
-  security,
-  support,
-  volunteer,
+  staff,
 }
 
 extension StaffRoleExtension on StaffRole {
   String get displayName {
     switch (this) {
-      case StaffRole.admin:
-        return 'Admin';
-      case StaffRole.manager:
-        return 'Manager';
-      case StaffRole.coordinator:
-        return 'Coordinator';
-      case StaffRole.scanner:
-        return 'Scanner';
-      case StaffRole.security:
-        return 'Security';
-      case StaffRole.support:
-        return 'Support';
-      case StaffRole.volunteer:
-        return 'Volunteer';
+      case StaffRole.staff:
+        return 'Staff';
     }
   }
 
   List<String> get defaultPermissions {
     switch (this) {
-      case StaffRole.admin:
-        return [
-          'manage_events',
-          'manage_staff',
-          'manage_attendees',
-          'scan_tickets',
-          'view_reports',
-          'export_data',
-          'send_messages',
-        ];
-      case StaffRole.manager:
-        return [
-          'manage_attendees',
-          'scan_tickets',
-          'view_reports',
-          'export_data',
-          'send_messages',
-        ];
-      case StaffRole.coordinator:
-        return [
-          'manage_attendees',
-          'scan_tickets',
-          'view_reports',
-          'send_messages',
-        ];
-      case StaffRole.scanner:
+      case StaffRole.staff:
         return ['scan_tickets', 'view_attendees'];
-      case StaffRole.security:
-        return ['scan_tickets', 'view_attendees', 'manage_access'];
-      case StaffRole.support:
-        return ['view_attendees', 'send_messages'];
-      case StaffRole.volunteer:
-        return ['view_attendees'];
     }
   }
 
   int get hierarchyLevel {
     switch (this) {
-      case StaffRole.admin:
-        return 6;
-      case StaffRole.manager:
-        return 5;
-      case StaffRole.coordinator:
-        return 4;
-      case StaffRole.scanner:
-        return 3;
-      case StaffRole.security:
-        return 3;
-      case StaffRole.support:
-        return 2;
-      case StaffRole.volunteer:
+      case StaffRole.staff:
         return 1;
     }
   }

@@ -144,8 +144,8 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
 
   String get priceRange {
     if (isFree) return 'Free';
-    if (minPrice == maxPrice) return '\$${minPrice.toStringAsFixed(0)}';
-    return '\$${minPrice.toStringAsFixed(0)} - \$${maxPrice.toStringAsFixed(0)}';
+    if (minPrice == maxPrice) return '${minPrice.toStringAsFixed(0)} Birr';
+    return '${minPrice.toStringAsFixed(0)} - ${maxPrice.toStringAsFixed(0)} Birr';
   }
 
   bool _isSameDay(DateTime date1, DateTime date2) {

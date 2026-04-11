@@ -660,7 +660,7 @@ class FirebaseAttendeeManagementDataSource {
           'eventDateTime':
               Timestamp.fromDate(DateTime.parse('2026-04-15 10:00:00')),
           'price': 199.0,
-          'currency': 'USD',
+          'currency': 'ETB',
           'status': 'active',
           'attendeeStatus':
               i < 2 ? 'checkedIn' : 'registered', // First 2 are checked in

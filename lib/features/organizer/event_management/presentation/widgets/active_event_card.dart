@@ -144,7 +144,7 @@ class ActiveEventCard extends StatelessWidget {
                           ),
                           Text(
                             revenue > 0
-                                ? '\$${revenue.toStringAsFixed(0)}'
+                                ? '${revenue.toStringAsFixed(0)} Birr'
                                 : 'Free',
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: statusColor,

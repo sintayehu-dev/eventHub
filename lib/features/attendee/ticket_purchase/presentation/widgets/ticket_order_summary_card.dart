@@ -70,7 +70,7 @@ class TicketOrderSummaryCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '\$${(ticket['price'] * ticket['quantity']).toStringAsFixed(2)}',
+                      '${(ticket['price'] * ticket['quantity']).toStringAsFixed(2)} Birr',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,

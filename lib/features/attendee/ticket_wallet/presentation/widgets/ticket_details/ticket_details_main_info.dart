@@ -20,7 +20,7 @@ class TicketDetailsMainInfo extends StatelessWidget {
         TicketDetailRowData('Description', ticket.ticketTypeDescription),
         TicketDetailRowData(
           'Price',
-          '\$${ticket.ticketPrice.toStringAsFixed(2)}',
+          '${ticket.ticketPrice.toStringAsFixed(2)} Birr',
         ),
         TicketDetailRowData('Status', ticket.status.displayName),
         if (ticket.seatNumber != null)

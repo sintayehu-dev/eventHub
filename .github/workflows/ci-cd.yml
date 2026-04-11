@@ -1,12 +1,11 @@
 name: EventHub CI/CD Pipeline
 
-# Workflow triggers - when this pipeline runs
 on:
   push:
-    branches: [ master ]          # Auto-build on push to master branch
+    branches: [ master ]         
   pull_request:
-    branches: [ master ]          # Build APK for PR testing
-  workflow_dispatch:               # Manual trigger for releases
+    branches: [ master ]          
+  workflow_dispatch:              
     inputs:
       create_release:
         description: 'Create GitHub Release'
@@ -19,109 +18,94 @@ on:
         default: 'Latest build from master branch'
         type: string
 
-# Environment variables - matches local development setup
 env:
-  FLUTTER_VERSION: '3.27.4'       # Same as local Flutter version
-  JAVA_VERSION: '17'              # Same as local Java version
+  FLUTTER_VERSION: '3.27.4'      
+  JAVA_VERSION: '17'              
 
-# Permissions for GitHub token
 permissions:
-  contents: write                  # Required to create releases
-  actions: read                    # Required to download artifacts
+  contents: write                  
+  actions: read                   
 
-# NOTE: Code analysis and tests have been removed from this workflow
-# to avoid build failures. The workflow builds release APK and will only fail on:
-# - Dependency resolution issues
-# - Code generation failures  
-# - Build compilation errors
-# Tests and code analysis can still be run locally during development
 
 jobs:
   build:
     name: Build APK
-    runs-on: ubuntu-latest         # Use Ubuntu runner for consistent Linux environment
+    runs-on: ubuntu-latest         
     
     steps:
-    # Step 1: Get the source code from repository
     - name: Checkout code
-      uses: actions/checkout@v4    # Download repository files to runner
-      
-    # Step 2: Setup Java environment (required for Android builds)
+      uses: actions/checkout@v4   
+ 
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'    # Use Eclipse Temurin (OpenJDK)
-        java-version: ${{ env.JAVA_VERSION }}  # Java 17 to match local setup
+        distribution: 'temurin'   
+        java-version: ${{ env.JAVA_VERSION }} 
         
-    # Step 2.1: Set JAVA_HOME environment variable
+   
     - name: Set JAVA_HOME
       run: |
         echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
         echo "Java Home: $JAVA_HOME"
         java -version
         
-    # Step 2.2: Setup Android SDK path
+   
     - name: Setup Android SDK
       run: |
         echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
         echo "Android SDK: $ANDROID_HOME"
         
-    # Step 3: Setup Flutter SDK
+   
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}  # Flutter 3.27.4 to match local
-        channel: 'stable'         # Use stable channel for reliability
-        cache: true               # Cache Flutter SDK for faster builds
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'        
+        cache: true              
         
-    # Step 4: Verify Flutter installation and show environment info
+    
     - name: Verify Flutter installation
       run: |
         flutter config --no-analytics  # Disable analytics to avoid prompts
         flutter --version         # Show Flutter version for debugging
         flutter doctor -v         # Show detailed Flutter environment info
         
-    # Step 5: Download project dependencies from pub.dev
+  
     - name: Get dependencies
-      run: flutter pub get       # Download packages listed in pubspec.yaml
-      
-    # Step 6: Generate code (freezed, json_serializable, injectable, etc.)
+      run: flutter pub get       
+  
     - name: Generate code
       run: |
         # Clean previous generated files
         flutter packages pub run build_runner clean
         # Generate new files including dependency injection
         flutter packages pub run build_runner build --delete-conflicting-outputs
-      # Generates: *.freezed.dart, *.g.dart, *.config.dart files
-      
-    # Step 7: Build release APK (for production/distribution)
+   
     - name: Build Release APK
       run: |
         # Set Gradle properties for proper Java home
         echo "org.gradle.java.home=$JAVA_HOME" >> android/gradle.properties
         # Build the release APK
         flutter build apk --release
-      # Creates: build/app/outputs/flutter-apk/app-release.apk
-      
-    # Step 8: Prepare artifacts with proper naming
+   
     - name: Prepare artifacts
       run: |
         mkdir -p artifacts        # Create artifacts directory
         # Copy and rename release APK with run number
         cp build/app/outputs/flutter-apk/app-release.apk artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
         
-    # Step 9: Upload release APK as GitHub artifact
+   
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: eventhub-ft-clean-release-${{ github.run_number }}  # Unique artifact name
+        name: eventhub-ft-clean-release-${{ github.run_number }} 
         path: artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
-        retention-days: 7         # Keep for 7 days (release builds)
+        retention-days: 7        
         
-    # Step 10: Add comment to PR with APK download instructions
+  
     - name: Comment on PR with APK download
-      if: github.event_name == 'pull_request'  # Only run for pull requests
+      if: github.event_name == 'pull_request' 
       uses: actions/github-script@v7
       with:
         script: |

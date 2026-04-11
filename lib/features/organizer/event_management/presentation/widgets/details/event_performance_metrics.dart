@@ -80,7 +80,8 @@ class EventPerformanceMetrics extends StatelessWidget {
         SizedBox(height: 12.h),
         _MetricCard(
           title: 'Revenue',
-          value: revenue > 0 ? '\$${revenue.toStringAsFixed(0)}' : 'Free Event',
+          value:
+              revenue > 0 ? '${revenue.toStringAsFixed(0)} Birr' : 'Free Event',
           subtitle: 'Total earnings',
           percentage: revenue > 0 && totalTickets > 0
               ? '+${((revenue / (totalTickets * (event.ticketTypes.isNotEmpty ? event.ticketTypes.first.price : 1))) * 100).toInt()}%'

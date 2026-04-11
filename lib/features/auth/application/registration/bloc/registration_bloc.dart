@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:eventhub/core/handlers/app_connectivity.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
 import 'package:eventhub/core/router/route_name.dart';
@@ -15,6 +16,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   RegistrationBloc(this._authRepository, this._userService)
       : super(const RegistrationState()) {
+    on<FullNameChanged>(_onFullNameChanged);
     on<EmailChanged>(_onEmailChanged);
     on<PasswordChanged>(_onPasswordChanged);
     on<UserRoleChanged>(_onUserRoleChanged);
@@ -24,6 +26,16 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   
   final AuthRepository _authRepository;
   final UserService _userService;
+
+  void _onFullNameChanged(
+      FullNameChanged event, Emitter<RegistrationState> emit) {
+    emit(state.copyWith(
+      fullName: FullName(event.fullName.trim()),
+      showErrorMessages: false,
+      isRegistrationError: false,
+      isRegistrationSuccessful: false,
+    ));
+  }
 
   void _onEmailChanged(EmailChanged event, Emitter<RegistrationState> emit) {
     emit(state.copyWith(
@@ -73,6 +85,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     }
     
     // Check if required fields are provided and valid
+    if (state.fullName == null || !state.fullName!.isValid()) {
+      emit(state.copyWith(showErrorMessages: true));
+      return;
+    }
+
     if (state.email == null || !state.email!.isValid()) {
       emit(state.copyWith(showErrorMessages: true));
       return;
@@ -94,7 +111,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     
     emit(state.copyWith(isLoading: true));
     
-    // Extract email and password from value objects
+    // Extract values from value objects
+    final fullName = state.fullName!.value.getOrElse(() => '');
     final email = state.email!.value.getOrElse(() => '');
     final password = state.password!.value.getOrElse(() => '');
     final role = state.userRole!.value.getOrElse(() => '');
@@ -111,11 +129,23 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             ));
       }
     }, (firebaseUser) async {
+      // Update Firebase user display name
+      try {
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null) {
+          await currentUser.updateDisplayName(fullName);
+          await currentUser.reload(); // Reload to get updated user data
+        }
+      } catch (e) {
+        print('Failed to update display name: $e');
+        // Continue with registration even if display name update fails
+      }
+
       // Create user profile for Firestore
       final userProfile = UserProfileEntity.fromFirebaseUser(
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
+        displayName: fullName, // Use the full name from the form
         photoURL: firebaseUser.photoUrl,
         isEmailVerified: firebaseUser.emailVerified,
         role: role,

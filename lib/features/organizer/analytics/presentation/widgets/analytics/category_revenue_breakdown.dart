@@ -75,7 +75,7 @@ class CategoryRevenueBreakdown extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '\$${entry.value.toStringAsFixed(0)}',
+                    '${entry.value.toStringAsFixed(0)} Birr',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,

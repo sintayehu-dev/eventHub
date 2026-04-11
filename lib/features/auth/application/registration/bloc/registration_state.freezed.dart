@@ -16,6 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$RegistrationState {
+  FullName? get fullName => throw _privateConstructorUsedError;
   EmailAddress? get email => throw _privateConstructorUsedError;
   Password? get password => throw _privateConstructorUsedError;
   ConfirmPassword? get confirmPassword => throw _privateConstructorUsedError;
@@ -44,7 +45,8 @@ abstract class $RegistrationStateCopyWith<$Res> {
       _$RegistrationStateCopyWithImpl<$Res, RegistrationState>;
   @useResult
   $Res call(
-      {EmailAddress? email,
+      {FullName? fullName,
+      EmailAddress? email,
       Password? password,
       ConfirmPassword? confirmPassword,
       UserRole? userRole,
@@ -74,6 +76,7 @@ class _$RegistrationStateCopyWithImpl<$Res, $Val extends RegistrationState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? fullName = freezed,
     Object? email = freezed,
     Object? password = freezed,
     Object? confirmPassword = freezed,
@@ -89,6 +92,10 @@ class _$RegistrationStateCopyWithImpl<$Res, $Val extends RegistrationState>
     Object? routeName = freezed,
   }) {
     return _then(_value.copyWith(
+      fullName: freezed == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as FullName?,
       email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
@@ -154,7 +161,8 @@ abstract class _$$RegistrationStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {EmailAddress? email,
+      {FullName? fullName,
+      EmailAddress? email,
       Password? password,
       ConfirmPassword? confirmPassword,
       UserRole? userRole,
@@ -182,6 +190,7 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? fullName = freezed,
     Object? email = freezed,
     Object? password = freezed,
     Object? confirmPassword = freezed,
@@ -197,6 +206,10 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
     Object? routeName = freezed,
   }) {
     return _then(_$RegistrationStateImpl(
+      fullName: freezed == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as FullName?,
       email: freezed == email
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
@@ -257,7 +270,8 @@ class __$$RegistrationStateImplCopyWithImpl<$Res>
 
 class _$RegistrationStateImpl extends _RegistrationState {
   const _$RegistrationStateImpl(
-      {this.email,
+      {this.fullName,
+      this.email,
       this.password,
       this.confirmPassword,
       this.userRole,
@@ -272,6 +286,8 @@ class _$RegistrationStateImpl extends _RegistrationState {
       this.routeName})
       : super._();
 
+  @override
+  final FullName? fullName;
   @override
   final EmailAddress? email;
   @override
@@ -308,7 +324,7 @@ class _$RegistrationStateImpl extends _RegistrationState {
 
   @override
   String toString() {
-    return 'RegistrationState(email: $email, password: $password, confirmPassword: $confirmPassword, userRole: $userRole, termsAcceptance: $termsAcceptance, isLoading: $isLoading, isRegistrationError: $isRegistrationError, showErrorMessages: $showErrorMessages, showPassword: $showPassword, showConfirmPassword: $showConfirmPassword, errorMessage: $errorMessage, isRegistrationSuccessful: $isRegistrationSuccessful, routeName: $routeName)';
+    return 'RegistrationState(fullName: $fullName, email: $email, password: $password, confirmPassword: $confirmPassword, userRole: $userRole, termsAcceptance: $termsAcceptance, isLoading: $isLoading, isRegistrationError: $isRegistrationError, showErrorMessages: $showErrorMessages, showPassword: $showPassword, showConfirmPassword: $showConfirmPassword, errorMessage: $errorMessage, isRegistrationSuccessful: $isRegistrationSuccessful, routeName: $routeName)';
   }
 
   @override
@@ -316,6 +332,8 @@ class _$RegistrationStateImpl extends _RegistrationState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$RegistrationStateImpl &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
                 other.password == password) &&
@@ -347,6 +365,7 @@ class _$RegistrationStateImpl extends _RegistrationState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      fullName,
       email,
       password,
       confirmPassword,
@@ -373,7 +392,8 @@ class _$RegistrationStateImpl extends _RegistrationState {
 
 abstract class _RegistrationState extends RegistrationState {
   const factory _RegistrationState(
-      {final EmailAddress? email,
+      {final FullName? fullName,
+      final EmailAddress? email,
       final Password? password,
       final ConfirmPassword? confirmPassword,
       final UserRole? userRole,
@@ -388,6 +408,8 @@ abstract class _RegistrationState extends RegistrationState {
       final String? routeName}) = _$RegistrationStateImpl;
   const _RegistrationState._() : super._();
 
+  @override
+  FullName? get fullName;
   @override
   EmailAddress? get email;
   @override

@@ -100,22 +100,37 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           ));
         },
         (firebaseUser) async {
-          // Store Firebase user data
-          await _userService.saveUserData(firebaseUser);
+          try {
+            // Store Firebase user data
+            await _userService.saveUserData(firebaseUser);
 
-          // Get user profile to determine role-based routing
-          final userProfile =
-              await _userService.getUserProfile(firebaseUser.uid);
+            // Get user profile to determine role-based routing
+            final userProfile =
+                await _userService.getUserProfile(firebaseUser.uid);
 
-          final routeName = _getRouteNameForRole(userProfile?.role);
-          
-          if (!emit.isDone) {
-            emit(state.copyWith(
-              isLoading: false,
-              isLoginError: false,
-              isLoginSuccessful: true,
-              routeName: routeName,
-            ));
+            final routeName = _getRouteNameForRole(userProfile?.role);
+
+            if (!emit.isDone) {
+              emit(state.copyWith(
+                isLoading: false,
+                isLoginError: false,
+                isLoginSuccessful: true,
+                routeName: routeName,
+              ));
+            }
+          } catch (e) {
+            // Handle any errors during user profile retrieval
+            final errorMessage = e.toString().contains('permission-denied')
+                ? 'Access denied. Please contact support.'
+                : 'Failed to load user profile: ${e.toString()}';
+
+            if (!emit.isDone) {
+              emit(state.copyWith(
+                isLoading: false,
+                isLoginError: true,
+                errorMessage: errorMessage,
+              ));
+            }
           }
         },
       );
@@ -146,22 +161,37 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           ));
         },
         (firebaseUser) async {
-          // Store Firebase user data
-          await _userService.saveUserData(firebaseUser);
+          try {
+            // Store Firebase user data
+            await _userService.saveUserData(firebaseUser);
 
-          // Get user profile to determine role-based routing
-          final userProfile =
-              await _userService.getUserProfile(firebaseUser.uid);
+            // Get user profile to determine role-based routing
+            final userProfile =
+                await _userService.getUserProfile(firebaseUser.uid);
 
-          final routeName = _getRouteNameForRole(userProfile?.role);
+            final routeName = _getRouteNameForRole(userProfile?.role);
 
-          if (!emit.isDone) {
-            emit(state.copyWith(
-              isLoading: false,
-              isLoginError: false,
-              isLoginSuccessful: true,
-              routeName: routeName,
-            ));
+            if (!emit.isDone) {
+              emit(state.copyWith(
+                isLoading: false,
+                isLoginError: false,
+                isLoginSuccessful: true,
+                routeName: routeName,
+              ));
+            }
+          } catch (e) {
+            // Handle any errors during user profile retrieval
+            final errorMessage = e.toString().contains('permission-denied')
+                ? 'Access denied. Please contact support.'
+                : 'Failed to load user profile: ${e.toString()}';
+
+            if (!emit.isDone) {
+              emit(state.copyWith(
+                isLoading: false,
+                isLoginError: true,
+                errorMessage: errorMessage,
+              ));
+            }
           }
         },
       );

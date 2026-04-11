@@ -231,8 +231,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     vertical: 16.h,
                                   ),
                                 ),
+                                  onChanged: (value) {
+                                    context.read<RegistrationBloc>().add(
+                                          RegistrationEvent.fullNameChanged(
+                                              value),
+                                        );
+                                  },
+                                ),
                               ),
-                            ),
+                              // Full Name validation error
+                              if (state.showErrorMessages &&
+                                  state.fullName != null &&
+                                  !state.fullName!.isValid())
+                                AppValidationErrorWidget(
+                                  errorMessage: state.fullName!.value.fold(
+                                    (f) => f.failedValue,
+                                    (_) => '',
+                                  ),
+                                ),
                             
                             SizedBox(height: 24.h),
                             

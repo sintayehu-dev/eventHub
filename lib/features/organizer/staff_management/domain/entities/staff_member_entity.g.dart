@@ -63,13 +63,7 @@ Map<String, dynamic> _$$StaffMemberEntityImplToJson(
     };
 
 const _$StaffRoleEnumMap = {
-  StaffRole.admin: 'admin',
-  StaffRole.manager: 'manager',
-  StaffRole.coordinator: 'coordinator',
-  StaffRole.scanner: 'scanner',
-  StaffRole.security: 'security',
-  StaffRole.support: 'support',
-  StaffRole.volunteer: 'volunteer',
+  StaffRole.staff: 'staff',
 };
 
 const _$StaffStatusEnumMap = {

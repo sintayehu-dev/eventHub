@@ -71,7 +71,7 @@ class PurchasedTicketsList extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
-                        '\$${ticket.ticketPrice.toStringAsFixed(2)}',
+                        '${ticket.ticketPrice.toStringAsFixed(2)} Birr',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold,

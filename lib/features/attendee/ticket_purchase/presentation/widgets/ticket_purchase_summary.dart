@@ -59,7 +59,7 @@ class TicketPurchaseSummary extends StatelessWidget {
                 ],
               ),
               Text(
-                '\$${totalAmount.toStringAsFixed(2)}',
+                '${totalAmount.toStringAsFixed(2)} Birr',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.bold,

@@ -219,15 +219,8 @@ class FirebaseStaffManagementDataSource {
   }
 
   StaffRole _mapStringToRole(String role) {
-    switch (role.toLowerCase()) {
-      case 'supervisor':
-        return StaffRole.supervisor;
-      case 'manager':
-        return StaffRole.manager;
-      case 'scanner':
-      default:
-        return StaffRole.scanner;
-    }
+    // All roles map to staff now
+    return StaffRole.staff;
   }
 
   StaffPermission? _mapStringToPermission(String permission) {

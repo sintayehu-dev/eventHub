@@ -21,9 +21,7 @@ class StaffEventAssignmentEntity with _$StaffEventAssignmentEntity {
 }
 
 enum StaffRole {
-  scanner,
-  supervisor,
-  manager,
+  staff,
 }
 
 enum StaffPermission {
@@ -37,28 +35,15 @@ enum StaffPermission {
 extension StaffRoleExtension on StaffRole {
   String get displayName {
     switch (this) {
-      case StaffRole.scanner:
-        return 'Scanner';
-      case StaffRole.supervisor:
-        return 'Supervisor';
-      case StaffRole.manager:
-        return 'Manager';
+      case StaffRole.staff:
+        return 'Staff';
     }
   }
 
   List<StaffPermission> get defaultPermissions {
     switch (this) {
-      case StaffRole.scanner:
+      case StaffRole.staff:
         return [StaffPermission.scan, StaffPermission.viewAttendees];
-      case StaffRole.supervisor:
-        return [
-          StaffPermission.scan,
-          StaffPermission.viewAttendees,
-          StaffPermission.manualCheckIn,
-          StaffPermission.viewReports,
-        ];
-      case StaffRole.manager:
-        return StaffPermission.values;
     }
   }
 }

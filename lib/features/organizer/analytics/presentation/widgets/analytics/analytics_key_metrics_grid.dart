@@ -30,7 +30,7 @@ class AnalyticsKeyMetricsGrid extends StatelessWidget {
             Expanded(
               child: _MetricCard(
                 title: 'Total Revenue',
-                value: '\$${analytics.totalRevenue.toStringAsFixed(0)}',
+                value: '${analytics.totalRevenue.toStringAsFixed(0)} Birr',
                 change: comparison?.changes.revenueChangeFormatted ?? '+0.0%',
                 isPositive: comparison?.changes.isRevenuePositive ?? true,
                 color: colorScheme.primary,
@@ -55,7 +55,8 @@ class AnalyticsKeyMetricsGrid extends StatelessWidget {
             Expanded(
               child: _MetricCard(
                 title: 'Avg. Ticket Price',
-                value: '\$${analytics.averageTicketPrice.toStringAsFixed(2)}',
+                value:
+                    '${analytics.averageTicketPrice.toStringAsFixed(2)} Birr',
                 change: comparison?.changes.averageTicketPriceChangeFormatted ??
                     '+0.0%',
                 isPositive:

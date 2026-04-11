@@ -213,25 +213,17 @@ class FirebaseStaffAssignmentService implements StaffAssignmentService {
   /// Helper method to map StaffRole to string
   String _mapRoleToString(StaffRole role) {
     switch (role) {
-      case StaffRole.scanner:
-        return 'scanner';
-      case StaffRole.supervisor:
-        return 'supervisor';
-      case StaffRole.manager:
-        return 'manager';
+      case StaffRole.staff:
+        return 'staff';
     }
   }
 
   /// Helper method to map string to StaffRole
   StaffRole _mapStringToRole(String role) {
     switch (role.toLowerCase()) {
-      case 'supervisor':
-        return StaffRole.supervisor;
-      case 'manager':
-        return StaffRole.manager;
-      case 'scanner':
+      case 'staff':
       default:
-        return StaffRole.scanner;
+        return StaffRole.staff;
     }
   }
 

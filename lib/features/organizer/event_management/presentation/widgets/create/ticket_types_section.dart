@@ -127,7 +127,7 @@ class TicketTypesSection extends StatelessWidget {
                   context,
                   controller: ticketType.priceController,
                   hintText: '0.00',
-                  label: 'Price (\$)',
+                  label: 'Price (Birr)',
                   keyboardType: TextInputType.number,
                 ),
               ),

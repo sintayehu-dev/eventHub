@@ -45,7 +45,7 @@ class TopPerformingEventsList extends StatelessWidget {
               child: _TopEventItem(
                 rank: index + 1,
                 title: event.eventTitle,
-                revenue: '\$${event.revenue.toStringAsFixed(0)}',
+                revenue: '${event.revenue.toStringAsFixed(0)} Birr',
                 tickets: '${event.ticketsSold} sold',
                 color: _getEventRankColor(index),
               ),

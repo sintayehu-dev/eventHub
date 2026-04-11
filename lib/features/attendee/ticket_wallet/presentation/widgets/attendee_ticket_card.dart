@@ -245,7 +245,7 @@ class AttendeeTicketCard extends StatelessWidget {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            '\$${ticket.ticketPrice.toStringAsFixed(2)}',
+                            '${ticket.ticketPrice.toStringAsFixed(2)} Birr',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.bold,

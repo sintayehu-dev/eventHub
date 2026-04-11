@@ -71,7 +71,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         _staffRoles.remove(staffId);
       } else {
         _selectedStaffIds.add(staffId);
-        _staffRoles[staffId] = StaffRole.scanner; // Default role
+        _staffRoles[staffId] = StaffRole.staff; // Default role
       }
     });
     _updateAssignments();
@@ -87,7 +87,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
   void _updateAssignments() {
     final assignments = _selectedStaffIds.map((staffId) {
       final staff = _availableStaff.firstWhere((s) => s.id == staffId);
-      final role = _staffRoles[staffId] ?? StaffRole.scanner;
+      final role = _staffRoles[staffId] ?? StaffRole.staff;
 
       return StaffAssignmentData(
         staffId: staffId,
@@ -395,7 +395,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
   }
 
   Widget _buildSelectedStaffCard(StaffEntity staff) {
-    final role = _staffRoles[staff.id] ?? StaffRole.scanner;
+    final role = _staffRoles[staff.id] ?? StaffRole.staff;
     
     return Container(
       padding: EdgeInsets.all(16.w),

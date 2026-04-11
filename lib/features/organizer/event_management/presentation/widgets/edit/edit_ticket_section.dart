@@ -29,7 +29,7 @@ class EditTicketSection extends StatelessWidget {
         if (selectedTicketType == 'Paid') ...[
           _buildTextField(
             controller: priceController,
-            hintText: 'Ticket price (\$)',
+            hintText: 'Ticket price (Birr)',
             keyboardType: TextInputType.number,
             enabled: canEditPrice,
             validator: (value) {

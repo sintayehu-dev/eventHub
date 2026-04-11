@@ -133,7 +133,7 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
               ),
             ),
             Text(
-              '\$${widget.totalAmount.toStringAsFixed(2)}',
+              '${widget.totalAmount.toStringAsFixed(2)} Birr',
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -186,7 +186,7 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
                       size: 24.h,
                     )
                   : Text(
-                      'Complete Purchase - \$${widget.totalAmount.toStringAsFixed(2)}',
+                      'Complete Purchase - ${widget.totalAmount.toStringAsFixed(2)} Birr',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,

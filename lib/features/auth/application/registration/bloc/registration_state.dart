@@ -6,6 +6,7 @@ part 'registration_state.freezed.dart';
 @freezed
 class RegistrationState with _$RegistrationState {
   const factory RegistrationState({
+    FullName? fullName,
     EmailAddress? email,
     Password? password,
     ConfirmPassword? confirmPassword,
@@ -25,9 +26,11 @@ class RegistrationState with _$RegistrationState {
 
   bool get isPasswordValid => password?.isValid() ?? false;
   bool get isFormValid => 
+      fullName != null &&
       email != null &&
       password != null &&
       userRole != null &&
+      fullName!.isValid() &&
       email!.isValid() &&
       password!.isValid() &&
       userRole!.isValid();

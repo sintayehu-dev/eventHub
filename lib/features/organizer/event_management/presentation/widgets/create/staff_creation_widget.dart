@@ -19,6 +19,8 @@ class StaffCreationWidget extends StatefulWidget {
 
 class _StaffCreationWidgetState extends State<StaffCreationWidget> {
   List<StaffCreationData> _staffMembers = [];
+  Map<int, bool> _passwordVisibility =
+      {}; // Track password visibility for each staff member
 
   @override
   void initState() {
@@ -32,9 +34,9 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: '',
         email: '',
-        password: _generatePassword(), // Generate random password
-        role: StaffRole.scanner,
-        permissions: StaffRole.scanner.defaultPermissions,
+        password: '', // Start with empty password for manual entry
+        role: StaffRole.staff, // Default to staff role
+        permissions: StaffRole.staff.defaultPermissions,
       ));
     });
     _updateStaffMembers();
@@ -48,6 +50,17 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
   void _removeStaffMember(int index) {
     setState(() {
       _staffMembers.removeAt(index);
+      _passwordVisibility.remove(index); // Clean up password visibility state
+      // Reindex remaining password visibility states
+      final newVisibility = <int, bool>{};
+      _passwordVisibility.forEach((key, value) {
+        if (key > index) {
+          newVisibility[key - 1] = value;
+        } else if (key < index) {
+          newVisibility[key] = value;
+        }
+      });
+      _passwordVisibility = newVisibility;
     });
     _updateStaffMembers();
   }
@@ -61,6 +74,21 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
 
   void _updateStaffMembers() {
     widget.onStaffMembersChanged(_staffMembers);
+  }
+
+  bool _isStaffMemberValid(StaffCreationData staffMember) {
+    return staffMember.name.isNotEmpty &&
+        staffMember.email.isNotEmpty &&
+        staffMember.password.isNotEmpty &&
+        _isValidEmail(staffMember.email);
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  List<StaffCreationData> get validStaffMembers {
+    return _staffMembers.where(_isStaffMemberValid).toList();
   }
 
   @override
@@ -225,10 +253,17 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           ),
           SizedBox(height: 12.h),
 
-          // Password Field (Read-only, auto-generated)
+          // Password Field (Manual entry with auto-generate option)
           _buildPasswordField(
-            label: 'Password (Auto-generated)',
+            index: index,
+            label: 'Password',
             value: staffMember.password,
+            onChanged: (value) {
+              _updateStaffMember(
+                index,
+                staffMember.copyWith(password: value),
+              );
+            },
             onRegenerate: () {
               _updateStaffMember(
                 index,
@@ -238,64 +273,35 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           ),
           SizedBox(height: 12.h),
 
-          // Role Selector
-          Row(
-            children: [
-              Text(
-                'Role:',
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                ),
+          // Note about role
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6.r),
+              border: Border.all(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                width: 1,
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A0B2E),
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: Colors.grey[600]!, width: 1),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<StaffRole>(
-                      value: staffMember.role,
-                      isExpanded: true,
-                      dropdownColor: const Color(0xFF1A0B2E),
-                      icon: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey[400],
-                        size: 16.sp,
-                      ),
-                      items: StaffRole.values.map((role) {
-                        return DropdownMenuItem(
-                          value: role,
-                          child: Text(
-                            role.displayName,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (newRole) {
-                        if (newRole != null) {
-                          _updateStaffMember(
-                            index,
-                            staffMember.copyWith(
-                              role: newRole,
-                              permissions: newRole.defaultPermissions,
-                            ),
-                          );
-                        }
-                      },
-                    ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: const Color(0xFF8B5CF6),
+                  size: 16.sp,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Role: Staff (Default)',
+                  style: TextStyle(
+                    color: const Color(0xFF8B5CF6),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -303,10 +309,13 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
   }
 
   Widget _buildPasswordField({
+    required int index,
     required String label,
     required String value,
+    required Function(String) onChanged,
     required VoidCallback onRegenerate,
   }) {
+    final isVisible = _passwordVisibility[index] ?? false;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -342,52 +351,70 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           ],
         ),
         SizedBox(height: 6.h),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A0B2E),
-            borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: Colors.grey[600]!, width: 1),
+        TextFormField(
+          initialValue: value,
+          onChanged: onChanged,
+          obscureText: !isVisible,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14.sp,
+            fontFamily: 'monospace',
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  value.isEmpty ? 'Password will be generated' : value,
-                  style: TextStyle(
-                    color: value.isEmpty ? Colors.grey[500] : Colors.white,
-                    fontSize: 14.sp,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
-              if (value.isNotEmpty)
-                GestureDetector(
-                  onTap: () {
-                    // Copy to clipboard functionality can be added here
-                  },
-                  child: Icon(
-                    Icons.copy,
-                    color: Colors.grey[400],
-                    size: 16.sp,
-                  ),
-                ),
-            ],
-          ),
-        ),
-        if (value.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(top: 4.h),
-            child: Text(
-              'Share this password with the staff member',
-              style: TextStyle(
-                color: Colors.orange[300],
-                fontSize: 10.sp,
-                fontStyle: FontStyle.italic,
+          decoration: InputDecoration(
+            hintText: 'Enter password or generate one',
+            hintStyle: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14.sp,
+            ),
+            filled: true,
+            fillColor: const Color(0xFF1A0B2E),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(
+                  color: value.isEmpty ? Colors.red : Colors.grey[600]!,
+                  width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(
+                  color: value.isEmpty ? Colors.red : Colors.grey[600]!,
+                  width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(
+                  color: value.isEmpty ? Colors.red : const Color(0xFF8B5CF6),
+                  width: 2),
+            ),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            suffixIcon: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _passwordVisibility[index] = !isVisible;
+                });
+              },
+              child: Icon(
+                isVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey[400],
+                size: 20.sp,
               ),
             ),
           ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 4.h),
+          child: Text(
+            value.isEmpty
+                ? 'Password is required for staff login'
+                : 'Staff member will use this password to login',
+            style: TextStyle(
+              color: value.isEmpty ? Colors.red[300] : Colors.grey[400],
+              fontSize: 10.sp,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -399,6 +426,16 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     required String hint,
     TextInputType? keyboardType,
   }) {
+    bool isValid = true;
+    String? errorText;
+
+    if (value.isNotEmpty) {
+      if (keyboardType == TextInputType.emailAddress) {
+        isValid = _isValidEmail(value);
+        errorText = isValid ? null : 'Invalid email format';
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -429,17 +466,26 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             fillColor: const Color(0xFF1A0B2E),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[600]!, width: 1),
+              borderSide: BorderSide(
+                  color: !isValid ? Colors.red : Colors.grey[600]!, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[600]!, width: 1),
+              borderSide: BorderSide(
+                  color: !isValid ? Colors.red : Colors.grey[600]!, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
-              borderSide: const BorderSide(color: Color(0xFF8B5CF6), width: 2),
+              borderSide: BorderSide(
+                  color: !isValid ? Colors.red : const Color(0xFF8B5CF6),
+                  width: 2),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            errorText: errorText,
+            errorStyle: TextStyle(
+              color: Colors.red[300],
+              fontSize: 10.sp,
+            ),
           ),
         ),
       ],
@@ -502,7 +548,7 @@ class StaffCreationData {
       password: json['password'] as String,
       role: StaffRole.values.firstWhere(
         (r) => r.name == json['role'],
-        orElse: () => StaffRole.scanner,
+        orElse: () => StaffRole.staff, // Default to staff role
       ),
       permissions: (json['permissions'] as List<dynamic>)
           .map((p) => StaffPermission.values.firstWhere(

@@ -60,7 +60,7 @@ class FirebaseStaffEventAssignmentDataSource {
             eventLocation: eventData['location'] ?? 'Test Location',
             eventDateTime: _parseDateTime(eventData['dateTime']) ??
                 DateTime.now().add(const Duration(days: 1)),
-            role: StaffRole.scanner,
+            role: StaffRole.staff,
             permissions: [
               StaffPermission.scan,
               StaffPermission.viewAttendees,
@@ -81,7 +81,7 @@ class FirebaseStaffEventAssignmentDataSource {
             eventTitle: 'Sample Event',
             eventLocation: 'Sample Venue',
             eventDateTime: DateTime.now().add(const Duration(days: 1)),
-            role: StaffRole.scanner,
+            role: StaffRole.staff,
             permissions: [
               StaffPermission.scan,
               StaffPermission.viewAttendees,
@@ -108,7 +108,7 @@ class FirebaseStaffEventAssignmentDataSource {
           eventTitle: 'Fallback Event',
           eventLocation: 'Fallback Location',
           eventDateTime: DateTime.now().add(const Duration(days: 1)),
-          role: StaffRole.scanner,
+          role: StaffRole.staff,
           permissions: [
             StaffPermission.scan,
             StaffPermission.viewAttendees,
@@ -228,7 +228,7 @@ class FirebaseStaffEventAssignmentDataSource {
         eventTitle: 'Dynamic Event',
         eventLocation: 'Dynamic Location',
         eventDateTime: DateTime.now().add(const Duration(days: 1)),
-        role: StaffRole.scanner,
+        role: StaffRole.staff,
         permissions: _getDefaultPermissions(),
         assignedBy: 'system',
         assignedAt: DateTime.now(),
@@ -314,15 +314,8 @@ class FirebaseStaffEventAssignmentDataSource {
 
   /// Helper method to map string to StaffRole
   StaffRole _mapStringToRole(String role) {
-    switch (role.toLowerCase()) {
-      case 'supervisor':
-        return StaffRole.supervisor;
-      case 'manager':
-        return StaffRole.manager;
-      case 'scanner':
-      default:
-        return StaffRole.scanner;
-    }
+    // All roles map to staff now
+    return StaffRole.staff;
   }
 
   /// Helper method to map string to StaffPermission

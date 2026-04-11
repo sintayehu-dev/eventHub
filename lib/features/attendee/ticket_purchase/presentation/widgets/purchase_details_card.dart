@@ -48,7 +48,7 @@ class PurchaseDetailsCard extends StatelessWidget {
             ),
             _buildDetailRow(
               'Total Paid',
-              '\$${purchaseResult.totalAmount.toStringAsFixed(2)}',
+              '${purchaseResult.totalAmount.toStringAsFixed(2)} Birr',
               theme,
               colorScheme,
               isTotal: true,
