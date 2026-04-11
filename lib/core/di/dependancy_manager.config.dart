@@ -182,6 +182,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i964.FirebaseStaffReportsDataSource>(() =>
         _i964.FirebaseStaffReportsDataSource(
             firestore: gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i607.FirebaseUserProfileDataSource>(
+        () => _i607.FirebaseUserProfileDataSource(
+              firestore: gh<_i974.FirebaseFirestore>(),
+              auth: gh<_i59.FirebaseAuth>(),
+              cloudinaryService: gh<_i837.CloudinaryService>(),
+            ));
     gh.lazySingleton<_i202.StaffManagementRepository>(() =>
         _i279.StaffManagementRepositoryImpl(
             gh<_i414.FirebaseStaffManagementDataSource>()));
@@ -194,21 +200,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i531.AttendeeManagementRepository>(() =>
         _i772.AttendeeManagementRepositoryImpl(
             dataSource: gh<_i430.FirebaseAttendeeManagementDataSource>()));
+    gh.lazySingleton<_i75.UserProfileRepository>(() =>
+        _i920.UserProfileRepositoryImpl(
+            gh<_i607.FirebaseUserProfileDataSource>()));
     gh.lazySingleton<_i935.StaffAssignmentService>(() =>
         _i912.FirebaseStaffAssignmentService(
             firestore: gh<_i974.FirebaseFirestore>()));
     gh.factory<_i746.AttendeeManagementBloc>(() =>
         _i746.AttendeeManagementBloc(gh<_i455.AttendeeManagementRepository>()));
+    gh.factory<_i237.UserProfileBloc>(
+        () => _i237.UserProfileBloc(gh<_i75.UserProfileRepository>()));
     gh.factory<_i479.StaffManagementBloc>(
         () => _i479.StaffManagementBloc(gh<_i547.StaffManagementRepository>()));
     gh.lazySingleton<_i1043.StaffReportsRepository>(() =>
         _i926.StaffReportsRepositoryImpl(
             gh<_i964.FirebaseStaffReportsDataSource>()));
-    gh.lazySingleton<_i607.FirebaseUserProfileDataSource>(
-        () => _i607.FirebaseUserProfileDataSource(
-              firestore: gh<_i974.FirebaseFirestore>(),
-              auth: gh<_i59.FirebaseAuth>(),
-            ));
     gh.factory<_i271.StaffReportsBloc>(
         () => _i271.StaffReportsBloc(gh<_i1043.StaffReportsRepository>()));
     gh.factory<_i470.UserFirestoreDataSource>(
@@ -274,11 +280,6 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i915.SignOutUseCase>(
         () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
-    gh.lazySingleton<_i75.UserProfileRepository>(() =>
-        _i920.UserProfileRepositoryImpl(
-            gh<_i607.FirebaseUserProfileDataSource>()));
-    gh.factory<_i237.UserProfileBloc>(
-        () => _i237.UserProfileBloc(gh<_i75.UserProfileRepository>()));
     gh.factory<_i743.TicketWalletRepository>(() =>
         _i820.TicketWalletRepositoryImpl(
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));

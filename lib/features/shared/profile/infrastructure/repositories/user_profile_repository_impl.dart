@@ -67,11 +67,9 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
     required String imagePath,
   }) async {
     try {
-      // Note: In a real implementation, you would upload the image to Firebase Storage
-      // and get the download URL. For now, we'll assume imagePath is already a URL.
       final imageUrl = await _dataSource.updateProfileImage(
         userId: userId,
-        imageUrl: imagePath,
+        imagePath: imagePath,
       );
       return Right(imageUrl);
     } on NetworkExceptions catch (e) {

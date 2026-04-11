@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -166,12 +167,8 @@ class _EditProfileViewState extends State<EditProfileView> {
           CircleAvatar(
             radius: 60.r,
             backgroundColor: colorScheme.primaryContainer,
-            backgroundImage: _selectedImagePath != null
-                ? NetworkImage(_selectedImagePath!)
-                : (widget.profile.profileImageUrl != null
-                    ? NetworkImage(widget.profile.profileImageUrl!)
-                    : null),
-            child: (widget.profile.profileImageUrl == null && _selectedImagePath == null)
+            backgroundImage: _getProfileImage(),
+            child: _getProfileImage() == null
                 ? Icon(
                     Icons.person,
                     size: 60.sp,
@@ -205,6 +202,17 @@ class _EditProfileViewState extends State<EditProfileView> {
         ],
       ),
     );
+  }
+
+  ImageProvider? _getProfileImage() {
+    if (_selectedImagePath != null) {
+      // Use FileImage for local files
+      return FileImage(File(_selectedImagePath!));
+    } else if (widget.profile.profileImageUrl != null) {
+      // Use NetworkImage for URLs
+      return NetworkImage(widget.profile.profileImageUrl!);
+    }
+    return null;
   }
 
   Widget _buildBasicInfoSection() {
@@ -254,7 +262,15 @@ class _EditProfileViewState extends State<EditProfileView> {
       name: _nameController.text.trim(),
     );
 
-    // Update profile image if selected
+    // Update the profile first
+    context.read<UserProfileBloc>().add(
+          UserProfileEvent.updateUserProfile(
+            userId: currentUser.uid,
+            profile: updatedProfile,
+          ),
+        );
+
+    // Update profile image if selected (this will be handled separately)
     if (_selectedImagePath != null) {
       context.read<UserProfileBloc>().add(
             UserProfileEvent.updateProfileImage(
@@ -263,14 +279,6 @@ class _EditProfileViewState extends State<EditProfileView> {
             ),
           );
     }
-
-    // Update the profile
-    context.read<UserProfileBloc>().add(
-          UserProfileEvent.updateUserProfile(
-            userId: currentUser.uid,
-            profile: updatedProfile,
-          ),
-    );
   }
 
   Widget _buildSectionTitle(String title) {

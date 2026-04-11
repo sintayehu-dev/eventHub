@@ -2,18 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/core/handlers/network_exceptions.dart';
+import 'package:eventhub/core/services/cloudinary_service.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 
 @LazySingleton()
 class FirebaseUserProfileDataSource {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final CloudinaryService _cloudinaryService;
 
   FirebaseUserProfileDataSource({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    required CloudinaryService cloudinaryService,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+        _auth = auth ?? FirebaseAuth.instance,
+        _cloudinaryService = cloudinaryService;
 
   /// Get user profile from Firestore
   Future<UserProfileEntity> getUserProfile({
@@ -129,9 +133,17 @@ class FirebaseUserProfileDataSource {
   /// Update profile image
   Future<String> updateProfileImage({
     required String userId,
-    required String imageUrl,
+    required String imagePath,
   }) async {
     try {
+      // Upload image to Cloudinary
+      final imageUrl = await _cloudinaryService.uploadImage(
+        imagePath: imagePath,
+        folder: 'eventhub/profile_images',
+        publicId: 'profile_$userId',
+      );
+
+      // Update Firestore with the Cloudinary URL
       await _firestore.collection('users').doc(userId).update({
         'photoURL': imageUrl,
         'updatedAt': DateTime.now().toIso8601String(),
