@@ -41,20 +41,9 @@ class EditProfileView extends StatefulWidget {
 class _EditProfileViewState extends State<EditProfileView> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
-  
-  // Role-specific controllers
-  final _organizationNameController = TextEditingController();
-  final _websiteController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _emergencyContactController = TextEditingController();
-  final _emergencyContactPhoneController = TextEditingController();
-  final _dateOfBirthController = TextEditingController();
 
   String? _selectedImagePath;
-  List<String> _selectedInterests = [];
-  List<String> _selectedSpecializations = [];
 
   @override
   void initState() {
@@ -64,39 +53,13 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   void _initializeControllers() {
     _nameController.text = widget.profile.name;
-    _phoneController.text = widget.profile.phone ?? '';
     _emailController.text = widget.profile.email;
-    
-    // Initialize role-specific data
-    if (widget.profile.organizerData != null) {
-      _organizationNameController.text = widget.profile.organizerData!.organizationName ?? '';
-      _websiteController.text = widget.profile.organizerData!.website ?? '';
-      _descriptionController.text = widget.profile.organizerData!.description ?? '';
-    }
-    
-    if (widget.profile.attendeeData != null) {
-      _selectedInterests = List.from(widget.profile.attendeeData!.interests);
-      _emergencyContactController.text = widget.profile.attendeeData!.emergencyContact ?? '';
-      _emergencyContactPhoneController.text = widget.profile.attendeeData!.emergencyContactPhone ?? '';
-      _dateOfBirthController.text = widget.profile.attendeeData!.dateOfBirth ?? '';
-    }
-    
-    if (widget.profile.staffData != null) {
-      _selectedSpecializations = List.from(widget.profile.staffData!.specializations);
-    }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
     _emailController.dispose();
-    _organizationNameController.dispose();
-    _websiteController.dispose();
-    _descriptionController.dispose();
-    _emergencyContactController.dispose();
-    _emergencyContactPhoneController.dispose();
-    _dateOfBirthController.dispose();
     super.dispose();
   }
 
@@ -186,8 +149,6 @@ class _EditProfileViewState extends State<EditProfileView> {
             _buildProfileImageSection(),
             SizedBox(height: 32.h),
             _buildBasicInfoSection(),
-            SizedBox(height: 24.h),
-            _buildRoleSpecificSection(),
             SizedBox(height: 32.h),
           ],
         ),
@@ -250,7 +211,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information'),
+        _buildSectionTitle('Profile Information'),
         SizedBox(height: 16.h),
         _buildTextField(
           controller: _nameController,
@@ -271,212 +232,44 @@ class _EditProfileViewState extends State<EditProfileView> {
           enabled: false, // Email should not be editable
           keyboardType: TextInputType.emailAddress,
         ),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _phoneController,
-          label: 'Phone Number',
-          hint: 'Enter your phone number',
-          keyboardType: TextInputType.phone,
-        ),
       ],
     );
   }
 
-  Widget _buildRoleSpecificSection() {
-    switch (widget.profile.role) {
-      case UserRole.organizer:
-        return _buildOrganizerSection();
-      case UserRole.attendee:
-        return _buildAttendeeSection();
-      case UserRole.staff:
-        return _buildStaffSection();
-      case UserRole.admin:
-        return _buildAdminSection();
+  void _saveProfile(BuildContext context) {
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
-  }
 
-  Widget _buildOrganizerSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Organization Information'),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _organizationNameController,
-          label: 'Organization Name',
-          hint: 'Enter your organization name',
-        ),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _websiteController,
-          label: 'Website',
-          hint: 'Enter your website URL',
-          keyboardType: TextInputType.url,
-        ),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _descriptionController,
-          label: 'Description',
-          hint: 'Tell us about your organization',
-          maxLines: 3,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAttendeeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Personal Information'),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _dateOfBirthController,
-          label: 'Date of Birth',
-          hint: 'YYYY-MM-DD',
-          keyboardType: TextInputType.datetime,
-        ),
-        SizedBox(height: 16.h),
-        _buildInterestsSection(),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _emergencyContactController,
-          label: 'Emergency Contact Name',
-          hint: 'Enter emergency contact name',
-        ),
-        SizedBox(height: 16.h),
-        _buildTextField(
-          controller: _emergencyContactPhoneController,
-          label: 'Emergency Contact Phone',
-          hint: 'Enter emergency contact phone',
-          keyboardType: TextInputType.phone,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStaffSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Staff Information'),
-        SizedBox(height: 16.h),
-        _buildSpecializationsSection(),
-      ],
-    );
-  }
-
-  Widget _buildAdminSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('Admin Information'),
-        SizedBox(height: 16.h),
-        Text(
-          'Admin profiles have additional privileges and settings.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInterestsSection() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser();
     
-    final availableInterests = [
-      'Music', 'Sports', 'Technology', 'Art', 'Food', 'Travel',
-      'Business', 'Education', 'Health', 'Entertainment', 'Fashion', 'Gaming'
-    ];
+    if (currentUser == null) {
+      AppHelpers.showErrorSnackBar(context, 'User not found');
+      return;
+    }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Interests',
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Wrap(
-          spacing: 8.w,
-          runSpacing: 8.h,
-          children: availableInterests.map((interest) {
-            final isSelected = _selectedInterests.contains(interest);
-            return FilterChip(
-              label: Text(interest),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    _selectedInterests.add(interest);
-                  } else {
-                    _selectedInterests.remove(interest);
-                  }
-                });
-              },
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              selectedColor: colorScheme.primaryContainer,
-              labelStyle: theme.textTheme.labelSmall?.copyWith(
-                color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+    // Create updated profile with only name changes
+    UserProfileEntity updatedProfile = widget.profile.copyWith(
+      name: _nameController.text.trim(),
     );
-  }
 
-  Widget _buildSpecializationsSection() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    final availableSpecializations = [
-      'Event Setup', 'Security', 'Registration', 'Technical Support',
-      'Customer Service', 'Catering', 'Photography', 'Sound & Lighting'
-    ];
+    // Update profile image if selected
+    if (_selectedImagePath != null) {
+      context.read<UserProfileBloc>().add(
+            UserProfileEvent.updateProfileImage(
+              userId: currentUser.uid,
+              imagePath: _selectedImagePath!,
+            ),
+          );
+    }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Specializations',
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
+    // Update the profile
+    context.read<UserProfileBloc>().add(
+          UserProfileEvent.updateUserProfile(
+            userId: currentUser.uid,
+            profile: updatedProfile,
           ),
-        ),
-        SizedBox(height: 8.h),
-        Wrap(
-          spacing: 8.w,
-          runSpacing: 8.h,
-          children: availableSpecializations.map((specialization) {
-            final isSelected = _selectedSpecializations.contains(specialization);
-            return FilterChip(
-              label: Text(specialization),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    _selectedSpecializations.add(specialization);
-                  } else {
-                    _selectedSpecializations.remove(specialization);
-                  }
-                });
-              },
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              selectedColor: colorScheme.primaryContainer,
-              labelStyle: theme.textTheme.labelSmall?.copyWith(
-                color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.onSurfaceVariant,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 
@@ -569,111 +362,5 @@ class _EditProfileViewState extends State<EditProfileView> {
         _selectedImagePath = image.path;
       });
     }
-  }
-
-  void _saveProfile(BuildContext context) {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    final userService = getIt<UserService>();
-    final currentUser = userService.getCurrentUser();
-    
-    if (currentUser == null) {
-      AppHelpers.showErrorSnackBar(context, 'User not found');
-      return;
-    }
-
-    // Create updated profile based on role
-    UserProfileEntity updatedProfile = widget.profile.copyWith(
-      name: _nameController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
-    );
-
-    // Update role-specific data
-    switch (widget.profile.role) {
-      case UserRole.organizer:
-        updatedProfile = updatedProfile.copyWith(
-          organizerData: widget.profile.organizerData?.copyWith(
-            organizationName: _organizationNameController.text.trim().isEmpty 
-                ? null 
-                : _organizationNameController.text.trim(),
-            website: _websiteController.text.trim().isEmpty 
-                ? null 
-                : _websiteController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty 
-                ? null 
-                : _descriptionController.text.trim(),
-          ) ?? OrganizerProfileData(
-            organizationName: _organizationNameController.text.trim().isEmpty 
-                ? null 
-                : _organizationNameController.text.trim(),
-            website: _websiteController.text.trim().isEmpty 
-                ? null 
-                : _websiteController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty 
-                ? null 
-                : _descriptionController.text.trim(),
-          ),
-        );
-        break;
-      case UserRole.attendee:
-        updatedProfile = updatedProfile.copyWith(
-          attendeeData: widget.profile.attendeeData?.copyWith(
-            interests: _selectedInterests,
-            emergencyContact: _emergencyContactController.text.trim().isEmpty 
-                ? null 
-                : _emergencyContactController.text.trim(),
-            emergencyContactPhone: _emergencyContactPhoneController.text.trim().isEmpty 
-                ? null 
-                : _emergencyContactPhoneController.text.trim(),
-            dateOfBirth: _dateOfBirthController.text.trim().isEmpty 
-                ? null 
-                : _dateOfBirthController.text.trim(),
-          ) ?? AttendeeProfileData(
-            interests: _selectedInterests,
-            emergencyContact: _emergencyContactController.text.trim().isEmpty 
-                ? null 
-                : _emergencyContactController.text.trim(),
-            emergencyContactPhone: _emergencyContactPhoneController.text.trim().isEmpty 
-                ? null 
-                : _emergencyContactPhoneController.text.trim(),
-            dateOfBirth: _dateOfBirthController.text.trim().isEmpty 
-                ? null 
-                : _dateOfBirthController.text.trim(),
-          ),
-        );
-        break;
-      case UserRole.staff:
-        updatedProfile = updatedProfile.copyWith(
-          staffData: widget.profile.staffData?.copyWith(
-            specializations: _selectedSpecializations,
-          ) ?? StaffProfileData(
-            specializations: _selectedSpecializations,
-          ),
-        );
-        break;
-      case UserRole.admin:
-        // Admin profiles don't have additional editable fields in this implementation
-        break;
-    }
-
-    // Update profile image if selected
-    if (_selectedImagePath != null) {
-      context.read<UserProfileBloc>().add(
-        UserProfileEvent.updateProfileImage(
-          userId: currentUser.uid,
-          imagePath: _selectedImagePath!,
-        ),
-      );
-    }
-
-    // Update the profile
-    context.read<UserProfileBloc>().add(
-      UserProfileEvent.updateUserProfile(
-        userId: currentUser.uid,
-        profile: updatedProfile,
-      ),
-    );
   }
 }
