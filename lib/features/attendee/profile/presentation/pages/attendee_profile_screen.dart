@@ -221,28 +221,33 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   }
 
   void _showEditProfileDialog() {
+    final currentState = context.read<UserProfileBloc>().state;
+    UserProfileEntity? currentProfile;
+
+    currentState.whenOrNull(
+      loaded: (profile) => currentProfile = profile,
+      profileUpdated: (profile) => currentProfile = profile,
+      profileRefreshed: (profile) => currentProfile = profile,
+    );
+
+    final profileToEdit = currentProfile ??
+        UserProfileEntity(
+          id: getIt<UserService>().getCurrentUser()?.uid ?? '',
+          email: getIt<UserService>().getCurrentUser()?.email ?? '',
+          name: getIt<UserService>().getCurrentUser()?.displayName ?? '',
+          role: UserRole.attendee,
+        );
+
     // Navigate to edit profile screen
     Navigator.of(context)
         .push(
       MaterialPageRoute(
-        builder: (context) => EditProfileScreen(
-          profile: context.read<UserProfileBloc>().state.whenOrNull(
-                    loaded: (profile) => profile,
-                    profileUpdated: (profile) => profile,
-                    profileRefreshed: (profile) => profile,
-                  ) ??
-              UserProfileEntity(
-                id: getIt<UserService>().getCurrentUser()?.uid ?? '',
-                email: getIt<UserService>().getCurrentUser()?.email ?? '',
-                name: getIt<UserService>().getCurrentUser()?.displayName ?? '',
-                role: UserRole.attendee,
-              ),
-        ),
+        builder: (context) => EditProfileScreen(profile: profileToEdit),
       ),
     )
         .then((result) {
       // Refresh profile if edit was successful
-      if (result == true) {
+      if (result == true && mounted) {
         final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
         context.read<UserProfileBloc>().add(
               UserProfileEvent.refreshProfile(userId: uid),
