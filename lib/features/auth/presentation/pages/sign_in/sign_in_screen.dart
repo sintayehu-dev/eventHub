@@ -54,10 +54,10 @@ class _SignInScreenState extends State<SignInScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              colorScheme.surface,
-              colorScheme.primaryContainer,
-              colorScheme.primary.withValues(alpha: 0.8),
-              colorScheme.primary,
+                colorScheme.primary.withValues(alpha: 0.95),
+                colorScheme.primaryContainer.withValues(alpha: 0.8),
+                colorScheme.surface.withValues(alpha: 0.9),
+                colorScheme.surface.withValues(alpha: 0.95),
             ],
             stops: const [0.0, 0.3, 0.7, 1.0],
           ),
@@ -155,11 +155,13 @@ class _SignInScreenState extends State<SignInScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color:
-                                  colorScheme.onSurface.withValues(alpha: 0.05),
+                                  colorScheme.onSurface
+                                    .withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(32.r),
                               border: Border.all(
                                 color:
-                                    colorScheme.outline.withValues(alpha: 0.3),
+                                    colorScheme.outline
+                                      .withValues(alpha: 0.4),
                                 width: 1,
                               ),
                             ),
@@ -241,11 +243,13 @@ class _SignInScreenState extends State<SignInScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color:
-                                  colorScheme.onSurface.withValues(alpha: 0.05),
+                                  colorScheme.onSurface
+                                    .withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(32.r),
                               border: Border.all(
                                 color:
-                                    colorScheme.outline.withValues(alpha: 0.3),
+                                    colorScheme.outline
+                                      .withValues(alpha: 0.4),
                                 width: 1,
                               ),
                             ),
@@ -477,10 +481,10 @@ class _SignInScreenState extends State<SignInScreen> {
         width: 56.w,
         height: 56.w,
         decoration: BoxDecoration(
-          color: colorScheme.onSurface.withValues(alpha: 0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.3),
+            color: colorScheme.outline.withValues(alpha: 0.4),
             width: 1,
           ),
         ),

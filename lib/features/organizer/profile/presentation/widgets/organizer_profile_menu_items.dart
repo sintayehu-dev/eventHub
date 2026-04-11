@@ -13,15 +13,15 @@ class OrganizerProfileMenuItems extends StatelessWidget {
     return Column(
       children: [
         _buildMenuCard(context, 'My Events', Icons.event_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard(context, 'Create Event', Icons.add_circle_outline, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard(context, 'Revenue & Analytics', Icons.bar_chart_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard(context, 'Staff Management', Icons.people_outline, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard(context, 'Promotion Tools', Icons.campaign_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard(context, 'Help & Support', Icons.help_outline, theme, colorScheme),
       ],
     );
@@ -31,12 +31,12 @@ class OrganizerProfileMenuItems extends StatelessWidget {
       BuildContext context, String title, IconData icon, ThemeData theme, ColorScheme colorScheme) {
     return InkWell(
       onTap: () => _showToBeImplemented(context),
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
@@ -45,18 +45,18 @@ class OrganizerProfileMenuItems extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(
                 icon,
                 color: colorScheme.secondary,
-                size: 20.sp,
+                size: 18.sp,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 14.w),
             Expanded(
               child: Text(
                 title,
@@ -68,7 +68,7 @@ class OrganizerProfileMenuItems extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
+              size: 18.sp,
             ),
           ],
         ),

@@ -201,7 +201,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
       child: Column(
         children: [
           AttendeeProfileHeader(profile: profile),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           AttendeeProfileMenu(
             onTicketsTap: () => _showToBeImplemented(context),
             onPaymentTap: () => _showToBeImplemented(context),
@@ -209,7 +209,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             onPrivacyTap: () => _showToBeImplemented(context),
             onSupportTap: () => _showToBeImplemented(context),
           ),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           AttendeeLogoutCard(onLogoutTap: () => _showLogoutDialog(context)),
         ],
       ),

@@ -50,12 +50,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              colorScheme.surface,
-              colorScheme.primaryContainer,
-              colorScheme.primary.withValues(alpha: 0.8),
-              colorScheme.primary,
+              colors: [
+                colorScheme.primary.withValues(alpha: 0.95),
+                colorScheme.primaryContainer.withValues(alpha: 0.8),
+                colorScheme.surface.withValues(alpha: 0.9),
+                colorScheme.surface.withValues(alpha: 0.95),
             ],
+            
             stops: const [0.0, 0.3, 0.7, 1.0],
           ),
         ),
@@ -78,96 +79,92 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }
             },
             builder: (context, state) {
-              return Column(
-                children: [
-                  // Header with back button and title
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                    child: Row(
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IconButton(
-                          onPressed: () => context.pop(),
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: colorScheme.onSurface,
-                            size: 24.sp,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Event Hub',
-                              style: darkTheme.textTheme.titleLarge?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        SizedBox(width: 48.w), // Balance the back button
-                      ],
-                    ),
-                  ),
-                  
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Hero Image Section
-                            Container(
-                              width: double.infinity,
-                              height: 120.h,
-                              margin: EdgeInsets.only(bottom: 32.h),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    colorScheme.primary.withValues(alpha: 0.3),
-                                    colorScheme.secondary
-                                        .withValues(alpha: 0.3),
-                                  ],
+                        // Header with back button and title (now scrollable)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => context.pop(),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: colorScheme.onSurface,
+                                  size: 24.sp,
                                 ),
                               ),
-                              child: Stack(
-                                children: [
-                                  // Particle effect simulation
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16.r),
-                                        image: const DecorationImage(
-                                          image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=200&fit=crop',
-                                          ),
-                                          fit: BoxFit.cover,
-                                          opacity: 0.3,
-                                        ),
-                                      ),
-                                    ),
+                              Expanded(
+                                child: Text(
+                                  'Event Hub',
+                                  style:
+                                      darkTheme.textTheme.titleLarge?.copyWith(
+                                    color: colorScheme.onSurface,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  // Overlay
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.transparent,
-                                          colorScheme.primary
-                                              .withValues(alpha: 0.4),
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
+                              SizedBox(width: 48.w), // Balance the back button
+                            ],
+                          ),
+                        ),
+                      
+                        // Hero Image Section
+                        Container(
+                          width: double.infinity,
+                          height: 120.h,
+                          margin: EdgeInsets.only(bottom: 32.h),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16.r),
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.primary.withValues(alpha: 0.3),
+                                colorScheme.secondary.withValues(alpha: 0.3),
+                              ],
                             ),
+                          ),
+                          child: Stack(
+                            children: [
+                              // Particle effect simulation
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16.r),
+                                    image: const DecorationImage(
+                                      image: NetworkImage(
+                                        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=200&fit=crop',
+                                      ),
+                                      fit: BoxFit.cover,
+                                      opacity: 0.3,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Overlay
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      colorScheme.primary
+                                          .withValues(alpha: 0.4),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                             
-                            // Title Section
                             Text(
                               'Join the Scene',
                                 style:
@@ -199,11 +196,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 color: colorScheme.onSurface
-                                    .withValues(alpha: 0.05),
+                                      .withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
                                   color: colorScheme.outline
-                                      .withValues(alpha: 0.3),
+                                        .withValues(alpha: 0.4),
                                   width: 1,
                                 ),
                               ),
@@ -264,11 +261,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 color: colorScheme.onSurface
-                                    .withValues(alpha: 0.05),
+                                      .withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
                                   color: colorScheme.outline
-                                      .withValues(alpha: 0.3),
+                                        .withValues(alpha: 0.4),
                                   width: 1,
                                 ),
                               ),
@@ -329,11 +326,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Container(
                               decoration: BoxDecoration(
                                 color: colorScheme.onSurface
-                                    .withValues(alpha: 0.05),
+                                      .withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(16.r),
                                 border: Border.all(
                                   color: colorScheme.outline
-                                      .withValues(alpha: 0.3),
+                                        .withValues(alpha: 0.4),
                                   width: 1,
                                 ),
                               ),
@@ -537,15 +534,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             SizedBox(height: 32.h),
                           ],
                         ),
-                      ),
-                    ),
                   ),
-                ],
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -558,27 +552,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }) {
     final darkTheme = AppTheme.darkTheme();
     final colorScheme = darkTheme.colorScheme;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedRole = value;
         });
         context.read<RegistrationBloc>().add(
-          RegistrationEvent.userRoleChanged(value),
-        );
+              RegistrationEvent.userRoleChanged(value),
+            );
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
         decoration: BoxDecoration(
           color: isSelected 
-              ? colorScheme.primary.withValues(alpha: 0.2)
-              : colorScheme.onSurface.withValues(alpha: 0.05),
+              ? colorScheme.primary.withValues(alpha: 0.25)
+              : colorScheme.onSurface.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: isSelected 
+            color: isSelected
                 ? colorScheme.primary
-                : colorScheme.outline.withValues(alpha: 0.3),
+                : colorScheme.outline.withValues(alpha: 0.4),
             width: 1,
           ),
         ),
@@ -586,7 +580,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected 
+              color: isSelected
                   ? colorScheme.primary
                   : colorScheme.onSurface.withValues(alpha: 0.6),
               size: 24.sp,
@@ -595,7 +589,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Text(
               title,
               style: darkTheme.textTheme.labelMedium?.copyWith(
-                color: isSelected 
+                color: isSelected
                     ? colorScheme.primary
                     : colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,

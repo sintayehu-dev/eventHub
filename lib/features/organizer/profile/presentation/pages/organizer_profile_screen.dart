@@ -124,9 +124,9 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
       child: Column(
         children: [
           OrganizerProfileHeader(profile: profile),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           const OrganizerProfileMenuItems(),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           const OrganizerProfileLogoutCard(),
         ],
       ),

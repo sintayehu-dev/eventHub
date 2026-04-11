@@ -200,9 +200,9 @@ class _StaffProfileViewState extends State<StaffProfileView> {
       child: Column(
         children: [
           _buildProfileHeader(profile, theme, colorScheme),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           _buildMenuCards(theme, colorScheme),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           _buildLogoutCard(),
         ],
       ),
@@ -211,166 +211,170 @@ class _StaffProfileViewState extends State<StaffProfileView> {
 
   Widget _buildProfileHeader(UserProfileEntity profile, ThemeData theme, ColorScheme colorScheme) {
     return Container(
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(24.r),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+            colorScheme.surfaceContainer.withValues(alpha: 0.6),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          color: colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          // Gradient banner
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24.r),
-              topRight: Radius.circular(24.r),
+          // Profile Avatar
+          Container(
+            width: 60.w,
+            height: 60.h,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primary.withValues(alpha: 0.8),
+                  colorScheme.secondary.withValues(alpha: 0.9),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Container(
-              height: 90.h,
+              margin: EdgeInsets.all(2.w),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorScheme.primary, colorScheme.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                shape: BoxShape.circle,
+                color: colorScheme.surface,
+              ),
+              child: ClipOval(
+                child: profile.profileImageUrl != null
+                    ? Image.network(
+                        profile.profileImageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.primary,
+                                colorScheme.secondary
+                              ],
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.badge_rounded,
+                            color: colorScheme.onPrimary,
+                            size: 28.sp,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              colorScheme.primary,
+                              colorScheme.secondary
+                            ],
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.badge_rounded,
+                          color: colorScheme.onPrimary,
+                          size: 28.sp,
+                        ),
+                      ),
               ),
             ),
           ),
 
-          // Avatar overlapping the banner
-          Transform.translate(
-            offset: Offset(0, -40.h),
+          SizedBox(width: 16.w),
+
+          // Name and Role Info
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 88.w,
-                  height: 88.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [colorScheme.primary, colorScheme.secondary],
-                    ),
-                    border: Border.all(
-                      color: colorScheme.surface,
-                      width: 4,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: profile.profileImageUrl != null
-                      ? ClipOval(
-                          child: Image.network(
-                            profile.profileImageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.badge,
-                              color: colorScheme.onPrimary,
-                              size: 36.sp,
-                            ),
-                          ),
-                        )
-                      : Icon(
-                          Icons.badge,
-                          color: colorScheme.onPrimary,
-                          size: 36.sp,
-                        ),
-                ),
-                SizedBox(height: 8.h),
                 Text(
                   profile.name,
                   style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 6.h),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20.r),
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.primary.withValues(alpha: 0.2),
+                        colorScheme.primary.withValues(alpha: 0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
-                      color: colorScheme.primary.withValues(alpha: 0.35),
+                      color: colorScheme.primary.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
-                  child: Text(
-                    'Staff Member',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.4,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.work_rounded,
+                        size: 14.sp,
+                        color: colorScheme.primary,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Staff',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
-
-          // Info rows
-          Transform.translate(
-            offset: Offset(0, -28.h),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Column(
-                children: [
-                  _buildHeaderInfoRow(
-                      Icons.email_outlined, profile.email, theme, colorScheme),
-                  if (profile.phone != null) ...[
-                    SizedBox(height: 8.h),
-                    _buildHeaderInfoRow(Icons.phone_outlined, profile.phone!,
-                        theme, colorScheme),
-                  ],
-                  SizedBox(height: 16.h),
-                ],
-              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildHeaderInfoRow(
-      IconData icon, String text, ThemeData theme, ColorScheme colorScheme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon,
-            size: 14.sp,
-            color: colorScheme.onSurface.withValues(alpha: 0.5)),
-        SizedBox(width: 6.w),
-        Flexible(
-          child: Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.65),
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildMenuCards(ThemeData theme, ColorScheme colorScheme) {
     return Column(
       children: [
         _buildMenuCard('My Assignments', Icons.assignment_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard('Check-in Scanner', Icons.qr_code_scanner_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard('Work Schedule', Icons.schedule_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard('Performance Report', Icons.bar_chart_outlined, theme, colorScheme),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _buildMenuCard('Help & Support', Icons.help_outline, theme, colorScheme),
       ],
     );
@@ -380,12 +384,12 @@ class _StaffProfileViewState extends State<StaffProfileView> {
       String title, IconData icon, ThemeData theme, ColorScheme colorScheme) {
     return InkWell(
       onTap: () => _showToBeImplemented(context),
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
@@ -394,18 +398,18 @@ class _StaffProfileViewState extends State<StaffProfileView> {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(
                 icon,
                 color: colorScheme.primary,
-                size: 20.sp,
+                size: 18.sp,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 14.w),
             Expanded(
               child: Text(
                 title,
@@ -417,7 +421,7 @@ class _StaffProfileViewState extends State<StaffProfileView> {
             Icon(
               Icons.chevron_right,
               color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
+              size: 18.sp,
             ),
           ],
         ),
@@ -435,10 +439,10 @@ class _StaffProfileViewState extends State<StaffProfileView> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
           color: colorScheme.error.withValues(alpha: 0.3),
           width: 1,
@@ -449,9 +453,9 @@ class _StaffProfileViewState extends State<StaffProfileView> {
           Icon(
             Icons.logout,
             color: colorScheme.error,
-            size: 32.sp,
+            size: 24.sp,
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 8.h),
           Text(
             'Sign Out',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -459,23 +463,23 @@ class _StaffProfileViewState extends State<StaffProfileView> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 6.h),
           Text(
             'Sign out of your account',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onErrorContainer,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () => _showLogoutDialog(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.error,
-                padding: EdgeInsets.symmetric(vertical: 12.h),
+                padding: EdgeInsets.symmetric(vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
               child: Text(
@@ -495,13 +499,13 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   void _showEditProfileDialog() {
     final currentState = context.read<UserProfileBloc>().state;
     UserProfileEntity? currentProfile;
-
+    
     currentState.whenOrNull(
       loaded: (profile) => currentProfile = profile,
       profileUpdated: (profile) => currentProfile = profile,
       profileRefreshed: (profile) => currentProfile = profile,
     );
-
+    
     final profileToEdit = currentProfile ??
         UserProfileEntity(
           id: getIt<UserService>().getCurrentUser()?.uid ?? '',

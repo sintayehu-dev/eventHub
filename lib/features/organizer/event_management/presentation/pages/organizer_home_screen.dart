@@ -5,6 +5,7 @@ import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import '../widgets/home/organizer_header.dart';
 import '../widgets/home/organizer_welcome_section.dart';
 import '../widgets/home/organizer_stats_section.dart';
@@ -20,25 +21,27 @@ class OrganizerHomeScreen extends StatelessWidget {
     final currentUser = userService
         .getCurrentUser()!; // Safe to use ! since auth is checked at splash
 
-    return BlocProvider(
-      create: (_) => getIt<EventManagementBloc>()
-        ..add(EventManagementEvent.loadOrganizerEvents(
-          organizerId: currentUser.uid,
-          status: EventStatus.active,
-        )),
-      child: const OrganizerHomeView(
-          organizerName: 'Alex'), // Hardcoded for now as per current UI
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => getIt<EventManagementBloc>()
+            ..add(EventManagementEvent.loadOrganizerEvents(
+              organizerId: currentUser.uid,
+              status: EventStatus.active,
+            )),
+        ),
+        BlocProvider(
+          create: (_) => getIt<UserProfileBloc>()
+            ..add(UserProfileEvent.loadUserProfile(userId: currentUser.uid)),
+        ),
+      ],
+      child: const OrganizerHomeView(),
     );
   }
 }
 
 class OrganizerHomeView extends StatelessWidget {
-  final String organizerName;
-
-  const OrganizerHomeView({
-    super.key,
-    required this.organizerName,
-  });
+  const OrganizerHomeView({super.key});
 
   Future<void> _onRefresh(BuildContext context) async {
     final userService = getIt<UserService>();
@@ -50,6 +53,9 @@ class OrganizerHomeView extends StatelessWidget {
               organizerId: currentUser.uid,
               status: EventStatus.active,
             ),
+          );
+      context.read<UserProfileBloc>().add(
+            UserProfileEvent.refreshProfile(userId: currentUser.uid),
           );
     }
   }
@@ -73,7 +79,20 @@ class OrganizerHomeView extends StatelessWidget {
               children: [
                 const OrganizerHeader(),
                 SizedBox(height: 32.h),
-                OrganizerWelcomeSection(organizerName: organizerName),
+                BlocBuilder<UserProfileBloc, UserProfileState>(
+                  builder: (context, state) {
+                    final organizerName = state.whenOrNull(
+                          loaded: (profile) => profile.name,
+                          profileUpdated: (profile) => profile.name,
+                          profileRefreshed: (profile) => profile.name,
+                        ) ??
+                        getIt<UserService>().getCurrentUser()?.displayName ??
+                        'Organizer';
+
+                    return OrganizerWelcomeSection(
+                        organizerName: organizerName);
+                  },
+                ),
                 SizedBox(height: 32.h),
                 const OrganizerStatsSection(),
                 SizedBox(height: 32.h),

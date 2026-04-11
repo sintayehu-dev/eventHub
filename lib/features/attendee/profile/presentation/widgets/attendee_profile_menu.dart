@@ -31,7 +31,7 @@ class AttendeeProfileMenu extends StatelessWidget {
           theme: theme,
           colorScheme: colorScheme,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _AttendeeProfileMenuItem(
           title: 'Payment Methods',
           icon: Icons.payment_outlined,
@@ -39,7 +39,7 @@ class AttendeeProfileMenu extends StatelessWidget {
           theme: theme,
           colorScheme: colorScheme,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _AttendeeProfileMenuItem(
           title: 'Notification Settings',
           icon: Icons.notifications_none_outlined,
@@ -47,7 +47,7 @@ class AttendeeProfileMenu extends StatelessWidget {
           theme: theme,
           colorScheme: colorScheme,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _AttendeeProfileMenuItem(
           title: 'Privacy & Security',
           icon: Icons.security_outlined,
@@ -55,7 +55,7 @@ class AttendeeProfileMenu extends StatelessWidget {
           theme: theme,
           colorScheme: colorScheme,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 10.h),
         _AttendeeProfileMenuItem(
           title: 'Help & Support',
           icon: Icons.help_outline,
@@ -87,12 +87,12 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
@@ -101,18 +101,18 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(
                 icon,
                 color: colorScheme.primary,
-                size: 20.sp,
+                size: 18.sp,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 14.w),
             Expanded(
               child: Text(
                 title,
@@ -124,7 +124,7 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
+              size: 18.sp,
             ),
           ],
         ),

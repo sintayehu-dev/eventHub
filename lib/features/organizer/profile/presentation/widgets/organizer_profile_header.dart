@@ -16,152 +16,157 @@ class OrganizerProfileHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(24.r),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+            colorScheme.surfaceContainer.withValues(alpha: 0.6),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          color: colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          // Gradient banner
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24.r),
-              topRight: Radius.circular(24.r),
+          // Profile Avatar
+          Container(
+            width: 60.w,
+            height: 60.h,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.secondary.withValues(alpha: 0.8),
+                  colorScheme.tertiary.withValues(alpha: 0.9),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.secondary.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Container(
-              height: 90.h,
+              margin: EdgeInsets.all(2.w),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorScheme.secondary, colorScheme.tertiary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                shape: BoxShape.circle,
+                color: colorScheme.surface,
+              ),
+              child: ClipOval(
+                child: profile.profileImageUrl != null
+                    ? Image.network(
+                        profile.profileImageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                colorScheme.secondary,
+                                colorScheme.tertiary
+                              ],
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.business_rounded,
+                            color: colorScheme.onSecondary,
+                            size: 28.sp,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              colorScheme.secondary,
+                              colorScheme.tertiary
+                            ],
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.business_rounded,
+                          color: colorScheme.onSecondary,
+                          size: 28.sp,
+                        ),
+                      ),
               ),
             ),
           ),
 
-          // Avatar overlapping the banner
-          Transform.translate(
-            offset: Offset(0, -40.h),
+          SizedBox(width: 16.w),
+
+          // Name and Role Info
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 88.w,
-                  height: 88.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [colorScheme.secondary, colorScheme.tertiary],
-                    ),
-                    border: Border.all(
-                      color: colorScheme.surface,
-                      width: 4,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.secondary.withValues(alpha: 0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: profile.profileImageUrl != null
-                      ? ClipOval(
-                          child: Image.network(
-                            profile.profileImageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.business,
-                              color: colorScheme.onSecondary,
-                              size: 36.sp,
-                            ),
-                          ),
-                        )
-                      : Icon(
-                          Icons.business,
-                          color: colorScheme.onSecondary,
-                          size: 36.sp,
-                        ),
-                ),
-                SizedBox(height: 8.h),
                 Text(
                   profile.name,
                   style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 6.h),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: colorScheme.secondary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20.r),
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.secondary.withValues(alpha: 0.2),
+                        colorScheme.secondary.withValues(alpha: 0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
-                      color: colorScheme.secondary.withValues(alpha: 0.35),
+                      color: colorScheme.secondary.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
-                  child: Text(
-                    'Event Organizer',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colorScheme.secondary,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.4,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.business_center_rounded,
+                        size: 14.sp,
+                        color: colorScheme.secondary,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Organizer',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.secondary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-
-          // Info rows
-          Transform.translate(
-            offset: Offset(0, -28.h),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Column(
-                children: [
-                  _buildHeaderInfoRow(
-                      Icons.email_outlined, profile.email, theme, colorScheme),
-                  if (profile.phone != null) ...[
-                    SizedBox(height: 8.h),
-                    _buildHeaderInfoRow(Icons.phone_outlined, profile.phone!,
-                        theme, colorScheme),
-                  ],
-                  SizedBox(height: 16.h),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeaderInfoRow(
-      IconData icon, String text, ThemeData theme, ColorScheme colorScheme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon,
-            size: 14.sp,
-            color: colorScheme.onSurface.withValues(alpha: 0.5)),
-        SizedBox(width: 6.w),
-        Flexible(
-          child: Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.65),
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 }
