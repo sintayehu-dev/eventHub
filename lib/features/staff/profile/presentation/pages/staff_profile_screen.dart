@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
+import 'package:eventhub/features/shared/profile/presentation/pages/edit_profile_screen.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
@@ -492,8 +493,34 @@ class _StaffProfileViewState extends State<StaffProfileView> {
   }
 
   void _showEditProfileDialog() {
-    AppHelpers.showInfoSnackBar(
-        context, 'Edit profile functionality coming soon');
+    // Navigate to edit profile screen
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+          profile: context.read<UserProfileBloc>().state.whenOrNull(
+                    loaded: (profile) => profile,
+                    profileUpdated: (profile) => profile,
+                    profileRefreshed: (profile) => profile,
+                  ) ??
+              UserProfileEntity(
+                id: getIt<UserService>().getCurrentUser()?.uid ?? '',
+                email: getIt<UserService>().getCurrentUser()?.email ?? '',
+                name: getIt<UserService>().getCurrentUser()?.displayName ?? '',
+                role: UserRole.staff,
+              ),
+        ),
+      ),
+    )
+        .then((result) {
+      // Refresh profile if edit was successful
+      if (result == true) {
+        final uid = getIt<UserService>().getCurrentUser()?.uid ?? '';
+        context.read<UserProfileBloc>().add(
+              UserProfileEvent.refreshProfile(userId: uid),
+            );
+      }
+    });
   }
 
   void _showLogoutDialog(BuildContext context) {
