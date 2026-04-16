@@ -45,6 +45,15 @@ class OrganizerEventsView extends StatefulWidget {
 class _OrganizerEventsViewState extends State<OrganizerEventsView> {
   EventStatus _selectedStatus = EventStatus.active;
 
+  @override
+  void initState() {
+    super.initState();
+    // Reload events when returning to this screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEvents(context);
+    });
+  }
+
   void _loadEvents(BuildContext context) {
     context.read<EventManagementBloc>().add(
           EventManagementEvent.loadOrganizerEvents(
@@ -64,36 +73,43 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
           AppHelpers.showErrorSnackBar(context, state.errorMessage);
         }
       },
-      child: Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 0),
-                sliver: SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const OrganizerEventsHeader(),
-                      SizedBox(height: 24.h),
-                      OrganizerEventsFilterSection(
-                        selectedStatus: _selectedStatus,
-                        onStatusChanged: (status) {
-                          setState(() {
-                            _selectedStatus = status;
-                          });
-                          _loadEvents(context);
-                        },
-                      ),
-                      SizedBox(height: 24.h),
-                    ],
+      child: RefreshIndicator(
+        onRefresh: () async {
+          _loadEvents(context);
+          // Wait a bit for the events to load
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        child: Scaffold(
+          backgroundColor: colorScheme.surface,
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const OrganizerEventsHeader(),
+                        SizedBox(height: 24.h),
+                        OrganizerEventsFilterSection(
+                          selectedStatus: _selectedStatus,
+                          onStatusChanged: (status) {
+                            setState(() {
+                              _selectedStatus = status;
+                            });
+                            _loadEvents(context);
+                          },
+                        ),
+                        SizedBox(height: 24.h),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const OrganizerEventsListSection(),
-              SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
-            ],
+                const OrganizerEventsListSection(),
+                SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
+              ],
+            ),
           ),
         ),
       ),

@@ -75,10 +75,21 @@ class OrganizerActiveEventsSection extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 16.h),
           child: ActiveEventCard(
             event: event,
-            onTap: () => context.pushNamed(
-              RouteName.organizerEventDetail,
-              pathParameters: {'eventId': event.id},
-            ),
+                onTap: () async {
+                  final result = await context.pushNamed(
+                    RouteName.organizerEventDetail,
+                    pathParameters: {'eventId': event.id},
+                  );
+                  // If event was deleted (result == true), reload the events list
+                  if (result == true && context.mounted) {
+                    context.read<EventManagementBloc>().add(
+                          EventManagementEvent.loadOrganizerEvents(
+                            organizerId: event.organizerId,
+                            status: EventStatus.active,
+                          ),
+                        );
+                  }
+                },
           ),
         )),
       ],

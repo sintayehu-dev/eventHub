@@ -16,13 +16,22 @@ class OrganizerEventItemCard extends StatelessWidget {
     required this.event,
   });
 
-  void _handleAction(BuildContext context, String action) {
+  void _handleAction(BuildContext context, String action) async {
     switch (action) {
       case 'details':
-        context.pushNamed(
+        final result = await context.pushNamed(
           RouteName.organizerEventDetail,
           pathParameters: {'eventId': event.id},
         );
+        // If event was deleted (result == true), reload the events list
+        if (result == true && context.mounted) {
+          context.read<EventManagementBloc>().add(
+                EventManagementEvent.loadOrganizerEvents(
+                  organizerId: event.organizerId,
+                  status: EventStatus.active,
+                ),
+              );
+        }
         break;
       case 'attendees':
         context.pushNamed(
@@ -31,11 +40,20 @@ class OrganizerEventItemCard extends StatelessWidget {
         );
         break;
       case 'edit':
-        context.pushNamed(
+        final result = await context.pushNamed(
           RouteName.editEventScreen,
           pathParameters: {'eventId': event.id},
           extra: event,
         );
+        // If event was updated, reload the events list
+        if (result != null && context.mounted) {
+          context.read<EventManagementBloc>().add(
+                EventManagementEvent.loadOrganizerEvents(
+                  organizerId: event.organizerId,
+                  status: EventStatus.active,
+                ),
+              );
+        }
         break;
       case 'analytics':
         context.read<EventManagementBloc>().add(

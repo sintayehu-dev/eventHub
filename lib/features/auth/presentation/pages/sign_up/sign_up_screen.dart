@@ -7,6 +7,7 @@ import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
 import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/core/theme/app_theme.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_event.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_state.dart';
@@ -86,86 +87,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header with back button and title (now scrollable)
+                        // Back button
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 16.h),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                onPressed: () => context.pop(),
-                                icon: Icon(
-                                  Icons.arrow_back,
-                                  color: colorScheme.onSurface,
-                                  size: 24.sp,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'Event Hub',
-                                  style:
-                                      darkTheme.textTheme.titleLarge?.copyWith(
-                                    color: colorScheme.onSurface,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(width: 48.w), // Balance the back button
-                            ],
+                          child: AppBackButton(
+                            iconColor: colorScheme.onSurface,
                           ),
                         ),
                       
-                        // Hero Image Section
-                        Container(
-                          width: double.infinity,
-                          height: 120.h,
-                          margin: EdgeInsets.only(bottom: 32.h),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16.r),
-                            gradient: LinearGradient(
-                              colors: [
-                                colorScheme.primary.withValues(alpha: 0.3),
-                                colorScheme.secondary.withValues(alpha: 0.3),
-                              ],
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Particle effect simulation
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16.r),
-                                    image: const DecorationImage(
-                                      image: NetworkImage(
-                                        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=200&fit=crop',
-                                      ),
-                                      fit: BoxFit.cover,
-                                      opacity: 0.3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Overlay
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16.r),
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      colorScheme.primary
-                                          .withValues(alpha: 0.4),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                            
-                            Text(
+                        Text(
                               'Join the Scene',
                                 style:
                                     darkTheme.textTheme.displaySmall?.copyWith(
@@ -421,16 +351,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     value: 'organizer',
                                     isSelected: _selectedRole == 'organizer',
                                   ),
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: _buildRoleCard(
-                                    icon: Icons.people,
-                                    title: 'Venue Staff',
-                                    value: 'staff',
-                                    isSelected: _selectedRole == 'staff',
-                                  ),
-                                ),
+                            ),
                               ],
                             ),
                             // Role validation error

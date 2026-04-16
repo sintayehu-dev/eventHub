@@ -7,6 +7,7 @@ import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
+import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_header.dart';
@@ -58,23 +59,27 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
       builder: (context, state) {
         final colorScheme = Theme.of(context).colorScheme;
         
-        if (state.isLoading) {
+        if (state.isLoading && !state.isDeleting) {
           return Scaffold(
             backgroundColor: colorScheme.surface,
             body: const EventDetailShimmer(),
           );
         }
 
-        if (state.hasError && state.errorMessage.isNotEmpty) {
+        if (state.hasError &&
+            state.errorMessage.isNotEmpty &&
+            !state.isDeleting) {
           return _buildErrorScaffold(state.errorMessage);
         }
 
         if (state.selectedEvent != null) {
-          return _buildEventDetailScaffold(context, state.selectedEvent!);
+          return _buildEventDetailScaffold(
+              context, state.selectedEvent!, state.isDeleting);
         }
 
         if (state.events.isNotEmpty) {
-          return _buildEventDetailScaffold(context, state.events.first);
+          return _buildEventDetailScaffold(
+              context, state.events.first, state.isDeleting);
         }
 
         return _buildErrorScaffold('Event not found');
@@ -82,44 +87,73 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     );
   }
 
-  Widget _buildEventDetailScaffold(BuildContext context, EventEntity event) {
+  Widget _buildEventDetailScaffold(
+      BuildContext context, EventEntity event, bool isDeleting) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        top: false, // Let SliverAppBar handle the top safe area
-        child: CustomScrollView(
-          slivers: [
-            EventDetailHeader(
-              event: event,
-              onEdit: () => _editEvent(context, event),
-              onMore: () => _showMoreOptions(context, event),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EventPerformanceMetrics(event: event),
-                    SizedBox(height: 32.h),
-                    EventDetailActions(
-                      event: event,
-                      onViewAttendees: () =>
-                          _viewAllAttendees(context, event.id),
-                      onBroadcast: () => _broadcastMessage(context, event),
-                      onCancel: () => _cancelEvent(context, event),
+      body: Stack(
+        children: [
+          SafeArea(
+            top: false, // Let SliverAppBar handle the top safe area
+            child: CustomScrollView(
+              slivers: [
+                EventDetailHeader(
+                  event: event,
+                  onEdit: () => _editEvent(context, event),
+                  onMore: () => _showMoreOptions(context, event),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        EventPerformanceMetrics(event: event),
+                        SizedBox(height: 32.h),
+                        EventDetailActions(
+                          event: event,
+                          onViewAttendees: () =>
+                              _viewAllAttendees(context, event.id),
+                          onBroadcast: () => _broadcastMessage(context, event),
+                          onCancel: () => _cancelEvent(context, event),
+                        ),
+                        SizedBox(height: 24.h),
+                        EventInfoSection(event: event),
+                        SizedBox(height: 20.h),
+                      ],
                     ),
-                    SizedBox(height: 24.h),
-                    EventInfoSection(event: event),
-                    SizedBox(height: 20.h),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Loading overlay when deleting
+          if (isDeleting)
+            Container(
+              color: colorScheme.surface.withValues(alpha: 0.8),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SpinKitLoadingWidget(
+                      color: colorScheme.primary,
+                      size: 50.w,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Deleting event...',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -487,9 +521,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
             AppHelpers.showSuccessSnackBar(
                 context, 'Event "$eventTitle" deleted successfully');
 
-            // Navigate back to events page
-            // The events page will automatically refresh due to its BlocProvider setup
-            context.goNamed(RouteName.organizerEvents);
+            // Pop back to the previous screen (events list)
+            // Return true to indicate the event was deleted
+            context.pop(true);
           }
         }
       }
