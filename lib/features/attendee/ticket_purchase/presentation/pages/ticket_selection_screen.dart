@@ -72,7 +72,7 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
           ),
 
           // Bottom Summary
-          if (_totalAmount > 0)
+          if (totalTickets > 0)
             Positioned(
               left: 0,
               right: 0,
@@ -123,6 +123,8 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
       });
     }
 
+    // Always go to confirmation screen
+    // The confirmation screen will handle both free and paid tickets
     context.pushNamed(
       RouteName.purchaseConfirmation,
       extra: {
@@ -132,4 +134,4 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
       },
     );
   }
-}
+}

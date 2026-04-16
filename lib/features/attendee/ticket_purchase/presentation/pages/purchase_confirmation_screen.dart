@@ -33,15 +33,27 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
   PaymentMethod _selectedPaymentMethod = PaymentMethod.chapa;
 
   @override
+  void initState() {
+    super.initState();
+    // For free tickets, automatically complete the purchase
+    if (widget.totalAmount == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _purchaseTickets();
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isFree = widget.totalAmount == 0;
     
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Confirm Purchase',
+          isFree ? 'Get Free Ticket' : 'Confirm Purchase',
           style: theme.textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.bold,
@@ -51,6 +63,7 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: !isFree, // Hide back button for free tickets
       ),
       body: BlocListener<TicketPurchaseBloc, TicketPurchaseState>(
         listener: (context, state) {
@@ -68,44 +81,69 @@ class _PurchaseConfirmationScreenState extends State<PurchaseConfirmationScreen>
             );
           }
         },
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Event Summary
-                    TicketPurchaseEventHeader(event: widget.event),
-                    SizedBox(height: 24.h),
+        child: isFree
+            ? _buildFreeTicketLoading(colorScheme)
+            : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(20.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Event Summary
+                          TicketPurchaseEventHeader(event: widget.event),
+                          SizedBox(height: 24.h),
 
-                    // Ticket Summary
-                    TicketOrderSummaryCard(selectedTickets: widget.selectedTickets),
-                    SizedBox(height: 24.h),
+                          // Ticket Summary
+                          TicketOrderSummaryCard(
+                              selectedTickets: widget.selectedTickets),
+                          SizedBox(height: 24.h),
 
-                    // Payment Method
-                    PaymentMethodSelector(
-                      selectedMethod: _selectedPaymentMethod,
-                      onMethodChanged: (method) {
-                        setState(() {
-                          _selectedPaymentMethod = method;
-                        });
-                      },
+                          // Payment Method
+                          PaymentMethodSelector(
+                            selectedMethod: _selectedPaymentMethod,
+                            onMethodChanged: (method) {
+                              setState(() {
+                                _selectedPaymentMethod = method;
+                              });
+                            },
+                          ),
+                          SizedBox(height: 24.h),
+
+                          // Total
+                          _buildTotalSection(),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 24.h),
+                  ),
 
-                    // Total
-                    _buildTotalSection(),
-                  ],
-                ),
+                  // Purchase Button
+                  _buildPurchaseButton(),
+                ],
               ),
-            ),
+      ),
+    );
+  }
 
-            // Purchase Button
-            _buildPurchaseButton(),
-          ],
-        ),
+  Widget _buildFreeTicketLoading(ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SpinKitLoadingWidget(
+            color: colorScheme.primary,
+            size: 50.w,
+          ),
+          SizedBox(height: 24.h),
+          Text(
+            'Getting your free ticket...',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
+        ],
       ),
     );
   }

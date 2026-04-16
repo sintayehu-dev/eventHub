@@ -7,6 +7,7 @@ class EventLocationDateTimeSection extends StatelessWidget {
   final TimeOfDay? selectedTime;
   final VoidCallback onSelectDate;
   final VoidCallback onSelectTime;
+  final String? dateTimeError;
 
   const EventLocationDateTimeSection({
     super.key,
@@ -15,6 +16,7 @@ class EventLocationDateTimeSection extends StatelessWidget {
     required this.selectedTime,
     required this.onSelectDate,
     required this.onSelectTime,
+    this.dateTimeError,
   });
 
   @override
@@ -50,6 +52,15 @@ class EventLocationDateTimeSection extends StatelessWidget {
             ),
           ],
         ),
+        if (dateTimeError != null) ...[
+          SizedBox(height: 8.h),
+          Text(
+            dateTimeError!,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+          ),
+        ],
       ],
     );
   }

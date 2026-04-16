@@ -107,10 +107,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
             const AnalyticsKeyMetricsGrid(),
             SizedBox(height: 32.h),
-
-            const AnalyticsRevenueOverview(),
-            SizedBox(height: 32.h),
-
+            
             const TopPerformingEventsList(),
             SizedBox(height: 32.h),
 
@@ -151,10 +148,6 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
           // Key metrics grid shimmer
           _buildKeyMetricsShimmer(context),
-          SizedBox(height: 32.h),
-
-          // Revenue overview shimmer
-          _buildRevenueOverviewShimmer(context),
           SizedBox(height: 32.h),
 
           // Top performing events shimmer

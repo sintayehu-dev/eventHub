@@ -7,6 +7,7 @@ class EventBasicInfoSection extends StatelessWidget {
   final String? selectedCategory;
   final List<String> categories;
   final Function(String?) onCategoryChanged;
+  final String? categoryError;
 
   const EventBasicInfoSection({
     super.key,
@@ -15,6 +16,7 @@ class EventBasicInfoSection extends StatelessWidget {
     required this.selectedCategory,
     required this.categories,
     required this.onCategoryChanged,
+    this.categoryError,
   });
 
   @override
@@ -40,6 +42,15 @@ class EventBasicInfoSection extends StatelessWidget {
         _buildSectionTitle(context, 'Event Category'),
         SizedBox(height: 8.h),
         _buildCategoryDropdown(context),
+        if (categoryError != null) ...[
+          SizedBox(height: 8.h),
+          Text(
+            categoryError!,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+          ),
+        ],
         SizedBox(height: 24.h),
 
         _buildSectionTitle(context, 'Description'),

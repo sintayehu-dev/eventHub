@@ -3674,6 +3674,9 @@ mixin _$EventManagementState {
   DateTime? get filterStartDate => throw _privateConstructorUsedError;
   DateTime? get filterEndDate => throw _privateConstructorUsedError;
   String? get uploadedBannerUrl => throw _privateConstructorUsedError;
+  bool get showValidationErrors => throw _privateConstructorUsedError;
+  Map<String, String> get validationErrors =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of EventManagementState
   /// with the given fields replaced by the non-null parameter values.
@@ -3702,7 +3705,9 @@ abstract class $EventManagementStateCopyWith<$Res> {
       EventStatus? filterStatus,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
-      String? uploadedBannerUrl});
+      String? uploadedBannerUrl,
+      bool showValidationErrors,
+      Map<String, String> validationErrors});
 
   $EventEntityCopyWith<$Res>? get selectedEvent;
   $EventStatisticsCopyWith<$Res>? get statistics;
@@ -3738,6 +3743,8 @@ class _$EventManagementStateCopyWithImpl<$Res,
     Object? filterStartDate = freezed,
     Object? filterEndDate = freezed,
     Object? uploadedBannerUrl = freezed,
+    Object? showValidationErrors = null,
+    Object? validationErrors = null,
   }) {
     return _then(_value.copyWith(
       events: null == events
@@ -3796,6 +3803,14 @@ class _$EventManagementStateCopyWithImpl<$Res,
           ? _value.uploadedBannerUrl
           : uploadedBannerUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      showValidationErrors: null == showValidationErrors
+          ? _value.showValidationErrors
+          : showValidationErrors // ignore: cast_nullable_to_non_nullable
+              as bool,
+      validationErrors: null == validationErrors
+          ? _value.validationErrors
+          : validationErrors // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ) as $Val);
   }
 
@@ -3850,7 +3865,9 @@ abstract class _$$EventManagementStateImplCopyWith<$Res>
       EventStatus? filterStatus,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
-      String? uploadedBannerUrl});
+      String? uploadedBannerUrl,
+      bool showValidationErrors,
+      Map<String, String> validationErrors});
 
   @override
   $EventEntityCopyWith<$Res>? get selectedEvent;
@@ -3885,6 +3902,8 @@ class __$$EventManagementStateImplCopyWithImpl<$Res>
     Object? filterStartDate = freezed,
     Object? filterEndDate = freezed,
     Object? uploadedBannerUrl = freezed,
+    Object? showValidationErrors = null,
+    Object? validationErrors = null,
   }) {
     return _then(_$EventManagementStateImpl(
       events: null == events
@@ -3943,6 +3962,14 @@ class __$$EventManagementStateImplCopyWithImpl<$Res>
           ? _value.uploadedBannerUrl
           : uploadedBannerUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      showValidationErrors: null == showValidationErrors
+          ? _value.showValidationErrors
+          : showValidationErrors // ignore: cast_nullable_to_non_nullable
+              as bool,
+      validationErrors: null == validationErrors
+          ? _value._validationErrors
+          : validationErrors // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ));
   }
 }
@@ -3964,8 +3991,11 @@ class _$EventManagementStateImpl implements _EventManagementState {
       this.filterStatus,
       this.filterStartDate,
       this.filterEndDate,
-      this.uploadedBannerUrl})
-      : _events = events;
+      this.uploadedBannerUrl,
+      this.showValidationErrors = false,
+      final Map<String, String> validationErrors = const {}})
+      : _events = events,
+        _validationErrors = validationErrors;
 
   final List<EventEntity> _events;
   @override
@@ -4009,10 +4039,21 @@ class _$EventManagementStateImpl implements _EventManagementState {
   final DateTime? filterEndDate;
   @override
   final String? uploadedBannerUrl;
+  @override
+  @JsonKey()
+  final bool showValidationErrors;
+  final Map<String, String> _validationErrors;
+  @override
+  @JsonKey()
+  Map<String, String> get validationErrors {
+    if (_validationErrors is EqualUnmodifiableMapView) return _validationErrors;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_validationErrors);
+  }
 
   @override
   String toString() {
-    return 'EventManagementState(events: $events, isLoading: $isLoading, isCreating: $isCreating, isUpdating: $isUpdating, isDeleting: $isDeleting, hasError: $hasError, errorMessage: $errorMessage, selectedEvent: $selectedEvent, statistics: $statistics, searchQuery: $searchQuery, filterStatus: $filterStatus, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate, uploadedBannerUrl: $uploadedBannerUrl)';
+    return 'EventManagementState(events: $events, isLoading: $isLoading, isCreating: $isCreating, isUpdating: $isUpdating, isDeleting: $isDeleting, hasError: $hasError, errorMessage: $errorMessage, selectedEvent: $selectedEvent, statistics: $statistics, searchQuery: $searchQuery, filterStatus: $filterStatus, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate, uploadedBannerUrl: $uploadedBannerUrl, showValidationErrors: $showValidationErrors, validationErrors: $validationErrors)';
   }
 
   @override
@@ -4046,7 +4087,11 @@ class _$EventManagementStateImpl implements _EventManagementState {
             (identical(other.filterEndDate, filterEndDate) ||
                 other.filterEndDate == filterEndDate) &&
             (identical(other.uploadedBannerUrl, uploadedBannerUrl) ||
-                other.uploadedBannerUrl == uploadedBannerUrl));
+                other.uploadedBannerUrl == uploadedBannerUrl) &&
+            (identical(other.showValidationErrors, showValidationErrors) ||
+                other.showValidationErrors == showValidationErrors) &&
+            const DeepCollectionEquality()
+                .equals(other._validationErrors, _validationErrors));
   }
 
   @override
@@ -4065,7 +4110,9 @@ class _$EventManagementStateImpl implements _EventManagementState {
       filterStatus,
       filterStartDate,
       filterEndDate,
-      uploadedBannerUrl);
+      uploadedBannerUrl,
+      showValidationErrors,
+      const DeepCollectionEquality().hash(_validationErrors));
 
   /// Create a copy of EventManagementState
   /// with the given fields replaced by the non-null parameter values.
@@ -4093,7 +4140,9 @@ abstract class _EventManagementState implements EventManagementState {
       final EventStatus? filterStatus,
       final DateTime? filterStartDate,
       final DateTime? filterEndDate,
-      final String? uploadedBannerUrl}) = _$EventManagementStateImpl;
+      final String? uploadedBannerUrl,
+      final bool showValidationErrors,
+      final Map<String, String> validationErrors}) = _$EventManagementStateImpl;
 
   @override
   List<EventEntity> get events;
@@ -4123,6 +4172,10 @@ abstract class _EventManagementState implements EventManagementState {
   DateTime? get filterEndDate;
   @override
   String? get uploadedBannerUrl;
+  @override
+  bool get showValidationErrors;
+  @override
+  Map<String, String> get validationErrors;
 
   /// Create a copy of EventManagementState
   /// with the given fields replaced by the non-null parameter values.

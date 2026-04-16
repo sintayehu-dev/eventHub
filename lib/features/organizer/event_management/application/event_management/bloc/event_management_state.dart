@@ -17,6 +17,8 @@ class EventManagementState with _$EventManagementState {
     DateTime? filterStartDate,
     DateTime? filterEndDate,
     String? uploadedBannerUrl,
+    @Default(false) bool showValidationErrors,
+    @Default({}) Map<String, String> validationErrors,
   }) = _EventManagementState;
 
   factory EventManagementState.initial() => const EventManagementState();

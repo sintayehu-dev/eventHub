@@ -17,6 +17,7 @@ class TicketPurchaseSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isFree = totalAmount == 0;
     
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, MediaQuery.of(context).padding.bottom + 16.h),
@@ -50,7 +51,7 @@ class TicketPurchaseSummary extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Total Amount',
+                    isFree ? 'Free Event' : 'Total Amount',
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
@@ -58,13 +59,30 @@ class TicketPurchaseSummary extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(
-                '${totalAmount.toStringAsFixed(2)} Birr',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
+              if (!isFree)
+                Text(
+                  '${totalAmount.toStringAsFixed(2)} Birr',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              else
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Text(
+                    'FREE',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
           SizedBox(height: 20.h),
@@ -81,12 +99,22 @@ class TicketPurchaseSummary extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: Text(
-                'Continue to Payment',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    isFree ? Icons.confirmation_number : Icons.payment,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    isFree ? 'Get Ticket' : 'Continue to Payment',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

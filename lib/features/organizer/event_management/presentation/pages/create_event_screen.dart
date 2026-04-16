@@ -53,6 +53,13 @@ class _CreateEventViewState extends State<CreateEventView> {
   // Staff Creation Management
   final List<StaffCreationData> _staffMembers = [];
 
+  // Validation state
+  bool _showValidationErrors = false;
+  String? _categoryError;
+  String? _dateTimeError;
+  final Map<int, String> _ticketTypeErrors = {};
+  final Map<int, String> _staffMemberErrors = {};
+
   @override
   void initState() {
     super.initState();
@@ -163,8 +170,11 @@ class _CreateEventViewState extends State<CreateEventView> {
                   _selectedCategory = EventCategory.values.firstWhere(
                     (e) => e.displayName == newValue,
                   );
+                  _categoryError =
+                      null; // Clear error when category is selected
                 });
               },
+              categoryError: _showValidationErrors ? _categoryError : null,
             ),
             SizedBox(height: 24.h),
 
@@ -184,6 +194,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               selectedTime: _selectedTime,
               onSelectDate: () => _selectDate(context),
               onSelectTime: () => _selectTime(context),
+              dateTimeError: _showValidationErrors ? _dateTimeError : null,
             ),
             SizedBox(height: 24.h),
 
@@ -264,6 +275,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        _dateTimeError = null; // Clear error when date is selected
       });
     }
   }
@@ -292,6 +304,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     if (picked != null && picked != _selectedTime) {
       setState(() {
         _selectedTime = picked;
+        _dateTimeError = null; // Clear error when time is selected
       });
     }
   }
@@ -318,56 +331,118 @@ class _CreateEventViewState extends State<CreateEventView> {
   }
 
   void _createEvent(BuildContext context) async {
+    // Clear previous validation errors
+    setState(() {
+      _showValidationErrors = true;
+      _categoryError = null;
+      _dateTimeError = null;
+      _ticketTypeErrors.clear();
+      _staffMemberErrors.clear();
+    });
+
+    // Validate form fields
     if (!_formKey.currentState!.validate()) {
+      _scrollToFirstError();
       return;
     }
 
-    final userService = getIt<UserService>();
-    final currentUser = userService
-        .getCurrentUser()!; // Safe to use ! since auth is checked at splash
-
+    // Validate category
     if (_selectedCategory == null) {
+      setState(() {
+        _categoryError = 'Please select an event category';
+      });
       AppHelpers.showErrorSnackBar(context, 'Please select an event category');
+      _scrollToFirstError();
       return;
     }
 
+    // Validate date and time
     if (_selectedDate == null || _selectedTime == null) {
+      setState(() {
+        _dateTimeError = 'Please select event date and time';
+      });
       AppHelpers.showErrorSnackBar(
           context, 'Please select event date and time');
+      _scrollToFirstError();
       return;
     }
 
     // Validate ticket types
+    bool hasTicketError = false;
     for (int i = 0; i < _ticketTypes.length; i++) {
       final ticketType = _ticketTypes[i];
       if (ticketType.nameController.text.trim().isEmpty) {
-        AppHelpers.showErrorSnackBar(
-            context, 'Please fill in ticket type ${i + 1} name');
-        return;
+        setState(() {
+          _ticketTypeErrors[i] = 'Ticket name is required';
+        });
+        hasTicketError = true;
+      }
+      if (ticketType.priceController.text.trim().isEmpty ||
+          double.tryParse(ticketType.priceController.text) == null) {
+        setState(() {
+          _ticketTypeErrors[i] = 'Valid price is required';
+        });
+        hasTicketError = true;
+      }
+      if (ticketType.quantityController.text.trim().isEmpty ||
+          int.tryParse(ticketType.quantityController.text) == null ||
+          int.parse(ticketType.quantityController.text) <= 0) {
+        setState(() {
+          _ticketTypeErrors[i] = 'Valid quantity is required';
+        });
+        hasTicketError = true;
       }
     }
 
+    if (hasTicketError) {
+      AppHelpers.showErrorSnackBar(
+          context, 'Please fix ticket type errors');
+      _scrollToFirstError();
+      return;
+    }
+
     // Validate staff members
+    bool hasStaffError = false;
     for (int i = 0; i < _staffMembers.length; i++) {
       final staffMember = _staffMembers[i];
       if (staffMember.name.trim().isEmpty) {
-        AppHelpers.showErrorSnackBar(
-            context, 'Please enter name for staff member ${i + 1}');
-        return;
+        setState(() {
+          _staffMemberErrors[i] = 'Staff name is required';
+        });
+        hasStaffError = true;
       }
       if (staffMember.email.trim().isEmpty) {
-        AppHelpers.showErrorSnackBar(
-            context, 'Please enter email for staff member ${i + 1}');
-        return;
-      }
-      // Basic email validation
-      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+        setState(() {
+          _staffMemberErrors[i] = 'Staff email is required';
+        });
+        hasStaffError = true;
+      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
           .hasMatch(staffMember.email.trim())) {
-        AppHelpers.showErrorSnackBar(
-            context, 'Please enter a valid email for staff member ${i + 1}');
-        return;
+        setState(() {
+          _staffMemberErrors[i] = 'Valid email is required';
+        });
+        hasStaffError = true;
       }
     }
+
+    if (hasStaffError) {
+      AppHelpers.showErrorSnackBar(
+          context, 'Please fix staff member errors');
+      _scrollToFirstError();
+      return;
+    }
+
+    // Validate capacity
+    final capacity = int.tryParse(_capacityController.text);
+    if (capacity == null || capacity <= 0) {
+      AppHelpers.showErrorSnackBar(
+          context, 'Please enter a valid event capacity');
+      _scrollToFirstError();
+      return;
+    }
+
+    final userService = getIt<UserService>();
+    final currentUser = userService.getCurrentUser()!;
 
     final eventDateTime = DateTime(
       _selectedDate!.year,
@@ -404,16 +479,30 @@ class _CreateEventViewState extends State<CreateEventView> {
       dateTime: eventDateTime,
       category: _selectedCategory!,
       ticketTypes: ticketTypeRequests,
-      maxCapacity: int.tryParse(_capacityController.text) ?? 0,
+      maxCapacity: capacity,
       staffMembers: staffMemberRequests,
     );
 
-    // Create the event first
+    // Create the event
     context.read<EventManagementBloc>().add(
           EventManagementEvent.createEvent(
             organizerId: currentUser.uid,
             request: request,
           ),
         );
+  }
+
+  void _scrollToFirstError() {
+    // Scroll to the first error field
+    // This is a simple implementation - you can enhance it
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 }
