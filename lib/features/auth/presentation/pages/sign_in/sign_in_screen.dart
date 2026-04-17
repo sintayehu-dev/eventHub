@@ -172,9 +172,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                 color: colorScheme.onSurface,
                               ),
                               decoration: InputDecoration(
-                                hintText: 'name@company.com',
+                                  hintText: 'Enter your email',
                                   hintStyle:
-                                      darkTheme.textTheme.bodyLarge?.copyWith(
+                                      darkTheme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                 ),

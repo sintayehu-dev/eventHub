@@ -207,9 +207,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: 'name@gmail.com',
+                              hintText: 'Enter your email',
                                   hintStyle:
-                                        darkTheme.textTheme.bodyLarge?.copyWith(
+                                  darkTheme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurface
                                         .withValues(alpha: 0.5),
                                   ),
