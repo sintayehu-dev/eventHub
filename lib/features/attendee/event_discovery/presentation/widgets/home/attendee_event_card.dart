@@ -31,6 +31,17 @@ class AttendeeEventCard extends StatelessWidget {
               colorScheme.surface,
             ],
           ),
+          border: Border.all(
+            color: colorScheme.primary.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

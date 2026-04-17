@@ -14,7 +14,9 @@ service cloud.firestore {
       allow create: if request.auth != null && 
         request.auth.uid == request.resource.data.organizerId;
       allow update: if request.auth != null && 
-        request.auth.uid == resource.data.organizerId;
+        (request.auth.uid == resource.data.organizerId ||
+         // Allow ticket purchases to update ticket availability
+         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ticketTypes', 'updatedAt'])));
       allow delete: if request.auth != null && 
         request.auth.uid == resource.data.organizerId;
     }

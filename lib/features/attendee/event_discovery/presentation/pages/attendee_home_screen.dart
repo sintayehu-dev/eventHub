@@ -7,7 +7,6 @@ import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 
 import '../widgets/home/attendee_home_header.dart';
-import '../widgets/home/attendee_search_bar.dart';
 import '../widgets/home/attendee_categories_section.dart';
 import '../widgets/home/upcoming_events_section.dart';
 
@@ -50,10 +49,6 @@ class AttendeeHomeView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AttendeeHomeHeader(),
-                SizedBox(height: 24.h),
-                AttendeeSearchBar(
-                  onTap: () => context.pushNamed(RouteName.attendeeDiscover),
-                ),
                 SizedBox(height: 24.h),
                 AttendeeCategoriesSection(
                   onCategoryTap: (category) {

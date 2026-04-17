@@ -77,11 +77,18 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
       final querySnapshot = await query.get();
       
+      print(
+          '🔍 DEBUG: Found ${querySnapshot.docs.length} active events in Firestore');
+      
       // Parse events with error handling
       final allEvents = <EventDiscoveryEntity>[];
+      int parseErrorCount = 0;
+      
       for (final doc in querySnapshot.docs) {
         try {
           final data = doc.data() as Map<String, dynamic>;
+          print('📄 DEBUG: Processing event ${doc.id}: ${data['title']}');
+          
           // Add document ID if missing
           if (!data.containsKey('id')) {
             data['id'] = doc.id;
@@ -91,18 +98,30 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
           final discoveryData = await _convertEventDataToDiscoveryData(data);
           final event = EventDiscoveryEntity.fromFirestoreData(discoveryData);
           allEvents.add(event);
-        } catch (e) {
+          print('✅ DEBUG: Successfully parsed event ${doc.id}');
+        } catch (e, stackTrace) {
           // Skip malformed documents and continue
-          print('Error parsing event document ${doc.id}: $e');
+          parseErrorCount++;
+          print('❌ ERROR parsing event document ${doc.id}: $e');
+          print('Stack trace: $stackTrace');
           continue;
         }
       }
 
+      print(
+          '📊 DEBUG: Successfully parsed ${allEvents.length} events, ${parseErrorCount} errors');
+
       // Filter upcoming events in memory
       final now = DateTime.now();
       final upcomingEvents = allEvents.where((event) {
-        return event.dateTime.isAfter(now);
+        final isUpcoming = event.dateTime.isAfter(now);
+        print(
+            '📅 DEBUG: Event "${event.title}" - Date: ${event.dateTime}, IsUpcoming: $isUpcoming');
+        return isUpcoming;
       }).toList();
+
+      print(
+          '🎯 DEBUG: Found ${upcomingEvents.length} upcoming events after filtering');
 
       // Sort by date (earliest first)
       upcomingEvents.sort((a, b) => a.dateTime.compareTo(b.dateTime));
@@ -112,9 +131,11 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
           ? upcomingEvents.take(limit).toList()
           : upcomingEvents;
 
+      print('✨ DEBUG: Returning ${limitedEvents.length} events');
       return limitedEvents;
-    } catch (e) {
-      print('Error in getUpcomingEvents: $e');
+    } catch (e, stackTrace) {
+      print('❌ ERROR in getUpcomingEvents: $e');
+      print('Stack trace: $stackTrace');
       throw FirebaseException(
         plugin: 'cloud_firestore',
         message: 'Failed to get upcoming events: $e',
@@ -447,69 +468,90 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
   /// Convert EventEntity Firestore data to EventDiscoveryEntity format
   Future<Map<String, dynamic>> _convertEventDataToDiscoveryData(Map<String, dynamic> eventData) async {
-    // Get organizer name - first check if it's already stored in the event
-    final organizerId = eventData['organizerId'] as String;
-    String? storedOrganizerName = eventData['organizerName'] as String?;
+    try {
+      print('🔄 DEBUG: Converting event data for ${eventData['id']}');
+      
+      // Get organizer name - first check if it's already stored in the event
+      final organizerId = eventData['organizerId'] as String;
+      print('   👤 Organizer ID: $organizerId');
+      
+      String? storedOrganizerName = eventData['organizerName'] as String?;
+      print('   📝 Stored organizer name: $storedOrganizerName');
 
-    // If organizer name is not stored or is "Unknown Organizer", fetch it
-    String organizerName;
-    if (storedOrganizerName == null ||
-        storedOrganizerName.isEmpty ||
-        storedOrganizerName == 'Unknown Organizer') {
-      organizerName = await _getOrganizerName(organizerId);
-    } else {
-      organizerName = storedOrganizerName;
-    }
-    
-    // Calculate derived fields
-    final ticketTypesData = eventData['ticketTypes'] as List<dynamic>;
-    final ticketTypes = ticketTypesData.map((ticketData) {
-      final data = ticketData as Map<String, dynamic>;
-      return {
-        'id': data['id'],
-        'name': data['name'],
-        'description': data['description'],
-        'price': data['price'],
-        'availableQuantity': data['availableQuantity'],
-        'totalQuantity': data['quantity'], // Map quantity to totalQuantity
-        'isActive': data['isActive'],
+      // If organizer name is not stored or is "Unknown Organizer", fetch it
+      String organizerName;
+      if (storedOrganizerName == null ||
+          storedOrganizerName.isEmpty ||
+          storedOrganizerName == 'Unknown Organizer') {
+        organizerName = await _getOrganizerName(organizerId);
+        print('   🔍 Fetched organizer name: $organizerName');
+      } else {
+        organizerName = storedOrganizerName;
+      }
+
+      // Calculate derived fields
+      final ticketTypesData = eventData['ticketTypes'] as List<dynamic>;
+      print('   🎫 Processing ${ticketTypesData.length} ticket types');
+      
+      final ticketTypes = ticketTypesData.map((ticketData) {
+        final data = ticketData as Map<String, dynamic>;
+        return {
+          'id': data['id'],
+          'name': data['name'],
+          'description': data['description'],
+          'price': data['price'],
+          'availableQuantity': data['availableQuantity'],
+          'totalQuantity': data['quantity'], // Map quantity to totalQuantity
+          'isActive': data['isActive'],
+        };
+      }).toList();
+
+      // Calculate available tickets
+      final availableTickets = ticketTypes.fold<int>(0, (sum, ticket) {
+        return sum + (ticket['availableQuantity'] as int);
+      });
+      print('   📊 Available tickets: $availableTickets');
+      
+      // Calculate price range
+      final prices = ticketTypes
+          .map((t) => (t['price'] as num).toDouble())
+          .where((p) => p > 0)
+          .toList();
+      final minPrice =
+          prices.isEmpty ? 0.0 : prices.reduce((a, b) => a < b ? a : b);
+      final maxPrice =
+          prices.isEmpty ? 0.0 : prices.reduce((a, b) => a > b ? a : b);
+      print('   💰 Price range: $minPrice - $maxPrice');
+      
+      final result = {
+        'id': eventData['id'],
+        'organizerId': organizerId,
+        'organizerName': organizerName,
+        'title': eventData['title'],
+        'description': eventData['description'],
+        'bannerUrl': eventData['bannerUrl'],
+        'location': eventData['location'],
+        'dateTime': eventData['dateTime'],
+        'category': eventData['category'],
+        'ticketTypes': ticketTypes,
+        'maxCapacity': eventData['maxCapacity'],
+        'availableTickets': availableTickets,
+        'minPrice': minPrice,
+        'maxPrice': maxPrice,
+        'status': eventData['status'],
+        'createdAt': eventData['createdAt'],
+        'distance': null,
+        'isFavorite': null,
+        'attendeeCount': null,
       };
-    }).toList();
-    
-    // Calculate available tickets
-    final availableTickets = ticketTypes.fold<int>(0, (sum, ticket) {
-      return sum + (ticket['availableQuantity'] as int);
-    });
-    
-    // Calculate price range
-    final prices = ticketTypes
-        .map((t) => (t['price'] as num).toDouble())
-        .where((p) => p > 0)
-        .toList();
-    final minPrice = prices.isEmpty ? 0.0 : prices.reduce((a, b) => a < b ? a : b);
-    final maxPrice = prices.isEmpty ? 0.0 : prices.reduce((a, b) => a > b ? a : b);
-    
-    return {
-      'id': eventData['id'],
-      'organizerId': organizerId,
-      'organizerName': organizerName,
-      'title': eventData['title'],
-      'description': eventData['description'],
-      'bannerUrl': eventData['bannerUrl'],
-      'location': eventData['location'],
-      'dateTime': eventData['dateTime'],
-      'category': eventData['category'],
-      'ticketTypes': ticketTypes,
-      'maxCapacity': eventData['maxCapacity'],
-      'availableTickets': availableTickets,
-      'minPrice': minPrice,
-      'maxPrice': maxPrice,
-      'status': eventData['status'],
-      'createdAt': eventData['createdAt'],
-      'distance': null,
-      'isFavorite': null,
-      'attendeeCount': null,
-    };
+      
+      print('   ✅ Conversion successful');
+      return result;
+    } catch (e, stackTrace) {
+      print('   ❌ ERROR in _convertEventDataToDiscoveryData: $e');
+      print('   Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   Future<List<EventDiscoveryEntity>> _convertToDiscoveryEntities(
