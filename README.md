@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎪 EventHub
+# 🎪 Ethio Events
 
 **A Comprehensive Event Management Ecosystem**
 
@@ -36,7 +36,7 @@
 
 ## 🌟 Project Overview
 
-EventHub is a **Flutter-based event management platform** that demonstrates advanced mobile development skills through clean architecture, multi-role authentication, and real-time data management. The application serves three distinct user types with role-based interfaces and functionality.
+Ethio Events is a **Flutter-based event management platform** that demonstrates advanced mobile development skills through clean architecture, multi-role authentication, and real-time data management. The application serves three distinct user types with role-based interfaces and functionality.
 
 ### 🎯 What's Currently Implemented
 
@@ -251,8 +251,8 @@ Cloudinary Account
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/yourusername/eventhub.git
-   cd eventhub
+   git clone https://github.com/yourusername/ethio-events.git
+   cd ethio-events
    ```
 
 2. **Install Dependencies**
@@ -474,7 +474,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🌟 **About This Project**
 
-*EventHub demonstrates production-ready Flutter development skills, showcasing clean architecture, multi-role authentication, and modern mobile development practices.*
+*Ethio Events demonstrates production-ready Flutter development skills, showcasing clean architecture, multi-role authentication, and modern mobile development practices.*
 
 ---
 
