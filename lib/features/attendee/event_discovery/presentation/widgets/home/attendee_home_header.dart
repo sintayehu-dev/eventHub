@@ -73,7 +73,7 @@ class AttendeeHomeHeader extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      'ETHIO EVENTS',
+                      'Ethio Events',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.bold,

@@ -120,7 +120,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       
                       // App Name
                       Text(
-                        'Event Hub',
+                          'Ethio Events',
                           style: darkTheme.textTheme.displaySmall?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -338,7 +338,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Login to Hub',
+                                        'Login',
                                       style:
                                           darkTheme.textTheme.titleMedium
                                             ?.copyWith(

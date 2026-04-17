@@ -31,7 +31,7 @@ class OrganizerHeader extends StatelessWidget {
             ),
             SizedBox(width: 12.w),
             Text(
-              'Event Hub',
+              'Ethio Events',
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
