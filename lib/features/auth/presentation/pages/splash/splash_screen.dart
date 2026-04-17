@@ -198,7 +198,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: 'Event ',
+                                                text: 'Ethio ',
                                                 style: darkTheme
                                                   .textTheme.displayMedium
                                                   ?.copyWith(
@@ -207,7 +207,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                                               ),
                                             ),
                                             TextSpan(
-                                              text: 'Hub',
+                                                text: 'Events',
                                                 style: darkTheme
                                                   .textTheme.displayMedium
                                                   ?.copyWith(

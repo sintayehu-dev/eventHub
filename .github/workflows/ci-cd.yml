@@ -1,4 +1,4 @@
-name: EventHub CI/CD Pipeline
+name: Ethio Events CI/CD Pipeline
 
 on:
   push:
@@ -93,14 +93,14 @@ jobs:
       run: |
         mkdir -p artifacts        # Create artifacts directory
         # Copy and rename release APK with run number
-        cp build/app/outputs/flutter-apk/app-release.apk artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
+        cp build/app/outputs/flutter-apk/app-release.apk artifacts/ethio-events-release-${{ github.run_number }}.apk
         
    
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: eventhub-ft-clean-release-${{ github.run_number }} 
-        path: artifacts/eventhub-ft-clean-release-${{ github.run_number }}.apk
+        name: ethio-events-release-${{ github.run_number }} 
+        path: artifacts/ethio-events-release-${{ github.run_number }}.apk
         retention-days: 7        
         
   
@@ -111,7 +111,7 @@ jobs:
         script: |
           // Create helpful comment with download instructions
           const runNumber = context.runNumber;
-          const artifactName = `eventhub-ft-clean-release-${runNumber}`;
+          const artifactName = `ethio-events-release-${runNumber}`;
           const comment = `🚀 **Build completed successfully!**
           
           📱 **Release APK is ready for testing:**
@@ -149,7 +149,7 @@ jobs:
     - name: Download APK artifact
       uses: actions/download-artifact@v4
       with:
-        name: eventhub-ft-clean-release-${{ github.run_number }}
+        name: ethio-events-release-${{ github.run_number }}
         path: release-files/
         
     # Step 2.1: Check downloaded files and prepare for release
@@ -165,7 +165,7 @@ jobs:
         fi
         echo "Found APK file: $APK_FILE"
         # Verify the expected file exists
-        EXPECTED_NAME="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
+        EXPECTED_NAME="release-files/ethio-events-release-${{ github.run_number }}.apk"
         if [ ! -f "$EXPECTED_NAME" ]; then
           echo "Error: Expected APK file not found at $EXPECTED_NAME"
           echo "Available files:"
@@ -229,7 +229,7 @@ jobs:
         ls -la release-files/
         
         # Verify APK file exists
-        APK_FILE="release-files/eventhub-ft-clean-release-${{ github.run_number }}.apk"
+        APK_FILE="release-files/ethio-events-release-${{ github.run_number }}.apk"
         if [ ! -f "$APK_FILE" ]; then
           echo "Error: APK file not found at $APK_FILE"
           exit 1
@@ -238,8 +238,8 @@ jobs:
         
         # Create the release using GitHub CLI
         gh release create "build-${{ github.run_number }}" \
-          --title "EventHub Build #${{ github.run_number }}" \
-          --notes "📱 **APK**: \`eventhub-ft-clean-release-${{ github.run_number }}.apk\`" \
+          --title "Ethio Events Build #${{ github.run_number }}" \
+          --notes "📱 **APK**: \`ethio-events-release-${{ github.run_number }}.apk\`" \
           --prerelease \
           "$APK_FILE"
       env:
