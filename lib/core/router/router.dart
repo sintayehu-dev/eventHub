@@ -8,6 +8,7 @@ import 'package:eventhub/features/auth/presentation/pages/sign_in/sign_in_screen
 import 'package:eventhub/features/auth/presentation/pages/sign_up/sign_up_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/onboarding/onboarding_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/terms/terms_and_conditions_screen.dart';
+import 'package:eventhub/features/auth/presentation/pages/privacy_policy/privacy_policy_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/splash/splash_screen.dart';
 import 'package:eventhub/features/auth/presentation/providers/auth_providers.dart';
 
@@ -125,6 +126,13 @@ final router = GoRouter(
       name: RouteName.terms,
       path: '/${RouteName.terms}',
       builder: (context, state) => const TermsAndConditionsScreen(),
+    ),
+
+    // Privacy Policy
+    GoRoute(
+      name: RouteName.privacyPolicy,
+      path: '/${RouteName.privacyPolicy}',
+      builder: (context, state) => const PrivacyPolicyScreen(),
     ),
 
     // Event Detail (shared route)

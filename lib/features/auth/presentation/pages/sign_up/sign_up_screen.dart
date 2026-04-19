@@ -365,6 +365,114 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                             
+                        SizedBox(height: 32.h),
+
+                        // Privacy Policy Checkbox
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 24.w,
+                              height: 24.h,
+                              child: Checkbox(
+                                value: state.termsAcceptance?.getOrCrash() ??
+                                    false,
+                                onChanged: (value) {
+                                  context.read<RegistrationBloc>().add(
+                                        RegistrationEvent.termsAcceptedChanged(
+                                            value ?? false),
+                                      );
+                                },
+                                activeColor: colorScheme.primary,
+                                checkColor: colorScheme.onPrimary,
+                                side: BorderSide(
+                                  color: colorScheme.outline
+                                      .withValues(alpha: 0.4),
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  final currentValue =
+                                      state.termsAcceptance?.getOrCrash() ??
+                                          false;
+                                  context.read<RegistrationBloc>().add(
+                                        RegistrationEvent.termsAcceptedChanged(
+                                            !currentValue),
+                                      );
+                                },
+                                child: RichText(
+                                  text: TextSpan(
+                                    style:
+                                        darkTheme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.8),
+                                      height: 1.4,
+                                    ),
+                                    children: [
+                                      const TextSpan(text: 'I agree to the '),
+                                      WidgetSpan(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            context.pushNamed(RouteName.terms);
+                                          },
+                                          child: Text(
+                                            'Terms of Service',
+                                            style: darkTheme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: colorScheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor:
+                                                  colorScheme.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const TextSpan(text: ' and '),
+                                      WidgetSpan(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            context.pushNamed(
+                                                RouteName.privacyPolicy);
+                                          },
+                                          child: Text(
+                                            'Privacy Policy',
+                                            style: darkTheme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: colorScheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor:
+                                                  colorScheme.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Terms acceptance validation error
+                        if (state.showErrorMessages &&
+                            state.termsAcceptance != null &&
+                            !state.termsAcceptance!.isValid())
+                          Padding(
+                            padding: EdgeInsets.only(left: 36.w, top: 8.h),
+                            child: const AppValidationErrorWidget(
+                              errorMessage:
+                                  'You must accept the Terms of Service and Privacy Policy',
+                            ),
+                          ),
+                            
                             SizedBox(height: 40.h),
                             
                             // Sign Up Button
@@ -438,18 +546,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ),
                                 ),
                               ],
-                            ),
-                            
-                            SizedBox(height: 16.h),
-                            
-                            // Terms and Privacy
-                            Text(
-                              'By signing up you agree to our Terms of Service and Privacy Policy',
-                                style: darkTheme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.5),
-                              ),
-                              textAlign: TextAlign.center,
                             ),
                             
                             SizedBox(height: 32.h),

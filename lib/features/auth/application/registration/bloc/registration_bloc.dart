@@ -20,6 +20,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     on<EmailChanged>(_onEmailChanged);
     on<PasswordChanged>(_onPasswordChanged);
     on<UserRoleChanged>(_onUserRoleChanged);
+    on<TermsAcceptedChanged>(_onTermsAcceptedChanged);
     on<ToggleShowPassword>(_onToggleShowPassword);
     on<RegistrationSubmitted>(_onRegistrationSubmitted);
   }
@@ -69,6 +70,18 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     );
   }
 
+  void _onTermsAcceptedChanged(
+      TermsAcceptedChanged event, Emitter<RegistrationState> emit) {
+    emit(
+      state.copyWith(
+        termsAcceptance: TermsAcceptance(event.accepted),
+        showErrorMessages: false,
+        isRegistrationError: false,
+        isRegistrationSuccessful: false,
+      ),
+    );
+  }
+
   void _onToggleShowPassword(ToggleShowPassword event, Emitter<RegistrationState> emit) {
     emit(state.copyWith(showPassword: !state.showPassword));
   }
@@ -105,6 +118,15 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         showErrorMessages: true,
         isRegistrationError: true,
         errorMessage: 'Please select your role.',
+      ));
+      return;
+    }
+
+    if (state.termsAcceptance == null || !state.termsAcceptance!.isValid()) {
+      emit(state.copyWith(
+        showErrorMessages: true,
+        isRegistrationError: true,
+        errorMessage: 'Please accept the Terms of Service and Privacy Policy.',
       ));
       return;
     }

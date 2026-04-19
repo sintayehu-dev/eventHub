@@ -14,6 +14,7 @@ class RouteName {
   static const otpVerification = 'otpVerification';
   static const termsAndConditionsScreen = 'termsAndConditionsScreen';
   static const terms = 'terms';
+  static const privacyPolicy = 'privacy_policy';
 
   // Main app routes (legacy)
   static const home = 'home';
