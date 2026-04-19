@@ -7,6 +7,9 @@ class AttendeeProfileMenu extends StatelessWidget {
   final VoidCallback? onNotificationsTap;
   final VoidCallback? onPrivacyTap;
   final VoidCallback? onSupportTap;
+  final VoidCallback? onAboutTap;
+  final VoidCallback? onTermsTap;
+  final VoidCallback? onPrivacyPolicyTap;
 
   const AttendeeProfileMenu({
     super.key,
@@ -15,6 +18,9 @@ class AttendeeProfileMenu extends StatelessWidget {
     this.onNotificationsTap,
     this.onPrivacyTap,
     this.onSupportTap,
+    this.onAboutTap,
+    this.onTermsTap,
+    this.onPrivacyPolicyTap,
   });
 
   @override
@@ -60,6 +66,59 @@ class AttendeeProfileMenu extends StatelessWidget {
           title: 'Help & Support',
           icon: Icons.help_outline,
           onTap: onSupportTap,
+          theme: theme,
+          colorScheme: colorScheme,
+        ),
+        
+        // Divider for Legal & Info section
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: Text(
+                  'Legal & Information',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        _AttendeeProfileMenuItem(
+          title: 'About Ethio Events',
+          icon: Icons.info_outline,
+          onTap: onAboutTap,
+          theme: theme,
+          colorScheme: colorScheme,
+        ),
+        SizedBox(height: 10.h),
+        _AttendeeProfileMenuItem(
+          title: 'Terms & Conditions',
+          icon: Icons.description_outlined,
+          onTap: onTermsTap,
+          theme: theme,
+          colorScheme: colorScheme,
+        ),
+        SizedBox(height: 10.h),
+        _AttendeeProfileMenuItem(
+          title: 'Privacy Policy',
+          icon: Icons.privacy_tip_outlined,
+          onTap: onPrivacyPolicyTap,
           theme: theme,
           colorScheme: colorScheme,
         ),

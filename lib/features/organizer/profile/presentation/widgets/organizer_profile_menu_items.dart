@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 
 class OrganizerProfileMenuItems extends StatelessWidget {
@@ -12,25 +14,80 @@ class OrganizerProfileMenuItems extends StatelessWidget {
 
     return Column(
       children: [
-        _buildMenuCard(context, 'My Events', Icons.event_outlined, theme, colorScheme),
+        _buildMenuCard(context, 'My Events', Icons.event_outlined, theme,
+            colorScheme, null),
         SizedBox(height: 10.h),
-        _buildMenuCard(context, 'Create Event', Icons.add_circle_outline, theme, colorScheme),
+        _buildMenuCard(context, 'Create Event', Icons.add_circle_outline, theme,
+            colorScheme, null),
         SizedBox(height: 10.h),
-        _buildMenuCard(context, 'Revenue & Analytics', Icons.bar_chart_outlined, theme, colorScheme),
+        _buildMenuCard(context, 'Revenue & Analytics', Icons.bar_chart_outlined,
+            theme, colorScheme, null),
         SizedBox(height: 10.h),
-        _buildMenuCard(context, 'Staff Management', Icons.people_outline, theme, colorScheme),
+        _buildMenuCard(context, 'Staff Management', Icons.people_outline, theme,
+            colorScheme, null),
         SizedBox(height: 10.h),
-        _buildMenuCard(context, 'Promotion Tools', Icons.campaign_outlined, theme, colorScheme),
+        _buildMenuCard(context, 'Promotion Tools', Icons.campaign_outlined,
+            theme, colorScheme, null),
         SizedBox(height: 10.h),
-        _buildMenuCard(context, 'Help & Support', Icons.help_outline, theme, colorScheme),
+        _buildMenuCard(context, 'Help & Support', Icons.help_outline, theme,
+            colorScheme, null),
+
+        // Divider for Legal & Info section
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: Text(
+                  'Legal & Information',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        _buildMenuCard(context, 'About Ethio Events', Icons.info_outline, theme,
+            colorScheme, () => context.pushNamed(RouteName.about)),
+        SizedBox(height: 10.h),
+        _buildMenuCard(
+            context,
+            'Terms & Conditions',
+            Icons.description_outlined,
+            theme,
+            colorScheme,
+            () => context.pushNamed(RouteName.terms)),
+        SizedBox(height: 10.h),
+        _buildMenuCard(
+            context,
+            'Privacy Policy',
+            Icons.privacy_tip_outlined,
+            theme,
+            colorScheme,
+            () => context.pushNamed(RouteName.privacyPolicy)),
       ],
     );
   }
 
   Widget _buildMenuCard(
-      BuildContext context, String title, IconData icon, ThemeData theme, ColorScheme colorScheme) {
+      BuildContext context, String title, IconData icon,
+      ThemeData theme, ColorScheme colorScheme, VoidCallback? onTap) {
     return InkWell(
-      onTap: () => _showToBeImplemented(context),
+      onTap: onTap ?? () => _showToBeImplemented(context),
       borderRadius: BorderRadius.circular(14.r),
       child: Container(
         padding: EdgeInsets.all(12.w),

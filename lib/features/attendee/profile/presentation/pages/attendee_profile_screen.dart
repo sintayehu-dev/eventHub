@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/features/shared/profile/presentation/pages/edit_profile_screen.dart';
@@ -208,6 +210,10 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             onNotificationsTap: () => _showToBeImplemented(context),
             onPrivacyTap: () => _showToBeImplemented(context),
             onSupportTap: () => _showToBeImplemented(context),
+            onAboutTap: () => context.pushNamed(RouteName.about),
+            onTermsTap: () => context.pushNamed(RouteName.terms),
+            onPrivacyPolicyTap: () =>
+                context.pushNamed(RouteName.privacyPolicy),
           ),
           SizedBox(height: 24.h),
           AttendeeLogoutCard(onLogoutTap: () => _showLogoutDialog(context)),

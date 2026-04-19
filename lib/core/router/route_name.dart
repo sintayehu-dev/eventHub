@@ -15,6 +15,7 @@ class RouteName {
   static const termsAndConditionsScreen = 'termsAndConditionsScreen';
   static const terms = 'terms';
   static const privacyPolicy = 'privacy_policy';
+  static const about = 'about';
 
   // Main app routes (legacy)
   static const home = 'home';
