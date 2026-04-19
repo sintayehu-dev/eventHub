@@ -34,4 +34,39 @@ class RegistrationState with _$RegistrationState {
       email!.isValid() &&
       password!.isValid() &&
       userRole!.isValid();
+
+  /// Returns the first invalid field and its error message, or empty map if all valid
+  Map<String, String> get firstInvalidField {
+    if (fullName != null && !fullName!.isValid()) {
+      return {
+        'key': 'fullName',
+        'error': fullName!.value.fold((f) => f.failedValue, (_) => '')
+      };
+    }
+    if (email != null && !email!.isValid()) {
+      return {
+        'key': 'email',
+        'error': email!.value.fold((f) => f.failedValue, (_) => '')
+      };
+    }
+    if (password != null && !password!.isValid()) {
+      return {
+        'key': 'password',
+        'error': password!.value.fold((f) => f.failedValue, (_) => '')
+      };
+    }
+    if (userRole != null && !userRole!.isValid()) {
+      return {
+        'key': 'userRole',
+        'error': userRole!.value.fold((f) => f.failedValue, (_) => '')
+      };
+    }
+    if (termsAcceptance != null && !termsAcceptance!.isValid()) {
+      return {
+        'key': 'termsAcceptance',
+        'error': 'You must accept the Terms of Service and Privacy Policy'
+      };
+    }
+    return {};
+  }
 } 

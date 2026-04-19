@@ -168,13 +168,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               // Full Name validation error
                               if (state.showErrorMessages &&
-                                  state.fullName != null &&
-                                  !state.fullName!.isValid())
+                            state.firstInvalidField['key'] == 'fullName')
                                 AppValidationErrorWidget(
-                                  errorMessage: state.fullName!.value.fold(
-                                    (f) => f.failedValue,
-                                    (_) => '',
-                                  ),
+                            errorMessage: state.firstInvalidField['error'],
                                 ),
                             
                             SizedBox(height: 24.h),
@@ -233,13 +229,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             // Email validation error
                             if (state.showErrorMessages &&
-                                state.email != null &&
-                                !state.email!.isValid())
+                            state.firstInvalidField['key'] == 'email')
                               AppValidationErrorWidget(
-                                errorMessage: state.email!.value.fold(
-                                  (f) => f.failedValue,
-                                  (_) => '',
-                                ),
+                            errorMessage: state.firstInvalidField['error'],
                               ),
                             
                             SizedBox(height: 24.h),
@@ -313,13 +305,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             // Password validation error
                             if (state.showErrorMessages &&
-                                state.password != null &&
-                                !state.password!.isValid())
+                            state.firstInvalidField['key'] == 'password')
                               AppValidationErrorWidget(
-                                errorMessage: state.password!.value.fold(
-                                  (f) => f.failedValue,
-                                  (_) => '',
-                                ),
+                            errorMessage: state.firstInvalidField['error'],
                               ),
                             
                             SizedBox(height: 32.h),
@@ -356,13 +344,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             // Role validation error
                             if (state.showErrorMessages &&
-                                state.userRole != null &&
-                                !state.userRole!.isValid())
+                            state.firstInvalidField['key'] == 'userRole')
                               AppValidationErrorWidget(
-                                errorMessage: state.userRole!.value.fold(
-                                  (f) => f.failedValue,
-                                  (_) => '',
-                                ),
+                            errorMessage: state.firstInvalidField['error'],
                               ),
                             
                         SizedBox(height: 32.h),
@@ -375,7 +359,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               width: 24.w,
                               height: 24.h,
                               child: Checkbox(
-                                value: state.termsAcceptance?.getOrCrash() ??
+                                value: state.termsAcceptance?.value.fold(
+                                      (_) =>
+                                          false, // If invalid, show unchecked
+                                      (r) =>
+                                          r, // If valid, show the actual value
+                                    ) ??
                                     false,
                                 onChanged: (value) {
                                   context.read<RegistrationBloc>().add(
@@ -397,7 +386,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               child: GestureDetector(
                                 onTap: () {
                                   final currentValue =
-                                      state.termsAcceptance?.getOrCrash() ??
+                                      state.termsAcceptance?.value.fold(
+                                            (_) =>
+                                                false, // If invalid, treat as unchecked
+                                            (r) =>
+                                                r, // If valid, use the actual value
+                                          ) ??
                                           false;
                                   context.read<RegistrationBloc>().add(
                                         RegistrationEvent.termsAcceptedChanged(
@@ -463,13 +457,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         // Terms acceptance validation error
                         if (state.showErrorMessages &&
-                            state.termsAcceptance != null &&
-                            !state.termsAcceptance!.isValid())
+                            state.firstInvalidField['key'] == 'termsAcceptance')
                           Padding(
                             padding: EdgeInsets.only(left: 36.w, top: 8.h),
-                            child: const AppValidationErrorWidget(
-                              errorMessage:
-                                  'You must accept the Terms of Service and Privacy Policy',
+                            child: AppValidationErrorWidget(
+                              errorMessage: state.firstInvalidField['error'],
                             ),
                           ),
                             

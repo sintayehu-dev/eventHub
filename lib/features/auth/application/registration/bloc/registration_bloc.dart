@@ -32,7 +32,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       FullNameChanged event, Emitter<RegistrationState> emit) {
     emit(state.copyWith(
       fullName: FullName(event.fullName.trim()),
-      showErrorMessages: false,
+      showErrorMessages: false, // Hide validation errors while typing
       isRegistrationError: false,
       isRegistrationSuccessful: false,
     ));
@@ -41,7 +41,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   void _onEmailChanged(EmailChanged event, Emitter<RegistrationState> emit) {
     emit(state.copyWith(
       email: EmailAddress(event.email.trim()),
-      showErrorMessages: false,
+        showErrorMessages: false, // Hide validation errors while typing
       isRegistrationError: false,
         isRegistrationSuccessful: false,
     ),);
@@ -52,7 +52,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
    
     emit(state.copyWith(
         password: Password(password),
-      showErrorMessages: false,
+        showErrorMessages: false, // Hide validation errors while typing
       isRegistrationError: false,
         isRegistrationSuccessful: false,
     ),);
@@ -63,7 +63,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     emit(
       state.copyWith(
         userRole: UserRole(event.role),
-        showErrorMessages: false,
+        showErrorMessages: false, // Hide validation errors while typing
         isRegistrationError: false,
         isRegistrationSuccessful: false,
       ),
@@ -75,7 +75,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     emit(
       state.copyWith(
         termsAcceptance: TermsAcceptance(event.accepted),
-        showErrorMessages: false,
+        showErrorMessages: false, // Hide validation errors while typing
         isRegistrationError: false,
         isRegistrationSuccessful: false,
       ),
@@ -97,36 +97,27 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       return;
     }
     
-    // Check if required fields are provided and valid
-    if (state.fullName == null || !state.fullName!.isValid()) {
-      emit(state.copyWith(showErrorMessages: true));
-      return;
-    }
-
-    if (state.email == null || !state.email!.isValid()) {
-      emit(state.copyWith(showErrorMessages: true));
-      return;
-    }
-
-    if (state.password == null || !state.password!.isValid()) {
-      emit(state.copyWith(showErrorMessages: true));
-      return;
-    }
-
-    if (state.userRole == null || !state.userRole!.isValid()) {
+    // Initialize empty value objects if null to trigger validation
+    final fullNameValue = state.fullName ?? FullName('');
+    final emailValue = state.email ?? EmailAddress('');
+    final passwordValue = state.password ?? Password('');
+    final userRoleValue = state.userRole ?? UserRole('');
+    final termsAcceptanceValue =
+        state.termsAcceptance ?? TermsAcceptance(false);
+    
+    // Check if all fields are valid
+    if (!fullNameValue.isValid() ||
+        !emailValue.isValid() ||
+        !passwordValue.isValid() ||
+        !userRoleValue.isValid() ||
+        !termsAcceptanceValue.isValid()) {
       emit(state.copyWith(
+        fullName: fullNameValue,
+        email: emailValue,
+        password: passwordValue,
+        userRole: userRoleValue,
+        termsAcceptance: termsAcceptanceValue,
         showErrorMessages: true,
-        isRegistrationError: true,
-        errorMessage: 'Please select your role.',
-      ));
-      return;
-    }
-
-    if (state.termsAcceptance == null || !state.termsAcceptance!.isValid()) {
-      emit(state.copyWith(
-        showErrorMessages: true,
-        isRegistrationError: true,
-        errorMessage: 'Please accept the Terms of Service and Privacy Policy.',
       ));
       return;
     }

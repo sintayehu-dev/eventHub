@@ -48,6 +48,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         isPasswordResetSent: false,
         successMessage: '',
         isLoginSuccessful: false,
+        showErrorMessages: false, // Hide validation errors while typing
     ),);
   }
 
@@ -57,6 +58,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         isLoginError: false,
         errorMessage: '',
         isLoginSuccessful: false,
+        showErrorMessages: false, // Hide validation errors while typing
     ),);
   }
 
@@ -68,14 +70,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final connected = await AppConnectivity.connectivity();
     
     if (connected) {
-      // Check if email and password are provided and valid
-      if (state.email == null || !state.email!.isValid()) {
-        emit(state.copyWith(showErrorMessages: true));
-        return;
-      }
+      // Initialize empty value objects if null to trigger validation
+      final emailValue = state.email ?? EmailAddress('');
+      final passwordValue = state.password ?? Password('');
       
-      if (state.password == null || !state.password!.isValid()) {
-        emit(state.copyWith(showErrorMessages: true));
+      // Check if email and password are provided and valid
+      if (!emailValue.isValid() || !passwordValue.isValid()) {
+        emit(state.copyWith(
+          email: emailValue,
+          password: passwordValue,
+          showErrorMessages: true,
+        ));
         return;
       }
       
