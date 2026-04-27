@@ -10,6 +10,7 @@ class AttendeeProfileMenu extends StatelessWidget {
   final VoidCallback? onAboutTap;
   final VoidCallback? onTermsTap;
   final VoidCallback? onPrivacyPolicyTap;
+  final VoidCallback? onDeleteAccountTap;
 
   const AttendeeProfileMenu({
     super.key,
@@ -21,6 +22,7 @@ class AttendeeProfileMenu extends StatelessWidget {
     this.onAboutTap,
     this.onTermsTap,
     this.onPrivacyPolicyTap,
+    this.onDeleteAccountTap,
   });
 
   @override
@@ -122,6 +124,44 @@ class AttendeeProfileMenu extends StatelessWidget {
           theme: theme,
           colorScheme: colorScheme,
         ),
+        
+        // Divider for Danger Zone
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: Divider(
+                  color: colorScheme.error.withValues(alpha: 0.3),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: Text(
+                  'Danger Zone',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Divider(
+                  color: colorScheme.error.withValues(alpha: 0.3),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        _AttendeeProfileMenuItem(
+          title: 'Delete Account',
+          icon: Icons.delete_forever_outlined,
+          onTap: onDeleteAccountTap,
+          theme: theme,
+          colorScheme: colorScheme,
+          isDanger: true,
+        ),
       ],
     );
   }
@@ -133,6 +173,7 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
   final VoidCallback? onTap;
   final ThemeData theme;
   final ColorScheme colorScheme;
+  final bool isDanger;
 
   const _AttendeeProfileMenuItem({
     required this.title,
@@ -140,6 +181,7 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
     this.onTap,
     required this.theme,
     required this.colorScheme,
+    this.isDanger = false,
   });
 
   @override
@@ -150,10 +192,14 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          color: isDanger
+              ? colorScheme.errorContainer.withValues(alpha: 0.3)
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            color: isDanger
+                ? colorScheme.error.withValues(alpha: 0.5)
+                : colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -162,12 +208,14 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
+                color: isDanger
+                    ? colorScheme.errorContainer
+                    : colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(
                 icon,
-                color: colorScheme.primary,
+                color: isDanger ? colorScheme.error : colorScheme.primary,
                 size: 18.sp,
               ),
             ),
@@ -177,12 +225,14 @@ class _AttendeeProfileMenuItem extends StatelessWidget {
                 title,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: isDanger ? colorScheme.error : null,
                 ),
               ),
             ),
             Icon(
               Icons.chevron_right,
-              color: colorScheme.onSurfaceVariant,
+              color:
+                  isDanger ? colorScheme.error : colorScheme.onSurfaceVariant,
               size: 18.sp,
             ),
           ],

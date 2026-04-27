@@ -15,4 +15,7 @@ abstract class AuthRepository {
   Future<Either<NetworkExceptions, void>> sendPasswordResetEmail(String email);
   Future<Either<NetworkExceptions, FirebaseUserEntity?>> getCurrentUser();
   Stream<FirebaseUserEntity?> get authStateChanges;
+  
+  // Account management
+  Future<Either<NetworkExceptions, void>> deleteAccount();
 } 

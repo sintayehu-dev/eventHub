@@ -10,6 +10,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
+import 'package:firebase_storage/firebase_storage.dart' as _i457;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:google_sign_in/google_sign_in.dart' as _i116;
 import 'package:injectable/injectable.dart' as _i526;
@@ -50,6 +51,8 @@ import '../../features/auth/application/profile/bloc/profile_bloc.dart'
 import '../../features/auth/application/registration/bloc/registration_bloc.dart'
     as _i859;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
+import '../../features/auth/domain/usecases/delete_account_usecase.dart'
+    as _i914;
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart'
     as _i17;
 import '../../features/auth/domain/usecases/google_sign_in_usecase.dart'
@@ -210,6 +213,13 @@ extension GetItInjectableX on _i174.GetIt {
         _i746.AttendeeManagementBloc(gh<_i455.AttendeeManagementRepository>()));
     gh.factory<_i237.UserProfileBloc>(
         () => _i237.UserProfileBloc(gh<_i75.UserProfileRepository>()));
+    gh.factory<_i413.FirebaseAuthDataSource>(
+        () => _i413.FirebaseAuthDataSourceImpl(
+              gh<_i59.FirebaseAuth>(),
+              gh<_i116.GoogleSignIn>(),
+              gh<_i974.FirebaseFirestore>(),
+              gh<_i457.FirebaseStorage>(),
+            ));
     gh.factory<_i479.StaffManagementBloc>(
         () => _i479.StaffManagementBloc(gh<_i547.StaffManagementRepository>()));
     gh.lazySingleton<_i1043.StaffReportsRepository>(() =>
@@ -235,11 +245,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i818.EventDiscoveryRepository>(() =>
         _i872.EventDiscoveryRepositoryImpl(
             gh<_i191.FirebaseEventDiscoveryDataSource>()));
-    gh.factory<_i413.FirebaseAuthDataSource>(
-        () => _i413.FirebaseAuthDataSourceImpl(
-              gh<_i59.FirebaseAuth>(),
-              gh<_i116.GoogleSignIn>(),
-            ));
     gh.factory<_i1005.TicketRepository>(() =>
         _i699.TicketRepositoryImpl(gh<_i1021.FirebaseTicketDataSource>()));
     gh.factory<_i776.FirebaseTicketWalletDataSource>(() =>
@@ -280,6 +285,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i915.SignOutUseCase>(
         () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
+    gh.factory<_i914.DeleteAccountUseCase>(
+        () => _i914.DeleteAccountUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i743.TicketWalletRepository>(() =>
         _i820.TicketWalletRepositoryImpl(
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));

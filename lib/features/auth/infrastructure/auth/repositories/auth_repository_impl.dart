@@ -92,6 +92,18 @@ class AuthRepositoryImpl implements AuthRepository {
     return _firebaseDataSource.authStateChanges;
   }
 
+  @override
+  Future<Either<NetworkExceptions, void>> deleteAccount() async {
+    try {
+      await _firebaseDataSource.deleteAccount();
+      return right(null);
+    } on FirebaseAuthException catch (e) {
+      return left(NetworkExceptions.defaultError(_getFirebaseErrorMessage(e)));
+    } catch (e) {
+      return left(NetworkExceptions.defaultError(e.toString()));
+    }
+  }
+
   String _getFirebaseErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -116,6 +128,10 @@ class AuthRepositoryImpl implements AuthRepository {
         return 'Google sign-in was cancelled.';
       case 'google-sign-in-failed':
         return 'Failed to sign in with Google. Please try again.';
+      case 'requires-recent-login':
+        return 'For security, please sign in again before deleting your account.';
+      case 'no-current-user':
+        return 'No user is currently signed in.';
       default:
         return e.message ?? 'An unexpected error occurred. Please try again.';
     }

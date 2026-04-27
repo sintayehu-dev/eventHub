@@ -10,8 +10,10 @@ import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_bloc.dart';
 import 'package:eventhub/features/auth/application/auth_status/bloc/auth_status_event.dart';
+import 'package:eventhub/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:eventhub/core/application/app/bloc/app_bloc.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/handlers/network_exceptions.dart';
 
 import '../widgets/attendee_profile_header.dart';
 import '../widgets/attendee_profile_menu.dart';
@@ -214,6 +216,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             onTermsTap: () => context.pushNamed(RouteName.terms),
             onPrivacyPolicyTap: () =>
                 context.pushNamed(RouteName.privacyPolicy),
+            onDeleteAccountTap: () => _showDeleteAccountDialog(context),
           ),
           SizedBox(height: 24.h),
           AttendeeLogoutCard(onLogoutTap: () => _showLogoutDialog(context)),
@@ -320,6 +323,173 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             ),
           ],
         );
+      },
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: colorScheme.error,
+                size: 28.sp,
+              ),
+              SizedBox(width: 12.w),
+              Text(
+                'Delete Account',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This action cannot be undone!',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                'Deleting your account will permanently remove:',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              _buildDeleteItem('• Your profile and personal information', theme,
+                  colorScheme),
+              _buildDeleteItem('• All events you created', theme, colorScheme),
+              _buildDeleteItem(
+                  '• Your event registrations and tickets', theme, colorScheme),
+              _buildDeleteItem(
+                  '• All uploaded photos and media', theme, colorScheme),
+              _buildDeleteItem('• Your staff assignments', theme, colorScheme),
+              SizedBox(height: 12.h),
+              Text(
+                'Are you absolutely sure you want to continue?',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                'Cancel',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                await _deleteAccount(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              child: Text(
+                'Delete Forever',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onError,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDeleteItem(
+      String text, ThemeData theme, ColorScheme colorScheme) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4.h),
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16.h),
+                  Text('Deleting account...'),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    final deleteAccountUseCase = getIt<DeleteAccountUseCase>();
+    final result = await deleteAccountUseCase();
+
+    if (!context.mounted) return;
+
+    // Hide loading dialog
+    Navigator.of(context).pop();
+
+    result.fold(
+      (error) {
+        // Show error message
+        final errorMessage = NetworkExceptions.getRawErrorMessage(error);
+        AppHelpers.showErrorFlash(
+          context,
+          errorMessage.isNotEmpty
+              ? errorMessage
+              : 'Failed to delete account. Please try again.',
+        );
+      },
+      (_) {
+        // Account deleted successfully
+        AppHelpers.showCheckFlash(context, 'Account deleted successfully');
+
+        // Sign out and navigate to auth
+        context.read<AuthStatusBloc>().add(const AuthStatusEvent.signOut());
       },
     );
   }

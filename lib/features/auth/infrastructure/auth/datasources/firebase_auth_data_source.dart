@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import 'package:eventhub/features/auth/domain/entities/firebase_user_entity.dart';
@@ -11,14 +13,22 @@ abstract class FirebaseAuthDataSource {
   Future<void> sendPasswordResetEmail(String email);
   Future<FirebaseUserEntity?> getCurrentUser();
   Stream<FirebaseUserEntity?> get authStateChanges;
+  Future<void> deleteAccount();
 }
 
 @Injectable(as: FirebaseAuthDataSource)
 class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore _firestore;
+  final FirebaseStorage _storage;
 
-  FirebaseAuthDataSourceImpl(this._firebaseAuth, this._googleSignIn);
+  FirebaseAuthDataSourceImpl(
+    this._firebaseAuth,
+    this._googleSignIn,
+    this._firestore,
+    this._storage,
+  );
 
   @override
   Future<FirebaseUserEntity> signInWithEmailAndPassword(String email, String password) async {
@@ -120,5 +130,121 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
     return _firebaseAuth.authStateChanges().map((user) {
       return user != null ? FirebaseUserEntity.fromFirebaseUser(user) : null;
     });
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No user is currently signed in',
+      );
+    }
+
+    final userId = user.uid;
+
+    try {
+      // 1. Delete user data from Firestore
+      await _deleteUserData(userId);
+
+      // 2. Delete user files from Storage
+      await _deleteUserStorage(userId);
+
+      // 3. Sign out from Google if signed in with Google
+      await _googleSignIn.signOut();
+
+      // 4. Delete the Firebase Auth account
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw FirebaseAuthException(
+          code: 'requires-recent-login',
+          message: 'Please sign in again before deleting your account',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _deleteUserData(String userId) async {
+    final batch = _firestore.batch();
+
+    try {
+      // Delete user profile
+      final userProfileRef = _firestore.collection('users').doc(userId);
+      batch.delete(userProfileRef);
+
+      // Delete user's events (as organizer)
+      final eventsQuery = await _firestore
+          .collection('events')
+          .where('organizerId', isEqualTo: userId)
+          .get();
+
+      for (final doc in eventsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Delete user's event registrations
+      final registrationsQuery = await _firestore
+          .collection('eventRegistrations')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      for (final doc in registrationsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Delete user's staff assignments
+      final staffQuery = await _firestore
+          .collection('staff')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      for (final doc in staffQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Commit all deletions
+      await batch.commit();
+    } catch (e) {
+      print('Error deleting user data: $e');
+      // Continue with account deletion even if data deletion fails
+    }
+  }
+
+  Future<void> _deleteUserStorage(String userId) async {
+    try {
+      // Delete user profile images
+      final profileRef = _storage.ref().child('users/$userId');
+      await _deleteStorageFolder(profileRef);
+
+      // Delete user's event images
+      final eventsRef = _storage.ref().child('events/$userId');
+      await _deleteStorageFolder(eventsRef);
+    } catch (e) {
+      print('Error deleting user storage: $e');
+      // Continue with account deletion even if storage deletion fails
+    }
+  }
+
+  Future<void> _deleteStorageFolder(Reference folderRef) async {
+    try {
+      final listResult = await folderRef.listAll();
+
+      // Delete all files in the folder
+      for (final item in listResult.items) {
+        await item.delete();
+      }
+
+      // Recursively delete subfolders
+      for (final prefix in listResult.prefixes) {
+        await _deleteStorageFolder(prefix);
+      }
+    } catch (e) {
+      // Folder might not exist, which is fine
+      print('Error deleting storage folder: $e');
+    }
   }
 }
