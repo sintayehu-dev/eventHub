@@ -22,7 +22,8 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
     final bottomPadding = mediaQuery.padding.bottom;
     
     // Calculate adaptive dimensions based on screen size and item count
-    final adaptiveDimensions = _calculateAdaptiveDimensions(screenWidth, items.length, bottomPadding);
+    final adaptiveDimensions = _calculateAdaptiveDimensions(
+        context, screenWidth, items.length, bottomPadding);
     
     return Container(
       decoration: BoxDecoration(
@@ -96,13 +97,14 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
     );
   }
 
-  AdaptiveDimensions _calculateAdaptiveDimensions(double screenWidth, int itemCount, double bottomPadding) {
+  AdaptiveDimensions _calculateAdaptiveDimensions(BuildContext context,
+      double screenWidth, int itemCount, double bottomPadding) {
     final isSmallScreen = screenWidth < 360;
     final isMediumScreen = screenWidth >= 360 && screenWidth < 400;
     final hasManySections = itemCount > 4;
     
     // Get theme for icon sizes
-    final theme = Theme.of(navigationShell.shellRouteContext);
+    final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
     // Base dimensions - using theme font sizes
