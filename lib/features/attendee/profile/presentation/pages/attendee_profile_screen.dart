@@ -204,7 +204,10 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           20.w, 20.w, 20.w, 90.h), // Added bottom padding for nav bar
       child: Column(
         children: [
-          AttendeeProfileHeader(profile: profile),
+          AttendeeProfileHeader(
+            profile: profile,
+            onDeleteAccountTap: () => _showDeleteAccountDialog(context),
+          ),
           SizedBox(height: 24.h),
           AttendeeProfileMenu(
             onTicketsTap: () => _showToBeImplemented(context),
@@ -216,7 +219,6 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
             onTermsTap: () => context.pushNamed(RouteName.terms),
             onPrivacyPolicyTap: () =>
                 context.pushNamed(RouteName.privacyPolicy),
-            onDeleteAccountTap: () => _showDeleteAccountDialog(context),
           ),
           SizedBox(height: 24.h),
           AttendeeLogoutCard(onLogoutTap: () => _showLogoutDialog(context)),

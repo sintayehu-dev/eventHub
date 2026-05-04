@@ -101,25 +101,41 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
     final isMediumScreen = screenWidth >= 360 && screenWidth < 400;
     final hasManySections = itemCount > 4;
     
-    // Base dimensions - more conservative approach
+    // Get theme for icon sizes
+    final theme = Theme.of(navigationShell.shellRouteContext);
+    final textTheme = theme.textTheme;
+
+    // Base dimensions - using theme font sizes
     double iconSize, fontSize, baseHeight, horizontalPadding, verticalPadding;
     
     if (isSmallScreen) {
-      iconSize = hasManySections ? 14.sp : 16.sp; // Reduced further
-      fontSize = hasManySections ? 7.sp : 8.sp;   // Reduced further
-      baseHeight = 58.h; // Reduced from 65.h
+      iconSize = hasManySections
+          ? (textTheme.titleSmall?.fontSize ?? 14)
+          : (textTheme.titleMedium?.fontSize ?? 16);
+      fontSize = hasManySections
+          ? (textTheme.labelSmall?.fontSize ?? 11) * 0.7
+          : (textTheme.labelSmall?.fontSize ?? 11) * 0.8;
+      baseHeight = 58.h;
       horizontalPadding = 2.w;
       verticalPadding = 4.h;
     } else if (isMediumScreen) {
-      iconSize = hasManySections ? 16.sp : 18.sp;
-      fontSize = hasManySections ? 8.sp : 9.sp;
-      baseHeight = 62.h; // Reduced from 70.h
+      iconSize = hasManySections
+          ? (textTheme.titleMedium?.fontSize ?? 16)
+          : (textTheme.titleLarge?.fontSize ?? 22) * 0.8;
+      fontSize = hasManySections
+          ? (textTheme.labelSmall?.fontSize ?? 11) * 0.8
+          : (textTheme.labelSmall?.fontSize ?? 11) * 0.9;
+      baseHeight = 62.h;
       horizontalPadding = 4.w;
       verticalPadding = 5.h;
     } else {
-      iconSize = hasManySections ? 18.sp : 20.sp;
-      fontSize = hasManySections ? 9.sp : 10.sp;
-      baseHeight = 66.h; // Reduced from 75.h
+      iconSize = hasManySections
+          ? (textTheme.titleLarge?.fontSize ?? 22) * 0.8
+          : (textTheme.titleLarge?.fontSize ?? 22);
+      fontSize = hasManySections
+          ? (textTheme.labelSmall?.fontSize ?? 11) * 0.9
+          : (textTheme.labelMedium?.fontSize ?? 12);
+      baseHeight = 66.h;
       horizontalPadding = 6.w;
       verticalPadding = 6.h;
     }
@@ -133,7 +149,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
       totalHeight: totalHeight,
       horizontalPadding: horizontalPadding,
       verticalPadding: verticalPadding,
-      maxTextWidth: (screenWidth - (horizontalPadding * 2)) / itemCount - 8.w, // Reduced margin
+      maxTextWidth: (screenWidth - (horizontalPadding * 2)) / itemCount - 8.w,
     );
   }
 
@@ -270,6 +286,7 @@ class AdaptiveBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     
     if (showDot && (text == null || text!.isEmpty)) {
       return Container(
@@ -291,8 +308,8 @@ class AdaptiveBadge extends StatelessWidget {
     }
     
     final isSmallScreen = MediaQuery.of(context).size.width < 360;
-    final badgeSize = isSmallScreen ? 10.w : 12.w; // Reduced size
-    final fontSize = isSmallScreen ? 7.sp : 8.sp;   // Reduced font
+    final badgeSize = isSmallScreen ? 10.w : 12.w;
+    final fontSize = (textTheme.labelSmall?.fontSize ?? 11) * 0.7;
     
     return Container(
       constraints: BoxConstraints(

@@ -111,7 +111,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         child: Icon(
                           Icons.event,
-                          size: 40.sp,
+                            size: darkTheme.textTheme.displaySmall?.fontSize,
                           color: colorScheme.onPrimary,
                         ),
                       ),
@@ -182,7 +182,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                   Icons.email_outlined,
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.6),
-                                  size: 20.sp,
+                                    size: darkTheme
+                                        .textTheme.titleLarge?.fontSize,
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
@@ -270,7 +271,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                   Icons.lock_outline,
                                   color: colorScheme.onSurface
                                       .withValues(alpha: 0.6),
-                                  size: 20.sp,
+                                    size: darkTheme
+                                        .textTheme.titleLarge?.fontSize,
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -279,7 +281,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                         : Icons.visibility_outlined,
                                     color: colorScheme.onSurface
                                         .withValues(alpha: 0.6),
-                                    size: 20.sp,
+                                      size: darkTheme
+                                          .textTheme.titleLarge?.fontSize,
                                   ),
                                   onPressed: () {
                                     context.read<LoginBloc>().add(
@@ -349,7 +352,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                     SizedBox(width: 8.w),
                                     Icon(
                                       Icons.arrow_forward,
-                                      size: 18.sp,
+                                        size: darkTheme
+                                            .textTheme.titleMedium?.fontSize,
                                     ),
                                   ],
                                 ),
@@ -491,7 +495,7 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Icon(
           icon,
           color: color,
-          size: 24.sp,
+          size: darkTheme.textTheme.headlineSmall?.fontSize,
         ),
       ),
     );

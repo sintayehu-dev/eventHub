@@ -4,10 +4,12 @@ import 'package:eventhub/features/shared/profile/domain/entities/user_profile_en
 
 class AttendeeProfileHeader extends StatelessWidget {
   final UserProfileEntity profile;
+  final VoidCallback? onDeleteAccountTap;
 
   const AttendeeProfileHeader({
     super.key,
     required this.profile,
+    this.onDeleteAccountTap,
   });
 
   @override
@@ -165,6 +167,18 @@ class AttendeeProfileHeader extends StatelessWidget {
               ],
             ),
           ),
+
+          // Delete Account Icon
+          if (onDeleteAccountTap != null)
+            IconButton(
+              onPressed: onDeleteAccountTap,
+              icon: Icon(
+                Icons.delete_forever_outlined,
+                color: colorScheme.error,
+                size: 24.sp,
+              ),
+              tooltip: 'Delete Account',
+            ),
         ],
       ),
     );

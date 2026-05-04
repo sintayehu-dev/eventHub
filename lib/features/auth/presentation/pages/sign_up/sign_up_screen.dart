@@ -150,7 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   prefixIcon: Icon(
                                     Icons.person_outline,
                                     color: colorScheme.primary,
-                                    size: 20.sp,
+                                size: darkTheme.textTheme.titleLarge?.fontSize,
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
@@ -212,7 +212,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   prefixIcon: Icon(
                                     Icons.email_outlined,
                                     color: colorScheme.primary,
-                                    size: 20.sp,
+                                size: darkTheme.textTheme.titleLarge?.fontSize,
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
@@ -273,7 +273,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
                                     color: colorScheme.primary,
-                                    size: 20.sp,
+                                size: darkTheme.textTheme.titleLarge?.fontSize,
                                   ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
@@ -282,7 +282,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           : Icons.visibility_outlined,
                                       color: colorScheme.onSurface
                                           .withValues(alpha: 0.6),
-                                      size: 20.sp,
+                                  size:
+                                      darkTheme.textTheme.titleLarge?.fontSize,
                                     ),
                                     onPressed: () {
                                       context.read<RegistrationBloc>().add(
@@ -505,7 +506,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           SizedBox(width: 8.w),
                                           Icon(
                                             Icons.arrow_forward,
-                                            size: 18.sp,
+                                        size: darkTheme
+                                            .textTheme.titleMedium?.fontSize,
                                           ),
                                         ],
                                       ),
@@ -592,7 +594,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               color: isSelected
                   ? colorScheme.primary
                   : colorScheme.onSurface.withValues(alpha: 0.6),
-              size: 24.sp,
+              size: darkTheme.textTheme.headlineSmall?.fontSize,
             ),
             SizedBox(height: 8.h),
             Text(

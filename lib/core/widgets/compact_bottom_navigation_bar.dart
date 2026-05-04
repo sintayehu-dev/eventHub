@@ -17,11 +17,20 @@ class CompactBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     
     // Calculate if we need compact mode
     final isCompactMode = screenWidth < 380 || items.length > 4;
+    
+    // Use theme-based icon sizes
+    final iconSize = isCompactMode
+        ? (textTheme.titleLarge?.fontSize ?? 22) * 0.8
+        : textTheme.titleLarge?.fontSize ?? 22;
+    final fontSize = isCompactMode
+        ? (textTheme.labelSmall?.fontSize ?? 11) * 0.9
+        : textTheme.labelMedium?.fontSize ?? 12;
     
     return Container(
       decoration: BoxDecoration(
@@ -71,22 +80,22 @@ class CompactBottomNavigationBar extends StatelessWidget {
                   selectedItemColor: colorScheme.primary,
                   unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
                   selectedLabelStyle: TextStyle(
-                    fontSize: isCompactMode ? 9.sp : 10.sp,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.w600,
                     height: 1.0,
                   ),
                   unselectedLabelStyle: TextStyle(
-                    fontSize: isCompactMode ? 9.sp : 10.sp,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.w500,
                     height: 1.0,
                   ),
-                  selectedFontSize: isCompactMode ? 9.sp : 10.sp,
-                  unselectedFontSize: isCompactMode ? 9.sp : 10.sp,
-                  iconSize: isCompactMode ? 18.sp : 20.sp,
+                  selectedFontSize: fontSize,
+                  unselectedFontSize: fontSize,
+                  iconSize: iconSize,
                   items: items.map((item) => _buildBottomNavigationBarItem(
                     item,
                     colorScheme,
-                    isCompactMode,
+                            iconSize,
                   )).toList(),
                 ),
               ),
@@ -100,16 +109,16 @@ class CompactBottomNavigationBar extends StatelessWidget {
   BottomNavigationBarItem _buildBottomNavigationBarItem(
     CompactBottomNavigationItem item,
     ColorScheme colorScheme,
-    bool isCompactMode,
+    double iconSize,
   ) {
     Widget iconWidget = Icon(
       item.icon,
-      size: isCompactMode ? 18.sp : 20.sp,
+      size: iconSize,
     );
     
     Widget activeIconWidget = Icon(
       item.activeIcon,
-      size: isCompactMode ? 18.sp : 20.sp,
+      size: iconSize,
     );
 
     // Add badge if present
@@ -187,6 +196,7 @@ class CompactBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     
     if (showDot && (text == null || text!.isEmpty)) {
       return Container(
@@ -202,6 +212,8 @@ class CompactBadge extends StatelessWidget {
     if (text == null || text!.isEmpty) {
       return const SizedBox.shrink();
     }
+    
+    final fontSize = (textTheme.labelSmall?.fontSize ?? 11) * 0.8;
     
     return Container(
       constraints: BoxConstraints(
@@ -221,7 +233,7 @@ class CompactBadge extends StatelessWidget {
           text!,
           style: TextStyle(
             color: textColor ?? colorScheme.onError,
-            fontSize: 8.sp,
+            fontSize: fontSize,
             fontWeight: FontWeight.bold,
             height: 1.0,
           ),
