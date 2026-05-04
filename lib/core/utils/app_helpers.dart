@@ -46,8 +46,14 @@ class AppHelpers {
         content: Text(message),
         backgroundColor: colorScheme.primary,
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100.h,
+          left: 10.w,
+          right: 10.w,
         ),
       ),
     );
@@ -60,8 +66,14 @@ class AppHelpers {
         content: Text(message),
         backgroundColor: colorScheme.error,
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100.h,
+          left: 10.w,
+          right: 10.w,
         ),
       ),
     );
@@ -74,8 +86,14 @@ class AppHelpers {
         content: Text(message),
         backgroundColor: colorScheme.secondary,
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100.h,
+          left: 10.w,
+          right: 10.w,
         ),
       ),
     );
@@ -88,8 +106,14 @@ class AppHelpers {
         content: Text(message),
         backgroundColor: colorScheme.tertiary,
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100.h,
+          left: 10.w,
+          right: 10.w,
         ),
       ),
     );
@@ -112,9 +136,15 @@ class AppHelpers {
         ),
         backgroundColor: backgroundColor ?? colorScheme.primary,
         behavior: SnackBarBehavior.floating,
+        elevation: 0,
         duration: duration ?? const Duration(seconds: 4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
+        ),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100.h,
+          left: 10.w,
+          right: 10.w,
         ),
       ),
     );
