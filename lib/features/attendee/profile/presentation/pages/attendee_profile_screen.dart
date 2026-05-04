@@ -488,8 +488,15 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         // Account deleted successfully
         AppHelpers.showCheckFlash(context, 'Account deleted successfully');
 
-        // Sign out and navigate to auth
+        // Sign out and navigate to login page
         context.read<AuthStatusBloc>().add(const AuthStatusEvent.signOut());
+        
+        // Navigate to login page
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (context.mounted) {
+            context.goNamed(RouteName.login);
+          }
+        });
       },
     );
   }

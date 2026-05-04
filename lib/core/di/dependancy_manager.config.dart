@@ -171,6 +171,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i59.FirebaseAuth>(() => firebaseModule.firebaseAuth);
     gh.lazySingleton<_i974.FirebaseFirestore>(
         () => firebaseModule.firebaseFirestore);
+    gh.lazySingleton<_i457.FirebaseStorage>(
+        () => firebaseModule.firebaseStorage);
     gh.lazySingleton<_i116.GoogleSignIn>(() => firebaseModule.googleSignIn);
     gh.lazySingleton<_i837.CloudinaryService>(() => _i837.CloudinaryService());
     gh.lazySingleton<_i409.FirebaseStaffManagementDataSource>(() =>
