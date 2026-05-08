@@ -393,41 +393,34 @@ class _SignInScreenState extends State<SignInScreen> {
                       
                       SizedBox(height: 24.h),
                       
-                      // OAuth Buttons Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Google Button
-                          _buildOAuthButton(
-                            icon: Icons.g_mobiledata,
-                            color: const Color(0xFFDB4437),
+                      // Google Sign-In Button
+                        Center(
+                          child: GestureDetector(
                             onTap: () {
-                                AppHelpers.showInfoSnackBar(
-                                    context, 'Feature to be implemented soon'
-                              );
+                              context.read<LoginBloc>().add(
+                                    const LoginEvent.googleSignInSubmitted(),
+                                  );
                             },
+                            child: Container(
+                              width: 56.w,
+                              height: 56.w,
+                              decoration: BoxDecoration(
+                                color: colorScheme.onSurface
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(16.r),
+                                border: Border.all(
+                                  color: colorScheme.outline
+                                      .withValues(alpha: 0.4),
+                                  width: 1,
+                                ),
+                              ),
+                              padding: EdgeInsets.all(12.w),
+                              child: Image.asset(
+                                'assets/google.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
                           ),
-                          
-                          // Facebook Button
-                          _buildOAuthButton(
-                            icon: Icons.facebook,
-                            color: const Color(0xFF1877F2),
-                            onTap: () {
-                                AppHelpers.showInfoSnackBar(
-                                    context, 'Feature to be implemented soon');
-                            },
-                          ),
-                          
-                          // Twitter Button
-                          _buildOAuthButton(
-                            icon: Icons.alternate_email,
-                            color: const Color(0xFF1DA1F2),
-                            onTap: () {
-                                AppHelpers.showInfoSnackBar(
-                                    context, 'Feature to be implemented soon');
-                            },
-                          ),
-                        ],
                       ),
                       
                       SizedBox(height: 32.h),

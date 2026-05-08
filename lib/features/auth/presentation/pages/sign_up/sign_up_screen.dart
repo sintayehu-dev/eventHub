@@ -143,7 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 decoration: InputDecoration(
                                   hintText: 'Enter your full name',
                                   hintStyle:
-                                        darkTheme.textTheme.bodyLarge?.copyWith(
+                                  darkTheme.textTheme.bodySmall?.copyWith(
                                     color: colorScheme.onSurface
                                         .withValues(alpha: 0.5),
                                   ),

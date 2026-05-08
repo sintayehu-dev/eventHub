@@ -50,6 +50,8 @@ import '../../features/auth/application/profile/bloc/profile_bloc.dart'
     as _i1003;
 import '../../features/auth/application/registration/bloc/registration_bloc.dart'
     as _i859;
+import '../../features/auth/application/role_selection/bloc/role_selection_bloc.dart'
+    as _i78;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
 import '../../features/auth/domain/usecases/delete_account_usecase.dart'
     as _i914;
@@ -294,6 +296,8 @@ extension GetItInjectableX on _i174.GetIt {
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));
     gh.factory<_i350.EventDiscoveryBloc>(() => _i350.EventDiscoveryBloc(
         repository: gh<_i818.EventDiscoveryRepository>()));
+    gh.factory<_i78.RoleSelectionBloc>(
+        () => _i78.RoleSelectionBloc(gh<_i516.UserService>()));
     gh.factory<_i912.FirebaseEventDataSource>(
         () => _i912.FirebaseEventDataSourceImpl(
               gh<_i974.FirebaseFirestore>(),

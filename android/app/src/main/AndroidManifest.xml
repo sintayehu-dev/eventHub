@@ -1,12 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ethioevent.app">
+    <!-- Internet permission for API calls and Firebase -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
-    <uses-permission android:name="android.permission.BODY_SENSORS"/>
     
-    <!-- Camera and Gallery permissions -->
+    <!-- Camera permission for QR scanning and image capture -->
     <uses-permission android:name="android.permission.CAMERA"/>
     
     <!-- Storage permissions for older Android versions (API < 33) -->
@@ -15,10 +13,7 @@
     
     <!-- Granular media permissions for Android 13+ (API 33+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     
-    <!-- Optional: For accessing media files on Android 10+ -->
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/>
     <application
         android:label="Ethio Events"
         android:name="${applicationName}"
@@ -61,10 +56,6 @@
         <meta-data
             android:name="io.flutter.plugins.googlesignin.client_id"
             android:value="633714128030-5o8oa06g6o2naskp0d68v3dlipgqnehl.apps.googleusercontent.com"/>
-        <!-- Google Fit APP_ID for health data integration -->
-        <meta-data
-            android:name="com.google.android.gms.fitness.APP_ID"
-            android:value="@string/app_id" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -11,6 +11,7 @@ class RouteName {
   static const registrationScreen = 'registrationScreen';
   static const signIn = 'sign-in';
   static const signUp = 'sign-up';
+  static const roleSelection = 'role_selection';
   static const otpVerification = 'otpVerification';
   static const termsAndConditionsScreen = 'termsAndConditionsScreen';
   static const terms = 'terms';

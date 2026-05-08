@@ -170,19 +170,32 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             // Store Firebase user data
             await _userService.saveUserData(firebaseUser);
 
-            // Get user profile to determine role-based routing
+            // Check if user profile exists in Firestore
             final userProfile =
                 await _userService.getUserProfile(firebaseUser.uid);
 
-            final routeName = _getRouteNameForRole(userProfile?.role);
+            if (userProfile == null) {
+              // User doesn't exist in Firestore - navigate to role selection
+              if (!emit.isDone) {
+                emit(state.copyWith(
+                  isLoading: false,
+                  isLoginError: false,
+                  isLoginSuccessful: true,
+                  routeName: RouteName.roleSelection,
+                ));
+              }
+            } else {
+              // User exists - navigate based on role
+              final routeName = _getRouteNameForRole(userProfile.role);
 
-            if (!emit.isDone) {
-              emit(state.copyWith(
-                isLoading: false,
-                isLoginError: false,
-                isLoginSuccessful: true,
-                routeName: routeName,
-              ));
+              if (!emit.isDone) {
+                emit(state.copyWith(
+                  isLoading: false,
+                  isLoginError: false,
+                  isLoginSuccessful: true,
+                  routeName: routeName,
+                ));
+              }
             }
           } catch (e) {
             // Handle any errors during user profile retrieval

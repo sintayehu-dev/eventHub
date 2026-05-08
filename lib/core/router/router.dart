@@ -6,6 +6,7 @@ import 'package:eventhub/core/navigation/navigation_service.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/auth/presentation/pages/sign_in/sign_in_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/sign_up/sign_up_screen.dart';
+import 'package:eventhub/features/auth/presentation/pages/role_selection/role_selection_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/onboarding/onboarding_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/terms/terms_and_conditions_screen.dart';
 import 'package:eventhub/features/auth/presentation/pages/privacy_policy/privacy_policy_screen.dart';
@@ -112,6 +113,15 @@ final router = GoRouter(
       path: '/${RouteName.signIn}',
       builder: (context, state) => const AuthProviders(
         child: SignInScreen(),
+      ),
+    ),
+
+    // Role Selection
+    GoRoute(
+      name: RouteName.roleSelection,
+      path: '/${RouteName.roleSelection}',
+      builder: (context, state) => const AuthProviders(
+        child: RoleSelectionScreen(),
       ),
     ),
 

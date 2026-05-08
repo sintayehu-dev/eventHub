@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_bloc.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
+import 'package:eventhub/features/auth/application/role_selection/bloc/role_selection_bloc.dart';
 
 class AuthProviders extends StatelessWidget {
   final Widget child;
@@ -21,6 +22,9 @@ class AuthProviders extends StatelessWidget {
         ),
         BlocProvider<RegistrationBloc>(
           create: (context) => GetIt.instance<RegistrationBloc>(),
+        ),
+        BlocProvider<RoleSelectionBloc>(
+          create: (context) => GetIt.instance<RoleSelectionBloc>(),
         ),
       ],
       child: child,
