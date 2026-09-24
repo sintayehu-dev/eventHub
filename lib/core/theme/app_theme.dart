@@ -147,6 +147,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          iconColor: scheme.onPrimary,
           elevation: 0,
           minimumSize: const Size(64, 52),
           shape: const StadiumBorder(),
@@ -158,6 +159,7 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          iconColor: scheme.onPrimary,
           minimumSize: const Size(64, 52),
           shape: const StadiumBorder(),
           textStyle:

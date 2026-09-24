@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 
 class OrganizerHeader extends StatelessWidget {
   const OrganizerHeader({super.key});
@@ -7,49 +8,41 @@ class OrganizerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
             Container(
-              width: 32.w,
-              height: 32.h,
+              width: 40.w,
+              height: 40.w,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorScheme.primary, colorScheme.secondary],
-                ),
-                borderRadius: BorderRadius.circular(8.r),
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(14.r),
               ),
               child: Icon(
-                Icons.star,
-                color: colorScheme.onPrimary,
+                Icons.confirmation_number_rounded,
+                color: AppColors.white,
                 size: 20.sp,
               ),
             ),
             SizedBox(width: 12.w),
-            Text(
-              'Ethio Events',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('Ethio Events', style: theme.textTheme.titleLarge),
           ],
         ),
         Container(
-          width: 40.w,
-          height: 40.h,
+          width: 42.w,
+          height: 42.w,
           decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12.r),
+            color: scheme.surface,
+            shape: BoxShape.circle,
           ),
           child: Icon(
-            Icons.notifications_outlined,
-            color: colorScheme.primary,
-            size: 20.sp,
+            Icons.notifications_none_rounded,
+            color: scheme.primary,
+            size: 22.sp,
           ),
         ),
       ],

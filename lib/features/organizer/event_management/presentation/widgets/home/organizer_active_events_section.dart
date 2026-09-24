@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/presentation/widgets/section_header.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
@@ -37,10 +38,8 @@ class OrganizerActiveEventsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildActiveEventsContent(BuildContext context, List<EventEntity> events) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+  Widget _buildActiveEventsContent(
+      BuildContext context, List<EventEntity> events) {
     if (events.isEmpty) {
       return _buildEmptyEventsSection(context);
     }
@@ -48,104 +47,85 @@ class OrganizerActiveEventsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Active Events',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            GestureDetector(
-              onTap: () => context.pushNamed(RouteName.organizerEvents),
-              child: Text(
-                'View All',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w500,
+        SectionHeader(
+          title: 'Active events',
+          actionLabel: 'View all',
+          onAction: () => context.goNamed(RouteName.organizerEvents),
+        ),
+        SizedBox(height: 14.h),
+        ...events.take(3).map(
+              (event) => Padding(
+                padding: EdgeInsets.only(bottom: 14.h),
+                child: ActiveEventCard(
+                  event: event,
+                  onTap: () async {
+                    final result = await context.pushNamed(
+                      RouteName.organizerEventDetail,
+                      pathParameters: {'eventId': event.id},
+                    );
+                    // If event was deleted (result == true), reload the events list
+                    if (result == true && context.mounted) {
+                      context.read<EventManagementBloc>().add(
+                            EventManagementEvent.loadOrganizerEvents(
+                              organizerId: event.organizerId,
+                              status: EventStatus.active,
+                            ),
+                          );
+                    }
+                  },
                 ),
               ),
             ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        ...events.take(3).map((event) => Padding(
-          padding: EdgeInsets.only(bottom: 16.h),
-          child: ActiveEventCard(
-            event: event,
-                onTap: () async {
-                  final result = await context.pushNamed(
-                    RouteName.organizerEventDetail,
-                    pathParameters: {'eventId': event.id},
-                  );
-                  // If event was deleted (result == true), reload the events list
-                  if (result == true && context.mounted) {
-                    context.read<EventManagementBloc>().add(
-                          EventManagementEvent.loadOrganizerEvents(
-                            organizerId: event.organizerId,
-                            status: EventStatus.active,
-                          ),
-                        );
-                  }
-                },
-          ),
-        )),
       ],
     );
   }
 
   Widget _buildEmptyEventsSection(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Active Events',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 16.h),
+        Text('Active events', style: theme.textTheme.titleLarge),
+        SizedBox(height: 14.h),
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(32.w),
+          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 24.w),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16.r),
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(28.r),
           ),
           child: Column(
             children: [
-              Icon(Icons.event_note, color: colorScheme.onSurfaceVariant, size: 48.sp),
-              SizedBox(height: 16.h),
-              Text(
-                'No Active Events',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
+              Container(
+                width: 72.w,
+                height: 72.w,
+                decoration: BoxDecoration(
+                  color: scheme.secondaryContainer,
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(Icons.event_note_rounded,
+                    color: scheme.secondary, size: 32.sp),
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 16.h),
+              Text('No active events', style: theme.textTheme.titleMedium),
+              SizedBox(height: 6.h),
               Text(
-                'Create your first event to get started',
-                style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                'Create your first event to get started.',
+                style: theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 16.h),
+              SizedBox(height: 20.h),
               ElevatedButton(
                 onPressed: () => context.pushNamed(RouteName.createEventScreen),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  backgroundColor: scheme.secondary,
+                  foregroundColor: scheme.onSecondary,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 28.w, vertical: 14.h),
                 ),
-                child: Text(
-                  'Create Event',
-                  style: theme.textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary),
-                ),
+                child: const Text('Create event'),
               ),
             ],
           ),
@@ -156,23 +136,19 @@ class OrganizerActiveEventsSection extends StatelessWidget {
 
   Widget _buildLoadingEvents(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Active Events',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
+        Text('Active events', style: theme.textTheme.titleLarge),
+        SizedBox(height: 14.h),
+        ...List.generate(
+          3,
+          (index) => Padding(
+            padding: EdgeInsets.only(bottom: 14.h),
+            child: const _ShimmerEventCard(),
           ),
         ),
-        SizedBox(height: 16.h),
-        ...List.generate(3, (index) => Padding(
-          padding: EdgeInsets.only(bottom: 16.h),
-          child: const _ShimmerEventCard(),
-        )),
       ],
     );
   }
@@ -181,10 +157,8 @@ class OrganizerActiveEventsSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: AppErrorRetryWidget(
         errorMessage: message,
@@ -204,64 +178,34 @@ class _ShimmerEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Row(
         children: [
           ShimmerBox(
-            width: 60.w,
-            height: 60.h,
-            borderRadius: BorderRadius.circular(12.r),
+            width: 72.w,
+            height: 72.w,
+            borderRadius: BorderRadius.circular(18.r),
           ),
-          SizedBox(width: 16.w),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ShimmerText(
-                  width: double.infinity,
-                  height: 18.h,
-                ),
+                ShimmerText(width: double.infinity, height: 16.h),
                 SizedBox(height: 8.h),
-                ShimmerText(
-                  width: 120.w,
-                  height: 14.h,
-                ),
-                SizedBox(height: 4.h),
-                ShimmerText(
-                  width: 150.w,
-                  height: 14.h,
-                ),
-                SizedBox(height: 12.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ShimmerText(
-                      width: 80.w,
-                      height: 12.h,
-                    ),
-                    ShimmerText(
-                      width: 60.w,
-                      height: 14.h,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
+                ShimmerText(width: 120.w, height: 12.h),
+                SizedBox(height: 14.h),
                 ShimmerBox(
                   width: double.infinity,
-                  height: 4.h,
-                  borderRadius: BorderRadius.circular(2.r),
+                  height: 6.h,
+                  borderRadius: BorderRadius.circular(3.r),
                 ),
               ],
             ),

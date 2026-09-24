@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -65,20 +66,23 @@ class OrganizerHomeView extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => _onRefresh(context),
           color: colorScheme.primary,
-          backgroundColor: colorScheme.surface,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
+            padding: EdgeInsets.fromLTRB(
+              20.w,
+              16.h,
+              20.w,
+              FloatingPillNavigationBar.clearance(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const OrganizerHeader(),
-                SizedBox(height: 32.h),
+                SizedBox(height: 24.h),
                 BlocBuilder<UserProfileBloc, UserProfileState>(
                   builder: (context, state) {
                     final organizerName = state.whenOrNull(
@@ -93,11 +97,11 @@ class OrganizerHomeView extends StatelessWidget {
                         organizerName: organizerName);
                   },
                 ),
-                SizedBox(height: 32.h),
+                SizedBox(height: 24.h),
                 const OrganizerStatsSection(),
-                SizedBox(height: 32.h),
+                SizedBox(height: 24.h),
                 const OrganizerQuickActionsSection(),
-                SizedBox(height: 32.h),
+                SizedBox(height: 24.h),
                 const OrganizerActiveEventsSection(),
               ],
             ),

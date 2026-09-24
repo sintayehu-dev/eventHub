@@ -57,11 +57,20 @@ class EventDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      bottomNavigationBar: BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
+        builder: (context, state) {
+          final event = state.selectedEvent;
+          if (state.hasError ||
+              state.isLoading ||
+              state.isLoadingDetails ||
+              event == null) {
+            return const SizedBox.shrink();
+          }
+          return EventDetailGetTicketsButton(event: event);
+        },
+      ),
       body: BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
         builder: (context, state) {
           if (state.hasError) {
@@ -90,7 +99,7 @@ class EventDetailView extends StatelessWidget {
           ShimmerBox(
             width: double.infinity,
             height: 200.h,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(28.r),
           ),
           SizedBox(height: 20.h),
           ShimmerText(width: double.infinity, height: 24.h),
@@ -134,213 +143,122 @@ class EventDetailView extends StatelessWidget {
 
   Widget _buildEventDetailContent(BuildContext context, EventDiscoveryEntity event) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     
-    return SafeArea(
-      top: false, // Let SliverAppBar handle the top safe area
-      child: CustomScrollView(
-        slivers: [
-          EventDetailSliverAppBar(event: event),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
+    return CustomScrollView(
+      slivers: [
+        EventDetailSliverAppBar(event: event),
+        SliverToBoxAdapter(
+          // Pull the sheet up over the hero image.
+          child: Transform.translate(
+            offset: Offset(0, -28.h),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(32.r)),
+              ),
+              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildCategoryBadge(context, event),
-                  SizedBox(height: 16.h),
-                  Text(
-                    event.title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 14.h),
+                  Text(event.title, style: theme.textTheme.headlineMedium),
+                  SizedBox(height: 22.h),
                   EventDetailInfoCard(
-                    icon: Icons.calendar_today,
-                    title: 'Date & Time',
+                    icon: Icons.calendar_today_rounded,
+                    title: 'Date & time',
                     subtitle: _formatDateTime(event.dateTime),
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 12.h),
                   EventDetailInfoCard(
-                    icon: Icons.confirmation_number,
-                    title: 'Entry Price',
-                    subtitle: event.priceRange,
+                    icon: Icons.location_on_rounded,
+                    title: 'Location',
+                    subtitle: event.distance != null
+                        ? '${event.location} • ${event.distance!.toStringAsFixed(1)} km away'
+                        : event.location,
                   ),
-                  SizedBox(height: 24.h),
-                  _buildLocationSection(context, event),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 28.h),
                   _buildOrganizerSection(context, event),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 28.h),
                   EventDetailAboutSection(description: event.description),
-                  SizedBox(height: 32.h),
-                  EventDetailGetTicketsButton(event: event),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 8.h),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryBadge(BuildContext context, EventDiscoveryEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: colorScheme.primary,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Text(
-        event.category.name.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: colorScheme.onPrimary,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationSection(
-      BuildContext context, EventDiscoveryEntity event) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.location_on, color: colorScheme.primary, size: 20.sp),
-            SizedBox(width: 8.w),
-            Text(
-              'Location',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50.w,
-                height: 50.h,
-                decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.location_city,
-                  color: colorScheme.secondary,
-                  size: 24.sp,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      event.location,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (event.distance != null)
-                      Text(
-                        '${event.distance!.toStringAsFixed(1)} km away',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ],
     );
   }
 
+  Widget _buildCategoryBadge(BuildContext context, EventDiscoveryEntity event) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: scheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Text(
+          event.category.name.toUpperCase(),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: scheme.onSecondaryContainer,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildOrganizerSection(
       BuildContext context, EventDiscoveryEntity event) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Organizer',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text('Organizer', style: theme.textTheme.titleLarge),
         SizedBox(height: 12.h),
         Container(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.3),
-              width: 1,
-            ),
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(24.r),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.shadow.withValues(alpha: 0.06),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Row(
             children: [
               CircleAvatar(
-                radius: 25.r,
-                backgroundColor: colorScheme.tertiaryContainer,
+                radius: 23.r,
+                backgroundColor: scheme.primary,
                 child: Text(
                   _getInitials(event.organizerName),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.bold,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: scheme.onPrimary,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
-              SizedBox(width: 16.w),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      event.organizerName,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Event Organizer',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                    ),
+                    Text(event.organizerName, style: theme.textTheme.titleSmall),
+                    Text('Event organizer', style: theme.textTheme.bodySmall),
                   ],
                 ),
               ),

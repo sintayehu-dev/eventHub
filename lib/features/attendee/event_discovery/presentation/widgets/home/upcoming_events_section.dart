@@ -7,7 +7,6 @@ import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
-import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'attendee_event_card.dart';
 
 /// The list below the featured card. The first event is spotlighted by the

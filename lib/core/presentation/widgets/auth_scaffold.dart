@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/theme/app_colors.dart';
 
@@ -26,58 +27,61 @@ class AuthScaffold extends StatelessWidget {
     final height = headerHeight ?? 210.h;
     final top = MediaQuery.of(context).padding.top;
 
-    return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      body: Column(
-        children: [
-          SizedBox(
-            height: height + top,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                const Positioned.fill(child: _HeaderArt()),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(24.w, top + 12.h, 24.w, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (leading != null) leading!,
-                      const Spacer(),
-                      Text(
-                        title,
-                        style: theme.textTheme.headlineLarge
-                            ?.copyWith(color: AppColors.white),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        subtitle,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.white.withValues(alpha: 0.75),
-                        ),
-                      ),
-                      SizedBox(height: 44.h),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppColors.primaryDark,
+        body: Column(
+          children: [
+            SizedBox(
+              height: height + top,
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(32.r)),
-              ),
-              child: ClipRRect(
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(32.r)),
-                child: child,
+              child: Stack(
+                children: [
+                  const Positioned.fill(child: _HeaderArt()),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(24.w, top + 12.h, 24.w, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (leading != null) leading!,
+                        const Spacer(),
+                        Text(
+                          title,
+                          style: theme.textTheme.headlineLarge
+                              ?.copyWith(color: AppColors.white),
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: AppColors.white.withValues(alpha: 0.75),
+                          ),
+                        ),
+                        SizedBox(height: 44.h),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(32.r)),
+                ),
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(32.r)),
+                  child: child,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

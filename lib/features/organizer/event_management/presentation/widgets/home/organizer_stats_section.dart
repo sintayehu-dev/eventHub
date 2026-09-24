@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
@@ -29,142 +30,67 @@ class OrganizerStatsSection extends StatelessWidget {
           return _buildStatsContent(context, [state.selectedEvent!]);
         }
 
-        // Show empty state when no events and not loading
-        return _buildEmptyStats(context);
+        return _buildStatsContent(context, const []);
       },
     );
   }
 
   Widget _buildStatsContent(BuildContext context, List<EventEntity> events) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     final totalRevenue = events.fold<double>(0.0, (sum, event) {
-      return sum + event.ticketTypes.fold<double>(0.0, (ticketSum, ticket) {
-        final sold = ticket.quantity - ticket.availableQuantity;
-        return ticketSum + (sold * ticket.price);
-      });
+      return sum +
+          event.ticketTypes.fold<double>(0.0, (ticketSum, ticket) {
+            final sold = ticket.quantity - ticket.availableQuantity;
+            return ticketSum + (sold * ticket.price);
+          });
     });
 
     final totalTicketsSold = events.fold<int>(0, (sum, event) {
-      return sum + event.ticketTypes.fold<int>(0, (ticketSum, ticket) {
-        return ticketSum + (ticket.quantity - ticket.availableQuantity);
-      });
+      return sum +
+          event.ticketTypes.fold<int>(0, (ticketSum, ticket) {
+            return ticketSum + (ticket.quantity - ticket.availableQuantity);
+          });
     });
 
-    final totalCapacity = events.fold<int>(0, (sum, event) => sum + event.maxCapacity);
-    final avgAttendance = totalCapacity > 0 ? (totalTicketsSold / totalCapacity) * 100 : 0.0;
+    final totalCapacity =
+        events.fold<int>(0, (sum, event) => sum + event.maxCapacity);
+    final avgAttendance =
+        totalCapacity > 0 ? (totalTicketsSold / totalCapacity) * 100 : 0.0;
 
     return Column(
       children: [
+        _RevenueCard(
+          revenue: totalRevenue,
+          caption: events.isEmpty
+              ? 'Create your first event to start earning'
+              : '$totalTicketsSold ticket${totalTicketsSold == 1 ? '' : 's'} sold across ${events.length} event${events.length == 1 ? '' : 's'}',
+        ),
+        SizedBox(height: 14.h),
         Row(
           children: [
             Expanded(
-              child: _StatCard(
-                title: 'Total Revenue',
-                value: totalRevenue > 0
-                    ? '${totalRevenue.toStringAsFixed(0)} Birr'
-                    : '0 Birr',
-                change: '+12%',
-                isPositive: true,
-                color: colorScheme.primary,
-                icon: Icons.attach_money,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _StatCard(
-                title: 'Active Events',
+              child: _StatTile(
+                title: 'Active events',
                 value: '${events.length}',
-                change: '+3 new',
-                isPositive: true,
-                color: colorScheme.tertiary,
-                icon: Icons.event,
+                icon: Icons.event_rounded,
+                tint: AppColors.sky,
               ),
             ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
+            SizedBox(width: 12.w),
             Expanded(
-              child: _StatCard(
-                title: 'Tickets Sold',
+              child: _StatTile(
+                title: 'Tickets sold',
                 value: '$totalTicketsSold',
-                change: '+8%',
-                isPositive: true,
-                color: colorScheme.secondary,
-                icon: Icons.confirmation_number,
+                icon: Icons.confirmation_number_rounded,
+                tint: AppColors.peach,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 12.w),
             Expanded(
-              child: _StatCard(
-                title: 'Avg. Attendance',
+              child: _StatTile(
+                title: 'Filled',
                 value: '${avgAttendance.toInt()}%',
-                change: '+2.5%',
-                isPositive: true,
-                color: colorScheme.tertiary,
-                icon: Icons.people,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyStats(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _StatCard(
-                title: 'Total Revenue',
-                value: '0 Birr',
-                change: 'No events yet',
-                isPositive: true,
-                color: colorScheme.primary,
-                icon: Icons.attach_money,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _StatCard(
-                title: 'Active Events',
-                value: '0',
-                change: 'Create your first event',
-                isPositive: true,
-                color: colorScheme.tertiary,
-                icon: Icons.event,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(
-              child: _StatCard(
-                title: 'Tickets Sold',
-                value: '0',
-                change: 'Start selling tickets',
-                isPositive: true,
-                color: colorScheme.secondary,
-                icon: Icons.confirmation_number,
-              ),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: _StatCard(
-                title: 'Avg. Attendance',
-                value: '0%',
-                change: 'Build your audience',
-                isPositive: true,
-                color: colorScheme.tertiary,
-                icon: Icons.people,
+                icon: Icons.people_rounded,
+                tint: AppColors.mint,
               ),
             ),
           ],
@@ -176,19 +102,24 @@ class OrganizerStatsSection extends StatelessWidget {
   Widget _buildLoadingStats(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            const Expanded(child: _ShimmerStatCard()),
-            SizedBox(width: 16.w),
-            const Expanded(child: _ShimmerStatCard()),
-          ],
+        ShimmerBox(
+          width: double.infinity,
+          height: 128.h,
+          borderRadius: BorderRadius.circular(32.r),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 14.h),
         Row(
           children: [
-            const Expanded(child: _ShimmerStatCard()),
-            SizedBox(width: 16.w),
-            const Expanded(child: _ShimmerStatCard()),
+            for (var i = 0; i < 3; i++) ...[
+              if (i > 0) SizedBox(width: 12.w),
+              Expanded(
+                child: ShimmerBox(
+                  width: double.infinity,
+                  height: 104.h,
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+              ),
+            ],
           ],
         ),
       ],
@@ -196,13 +127,12 @@ class OrganizerStatsSection extends StatelessWidget {
   }
 
   Widget _buildErrorSection(BuildContext context, String message) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: AppErrorRetryWidget(
         errorMessage: message,
@@ -217,132 +147,82 @@ class OrganizerStatsSection extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String change;
-  final bool isPositive;
-  final Color color;
-  final IconData icon;
+class _RevenueCard extends StatelessWidget {
+  final double revenue;
+  final String caption;
 
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.change,
-    required this.isPositive,
-    required this.color,
-    required this.icon,
-  });
-
-  bool get _isEmptyState =>
-      change.contains('No events') ||
-      change.contains('Create your') ||
-      change.contains('Start selling') ||
-      change.contains('Build your');
+  const _RevenueCard({required this.revenue, required this.caption});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      width: double.infinity,
+      padding: EdgeInsets.all(22.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20.r),
+        gradient: AppColors.heroGradient,
+        borderRadius: BorderRadius.circular(32.r),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppColors.primaryDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
           ),
         ],
-        border: Border.all(
-          color: color.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 36.w,
-                height: 36.w,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 18.sp,
-                ),
+          Positioned(
+            right: -40.w,
+            bottom: -70.h,
+            child: Container(
+              width: 150.w,
+              height: 150.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.white.withValues(alpha: 0.06),
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32.w,
+                    height: 32.w,
+                    decoration: const BoxDecoration(
+                      color: AppColors.accent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.payments_rounded,
+                        size: 16.sp, color: AppColors.ink),
                   ),
+                  SizedBox(width: 10.w),
+                  Text(
+                    'Total revenue',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: AppColors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 14.h),
+              Text(
+                '${revenue.toStringAsFixed(0)} Birr',
+                style: theme.textTheme.displaySmall
+                    ?.copyWith(color: AppColors.white),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                caption,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.white.withValues(alpha: 0.75),
                 ),
               ),
             ],
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: _isEmptyState
-                  ? colorScheme.surfaceContainerHighest
-                  : isPositive
-                      ? colorScheme.tertiary.withValues(alpha: 0.1)
-                      : colorScheme.error.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(6.r),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!_isEmptyState) ...[
-                  Icon(
-                    isPositive ? Icons.trending_up : Icons.trending_down,
-                    color:
-                        isPositive ? colorScheme.tertiary : colorScheme.error,
-                    size: 14.sp,
-                  ),
-                  SizedBox(width: 4.w),
-                ],
-                Flexible(
-                  child: Text(
-                    change,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: _isEmptyState
-                          ? colorScheme.onSurfaceVariant
-                          : isPositive
-                              ? colorScheme.tertiary
-                              : colorScheme.error,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -350,60 +230,56 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _ShimmerStatCard extends StatelessWidget {
-  const _ShimmerStatCard();
+class _StatTile extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color tint;
+
+  const _StatTile({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.tint,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
+        color: tint,
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              ShimmerBox(
-                width: 36.w,
-                height: 36.w,
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: ShimmerText(
-                  width: double.infinity,
-                  height: 14.h,
-                ),
-              ),
-            ],
+          Container(
+            width: 34.w,
+            height: 34.w,
+            decoration: const BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 18.sp),
           ),
-          SizedBox(height: 16.h),
-          ShimmerText(
-            width: 80.w,
-            height: 24.h,
+          SizedBox(height: 14.h),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall
+                ?.copyWith(color: AppColors.ink, height: 1.1),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: 8.h),
-          ShimmerBox(
-            width: 60.w,
-            height: 20.h,
-            borderRadius: BorderRadius.circular(6.r),
+          SizedBox(height: 2.h),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelMedium
+                ?.copyWith(color: AppColors.ink.withValues(alpha: 0.7)),
           ),
         ],
       ),

@@ -37,6 +37,7 @@ class AppButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: bg,
           foregroundColor: fg,
+          iconColor: fg,
           disabledBackgroundColor: bg.withValues(alpha: 0.6),
           disabledForegroundColor: fg.withValues(alpha: 0.8),
           shape: const StadiumBorder(),

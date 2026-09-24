@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:eventhub/core/theme/app_theme.dart';
 import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 
 class AboutScreen extends StatelessWidget {

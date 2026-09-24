@@ -25,165 +25,128 @@ class AttendeeProfileMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AttendeeProfileMenuItem(
-          title: 'My Tickets',
-          icon: Icons.confirmation_number_outlined,
-          onTap: onTicketsTap,
-          theme: theme,
-          colorScheme: colorScheme,
+        _MenuGroup(
+          title: 'Account',
+          items: [
+            _MenuEntry('My tickets', Icons.confirmation_number_outlined,
+                onTicketsTap),
+            _MenuEntry(
+                'Payment methods', Icons.payment_outlined, onPaymentTap),
+            _MenuEntry('Notifications', Icons.notifications_none_outlined,
+                onNotificationsTap),
+            _MenuEntry(
+                'Privacy & security', Icons.security_outlined, onPrivacyTap),
+            _MenuEntry('Help & support', Icons.help_outline, onSupportTap),
+          ],
         ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Payment Methods',
-          icon: Icons.payment_outlined,
-          onTap: onPaymentTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Notification Settings',
-          icon: Icons.notifications_none_outlined,
-          onTap: onNotificationsTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Privacy & Security',
-          icon: Icons.security_outlined,
-          onTap: onPrivacyTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Help & Support',
-          icon: Icons.help_outline,
-          onTap: onSupportTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        
-        // Divider for Legal & Info section
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          child: Row(
-            children: [
-              Expanded(
-                child: Divider(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                child: Text(
-                  'Legal & Information',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Divider(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        _AttendeeProfileMenuItem(
-          title: 'About Ethio Events',
-          icon: Icons.info_outline,
-          onTap: onAboutTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Terms & Conditions',
-          icon: Icons.description_outlined,
-          onTap: onTermsTap,
-          theme: theme,
-          colorScheme: colorScheme,
-        ),
-        SizedBox(height: 10.h),
-        _AttendeeProfileMenuItem(
-          title: 'Privacy Policy',
-          icon: Icons.privacy_tip_outlined,
-          onTap: onPrivacyPolicyTap,
-          theme: theme,
-          colorScheme: colorScheme,
+        SizedBox(height: 20.h),
+        _MenuGroup(
+          title: 'Legal & information',
+          items: [
+            _MenuEntry('About Ethio Events', Icons.info_outline, onAboutTap),
+            _MenuEntry(
+                'Terms & conditions', Icons.description_outlined, onTermsTap),
+            _MenuEntry('Privacy policy', Icons.privacy_tip_outlined,
+                onPrivacyPolicyTap),
+          ],
         ),
       ],
     );
   }
 }
 
-class _AttendeeProfileMenuItem extends StatelessWidget {
+class _MenuEntry {
   final String title;
   final IconData icon;
   final VoidCallback? onTap;
-  final ThemeData theme;
-  final ColorScheme colorScheme;
 
-  const _AttendeeProfileMenuItem({
-    required this.title,
-    required this.icon,
-    this.onTap,
-    required this.theme,
-    required this.colorScheme,
-  });
+  const _MenuEntry(this.title, this.icon, this.onTap);
+}
+
+class _MenuGroup extends StatelessWidget {
+  final String title;
+  final List<_MenuEntry> items;
+
+  const _MenuGroup({required this.title, required this.items});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14.r),
-      child: Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-            width: 1,
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 8.w, bottom: 10.h),
+          child: Text(title, style: theme.textTheme.titleSmall),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(28.r),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.shadow.withValues(alpha: 0.06),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28.r),
+            child: Column(
+              children: [
+                for (var i = 0; i < items.length; i++) ...[
+                  _MenuRow(entry: items[i]),
+                  if (i != items.length - 1)
+                    Divider(indent: 68.w, endIndent: 20.w),
+                ],
+              ],
+            ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _MenuRow extends StatelessWidget {
+  final _MenuEntry entry;
+
+  const _MenuRow({required this.entry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return InkWell(
+      onTap: entry.onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(8.w),
+              width: 38.w,
+              height: 38.w,
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(10.r),
+                color: scheme.secondaryContainer,
+                shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: colorScheme.primary,
-                size: 18.sp,
-              ),
+              child: Icon(entry.icon, color: scheme.primary, size: 19.sp),
             ),
             SizedBox(width: 14.w),
             Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text(entry.title, style: theme.textTheme.titleSmall),
             ),
             Icon(
-              Icons.chevron_right,
-              color: colorScheme.onSurfaceVariant,
-              size: 18.sp,
+              Icons.chevron_right_rounded,
+              color: scheme.onSurfaceVariant,
+              size: 22.sp,
             ),
           ],
         ),

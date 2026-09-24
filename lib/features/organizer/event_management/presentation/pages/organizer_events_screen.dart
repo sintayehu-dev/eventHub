@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/event_management/application/event_management/bloc/event_management_bloc.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
@@ -65,8 +66,6 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return BlocListener<EventManagementBloc, EventManagementState>(
       listener: (context, state) {
         if (state.hasError && state.errorMessage.isNotEmpty) {
@@ -80,18 +79,17 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
           await Future.delayed(const Duration(milliseconds: 500));
         },
         child: Scaffold(
-          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: CustomScrollView(
               slivers: [
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 0),
+                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const OrganizerEventsHeader(),
-                        SizedBox(height: 24.h),
+                        SizedBox(height: 20.h),
                         OrganizerEventsFilterSection(
                           selectedStatus: _selectedStatus,
                           onStatusChanged: (status) {
@@ -107,7 +105,9 @@ class _OrganizerEventsViewState extends State<OrganizerEventsView> {
                   ),
                 ),
                 const OrganizerEventsListSection(),
-                SliverPadding(padding: EdgeInsets.only(bottom: 90.h)),
+                SliverPadding(
+                    padding: EdgeInsets.only(
+                        bottom: FloatingPillNavigationBar.clearance(context))),
               ],
             ),
           ),

@@ -9,31 +9,29 @@ class OrganizerEventsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'My Events',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        Text('My events', style: theme.textTheme.headlineMedium),
         GestureDetector(
           onTap: () => context.pushNamed(RouteName.createEventScreen),
           child: Container(
-            padding: EdgeInsets.all(8.w),
+            width: 46.w,
+            height: 46.w,
             decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: BorderRadius.circular(12.r),
+              color: scheme.secondary,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: scheme.secondary.withValues(alpha: 0.4),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            child: Icon(
-              Icons.add,
-              color: colorScheme.onPrimary,
-              size: 20.sp,
-            ),
+            child: Icon(Icons.add_rounded, color: scheme.onSecondary, size: 24.sp),
           ),
         ),
       ],

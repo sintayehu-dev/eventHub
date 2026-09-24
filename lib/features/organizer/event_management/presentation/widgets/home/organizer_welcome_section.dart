@@ -12,25 +12,14 @@ class OrganizerWelcomeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final firstName = organizerName.trim().split(' ').first;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Organizer Dashboard',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          'Welcome back, $organizerName. Here\'s what\'s happening today.',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
+        Text('Hello, $firstName', style: theme.textTheme.bodyMedium),
+        SizedBox(height: 4.h),
+        Text('Your dashboard', style: theme.textTheme.headlineMedium),
       ],
     );
   }

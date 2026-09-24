@@ -78,7 +78,6 @@ class OrganizerEventItemCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: colorScheme.surfaceContainerHighest,
         title: Text(
           'Cancel Event',
           style: theme.textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
@@ -204,19 +203,10 @@ class OrganizerEventItemCard extends StatelessWidget {
 
   Widget _buildBanner(ColorScheme colorScheme) {
     return Container(
-      height: 160.h,
+      height: 150.h,
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          topRight: Radius.circular(16.r),
-        ),
-      ),
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          topRight: Radius.circular(16.r),
-        ),
+        borderRadius: BorderRadius.circular(20.r),
         child: event.bannerUrl != null && event.bannerUrl!.isNotEmpty
             ? Image.network(
                 event.bannerUrl!,
@@ -235,8 +225,8 @@ class OrganizerEventItemCard extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
           decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(8.r),
+            color: statusColor.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -257,7 +247,8 @@ class OrganizerEventItemCard extends StatelessWidget {
         ),
         PopupMenuButton<String>(
           icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant, size: 20.sp),
-          color: colorScheme.surfaceContainerHighest,
+          color: colorScheme.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
           onSelected: (val) => _handleAction(context, val),
           itemBuilder: (context) => [
             const PopupMenuItem(value: 'details', child: Text('View Details')),
@@ -307,8 +298,8 @@ class OrganizerEventItemCard extends StatelessWidget {
             Text('Revenue', style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant)),
             SizedBox(height: 4.h),
             Text(
-              revenue > 0 ? '${revenue.toStringAsFixed(0)} Birr' : 'Free',
-              style: theme.textTheme.labelLarge?.copyWith(color: statusColor, fontWeight: FontWeight.bold),
+              '${revenue.toStringAsFixed(0)} Birr',
+              style: theme.textTheme.labelLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -317,22 +308,28 @@ class OrganizerEventItemCard extends StatelessWidget {
   }
 
   Widget _buildProgressBar(ColorScheme colorScheme, Color statusColor, double progress) {
-    return Container(
-      height: 6.h,
-      decoration: BoxDecoration(color: colorScheme.outline, borderRadius: BorderRadius.circular(3.r)),
-      child: FractionallySizedBox(
-        alignment: Alignment.centerLeft,
-        widthFactor: progress,
-        child: Container(decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(3.r))),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4.r),
+      child: LinearProgressIndicator(
+        value: progress.clamp(0.0, 1.0),
+        minHeight: 8.h,
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        color: colorScheme.secondary,
       ),
     );
   }
 
   Widget _buildPlaceholder(ColorScheme colorScheme) {
-    return Container(
-      color: colorScheme.surface,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [colorScheme.primaryContainer, colorScheme.secondaryContainer],
+        ),
+      ),
       child: Center(
-        child: Icon(Icons.image_outlined, color: colorScheme.onSurfaceVariant, size: 48.sp),
+        child: Icon(Icons.celebration_rounded, color: colorScheme.primary.withValues(alpha: 0.4), size: 44.sp),
       ),
     );
   }
@@ -345,16 +342,16 @@ class OrganizerShimmerEventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Column(
         children: [
-          ShimmerBox(width: double.infinity, height: 160.h, borderRadius: BorderRadius.vertical(top: Radius.circular(16.r))),
+          ShimmerBox(width: double.infinity, height: 150.h, borderRadius: BorderRadius.circular(20.r)),
           Padding(
-            padding: EdgeInsets.all(20.w),
+            padding: EdgeInsets.fromLTRB(10.w, 14.h, 10.w, 8.h),
             child: Column(
               children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

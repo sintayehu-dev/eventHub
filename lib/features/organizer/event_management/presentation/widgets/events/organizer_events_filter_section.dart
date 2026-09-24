@@ -20,8 +20,8 @@ class OrganizerEventsFilterSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(26.r),
       ),
       child: Row(
         children: [
@@ -42,16 +42,15 @@ class OrganizerEventsFilterSection extends StatelessWidget {
       child: GestureDetector(
         onTap: () => onStatusChanged(status),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: EdgeInsets.symmetric(vertical: 11.h),
           decoration: BoxDecoration(
             color: isSelected ? colorScheme.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: BorderRadius.circular(22.r),
           ),
           child: Text(
             title,
-            style: theme.textTheme.labelMedium?.copyWith(
+            style: theme.textTheme.labelLarge?.copyWith(
               color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),

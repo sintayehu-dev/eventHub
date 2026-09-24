@@ -85,9 +85,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 controller: _pageController,
                 onPageChanged: (i) => setState(() => _currentPage = i),
                 itemCount: _items.length,
-                itemBuilder: (context, i) => _OnboardingItemWidget(item: _items[i]),
+                itemBuilder: (context, i) =>
+                    _OnboardingItemWidget(item: _items[i]),
               ),
             ),
+            SizedBox(height: 20.h),
             SmoothPageIndicator(
               controller: _pageController,
               count: _items.length,

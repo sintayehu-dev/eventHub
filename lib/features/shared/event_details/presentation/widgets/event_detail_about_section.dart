@@ -12,23 +12,16 @@ class EventDetailAboutSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'About Event',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 12.h),
+        Text('About this event', style: theme.textTheme.titleLarge),
+        SizedBox(height: 10.h),
         Text(
           description,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.8),
+            color: theme.colorScheme.onSurfaceVariant,
             height: 1.6,
           ),
         ),

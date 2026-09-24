@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 
 class EventDetailSliverAppBar extends StatelessWidget {
@@ -13,40 +14,36 @@ class EventDetailSliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = Theme.of(context).colorScheme;
+
     return SliverAppBar(
-      expandedHeight: 300.h,
+      expandedHeight: 320.h,
       pinned: true,
-      backgroundColor: colorScheme.surface,
-      leading: GestureDetector(
-        onTap: () => context.pop(),
-        child: Container(
-          margin: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surface.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Icon(
-            Icons.arrow_back,
-            color: colorScheme.onSurface,
-            size: 20.sp,
-          ),
+      backgroundColor: AppColors.primaryDark,
+      surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+      leadingWidth: 64.w,
+      leading: Padding(
+        padding: EdgeInsets.only(left: 20.w),
+        child: _RoundAction(
+          icon: Icons.arrow_back_ios_new_rounded,
+          onTap: () => context.pop(),
         ),
       ),
       actions: [
-        _buildActionButton(context, Icons.share, () {}),
-        _buildActionButton(
-          context,
-          event.isFavorite == true ? Icons.favorite : Icons.favorite_border,
-          () {},
-          iconColor: event.isFavorite == true
-              ? colorScheme.error
-              : colorScheme.onSurface,
+        _RoundAction(icon: Icons.share_outlined, onTap: () {}),
+        SizedBox(width: 10.w),
+        _RoundAction(
+          icon: event.isFavorite == true
+              ? Icons.favorite_rounded
+              : Icons.favorite_border_rounded,
+          iconColor: event.isFavorite == true ? scheme.error : null,
+          onTap: () {},
         ),
+        SizedBox(width: 20.w),
       ],
       flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.parallax,
         background: Stack(
           fit: StackFit.expand,
           children: [
@@ -55,17 +52,18 @@ class EventDetailSliverAppBar extends StatelessWidget {
                     event.bannerUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
-                        _buildImagePlaceholder(context),
+                        _buildImagePlaceholder(),
                   )
-                : _buildImagePlaceholder(context),
-            Container(
+                : _buildImagePlaceholder(),
+            // Darken the top so the round buttons stay legible on any image.
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  end: Alignment.center,
                   colors: [
+                    Colors.black.withValues(alpha: 0.35),
                     Colors.transparent,
-                    colorScheme.surface.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -76,41 +74,50 @@ class EventDetailSliverAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
-      BuildContext context, IconData icon, VoidCallback onTap,
-      {Color? iconColor}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Container(
-      margin: EdgeInsets.all(8.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: IconButton(
-        onPressed: onTap,
-        icon: Icon(
-          icon,
-          color: iconColor ?? colorScheme.onSurface,
-          size: 20.sp,
+  Widget _buildImagePlaceholder() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      child: Center(
+        child: Icon(
+          Icons.celebration_rounded,
+          size: 72.sp,
+          color: AppColors.white.withValues(alpha: 0.35),
         ),
       ),
     );
   }
+}
 
-  Widget _buildImagePlaceholder(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colorScheme.surfaceContainerLowest,
-            colorScheme.surfaceContainer,
-            colorScheme.surfaceContainerHigh,
-          ],
+class _RoundAction extends StatelessWidget {
+  const _RoundAction({
+    required this.icon,
+    required this.onTap,
+    this.iconColor,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 42.w,
+          height: 42.w,
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            size: 18.sp,
+            color: iconColor ?? scheme.onSurface,
+          ),
         ),
       ),
     );

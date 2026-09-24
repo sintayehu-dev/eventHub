@@ -51,7 +51,6 @@ class TicketDetailsInfoSection extends StatelessWidget {
 
   Widget _buildDetailRow(BuildContext context, TicketDetailRowData detail) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.h),

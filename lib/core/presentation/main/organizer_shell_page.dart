@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:eventhub/core/widgets/compact_bottom_navigation_bar.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 
 class OrganizerShellPage extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -15,27 +15,27 @@ class OrganizerShellPage extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       body: navigationShell,
-      bottomNavigationBar: CompactBottomNavigationBar(
+      bottomNavigationBar: FloatingPillNavigationBar(
         navigationShell: navigationShell,
         items: const [
-          CompactBottomNavigationItem(
+          PillNavItem(
             icon: Icons.home_outlined,
-            activeIcon: Icons.home,
+            activeIcon: Icons.home_rounded,
             label: 'Home',
           ),
-          CompactBottomNavigationItem(
+          PillNavItem(
             icon: Icons.event_outlined,
-            activeIcon: Icons.event,
+            activeIcon: Icons.event_rounded,
             label: 'Events',
           ),
-          CompactBottomNavigationItem(
-            icon: Icons.analytics_outlined,
-            activeIcon: Icons.analytics,
-            label: 'Analytics',
+          PillNavItem(
+            icon: Icons.insights_outlined,
+            activeIcon: Icons.insights_rounded,
+            label: 'Insights',
           ),
-          CompactBottomNavigationItem(
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
+          PillNavItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
             label: 'Profile',
           ),
         ],

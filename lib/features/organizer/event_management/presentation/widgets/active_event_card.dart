@@ -16,7 +16,7 @@ class ActiveEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
     final soldTickets = event.ticketTypes.fold<int>(
       0,
@@ -36,152 +36,89 @@ class ActiveEventCard extends StatelessWidget {
       },
     );
 
-    final progress = totalTickets > 0 ? soldTickets / totalTickets : 0.0;
-    final statusColor =
-        OrganizerEventUtils.getStatusColor(context, event.status);
+    final progress =
+        totalTickets > 0 ? (soldTickets / totalTickets).clamp(0.0, 1.0) : 0.0;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: statusColor.withValues(alpha: 0.3),
-            width: 1,
-          ),
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
+          boxShadow: [
+            BoxShadow(
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            // Event Image with Placeholder
-            Container(
-              width: 60.w,
-              height: 60.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.r),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18.r),
+              child: SizedBox(
+                width: 72.w,
+                height: 72.w,
                 child: event.bannerUrl != null && event.bannerUrl!.isNotEmpty
                     ? Image.network(
                         event.bannerUrl!,
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: colorScheme.surface,
-                            child: Center(
-                              child: SizedBox(
-                                width: 20.w,
-                                height: 20.h,
-                                child: CircularProgressIndicator(
-                                  color: colorScheme.primary,
-                                  strokeWidth: 2,
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildEventImagePlaceholder(statusColor);
-                        },
+                        loadingBuilder: (context, child, loadingProgress) =>
+                            loadingProgress == null
+                                ? child
+                                : _placeholder(scheme),
+                        errorBuilder: (_, __, ___) => _placeholder(scheme),
                       )
-                    : _buildEventImagePlaceholder(statusColor),
+                    : _placeholder(scheme),
               ),
             ),
-            SizedBox(width: 16.w),
-
-            // Event Details
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     event.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: theme.textTheme.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    OrganizerEventUtils.formatDateTime(event.dateTime),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    event.location,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    OrganizerEventUtils.formatDateTime(event.dateTime),
+                    style: theme.textTheme.bodySmall,
                   ),
-                  SizedBox(height: 8.h),
-
-                  // Progress Bar
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 10.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '$soldTickets / $totalTickets sold',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          Text(
-                            revenue > 0
-                                ? '${revenue.toStringAsFixed(0)} Birr'
-                                : 'Free',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '$soldTickets / $totalTickets sold',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
-                      SizedBox(height: 4.h),
-                      Container(
-                        height: 4.h,
-                        decoration: BoxDecoration(
-                          color: colorScheme.outline,
-                          borderRadius: BorderRadius.circular(2.r),
-                        ),
-                        child: FractionallySizedBox(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: progress,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                              borderRadius: BorderRadius.circular(2.r),
-                            ),
-                          ),
-                        ),
+                      Text(
+                        '${revenue.toStringAsFixed(0)} Birr',
+                        style: theme.textTheme.labelMedium
+                            ?.copyWith(color: scheme.primary),
                       ),
                     ],
                   ),
+                  SizedBox(height: 6.h),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4.r),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 6.h,
+                      backgroundColor: scheme.surfaceContainerHighest,
+                      color: scheme.secondary,
+                    ),
+                  ),
                 ],
               ),
-            ),
-
-            // More Options
-            Icon(
-              Icons.more_vert,
-              color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
             ),
           ],
         ),
@@ -189,16 +126,17 @@ class ActiveEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventImagePlaceholder(Color color) {
-    return Container(
-      color: color.withValues(alpha: 0.2),
-      child: Center(
-        child: Icon(
-          Icons.image_outlined,
-          color: color,
-          size: 24.sp,
+  Widget _placeholder(ColorScheme scheme) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.primaryContainer, scheme.secondaryContainer],
         ),
       ),
+      child: Icon(Icons.celebration_rounded,
+          size: 26.sp, color: scheme.primary.withValues(alpha: 0.4)),
     );
   }
 }

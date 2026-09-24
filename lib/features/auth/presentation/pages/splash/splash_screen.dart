@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -103,108 +104,111 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 context, 'Something went wrong. Please restart the app.');
           }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.primaryDark,
-          body: Container(
-            decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -70.w,
-                  top: -40.h,
-                  child: _Dot(size: 240.w, alpha: 0.06),
-                ),
-                Positioned(
-                  left: -60.w,
-                  bottom: 120.h,
-                  child: _Dot(size: 180.w, alpha: 0.05),
-                ),
-                SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.w),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ScaleTransition(
-                                scale: _logoAnimation,
-                                child: Container(
-                                  width: 96.w,
-                                  height: 96.w,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accent,
-                                    borderRadius: BorderRadius.circular(30.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.accent
-                                            .withValues(alpha: 0.35),
-                                        blurRadius: 32,
-                                        offset: const Offset(0, 12),
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: Scaffold(
+            backgroundColor: AppColors.primaryDark,
+            body: Container(
+              decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -70.w,
+                    top: -40.h,
+                    child: _Dot(size: 240.w, alpha: 0.06),
+                  ),
+                  Positioned(
+                    left: -60.w,
+                    bottom: 120.h,
+                    child: _Dot(size: 180.w, alpha: 0.05),
+                  ),
+                  SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32.w),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ScaleTransition(
+                                  scale: _logoAnimation,
+                                  child: Container(
+                                    width: 96.w,
+                                    height: 96.w,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accent,
+                                      borderRadius: BorderRadius.circular(30.r),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.accent
+                                              .withValues(alpha: 0.35),
+                                          blurRadius: 32,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      Icons.confirmation_number_rounded,
+                                      size: 46.sp,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 32.h),
+                                FadeTransition(
+                                  opacity: _textAnimation,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Ethio Events',
+                                        style: theme.textTheme.displaySmall
+                                            ?.copyWith(color: AppColors.white),
+                                      ),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        'Where experiences connect',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          color: AppColors.white
+                                              .withValues(alpha: 0.7),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  child: Icon(
-                                    Icons.confirmation_number_rounded,
-                                    size: 46.sp,
-                                    color: AppColors.white,
-                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 32.h),
-                              FadeTransition(
-                                opacity: _textAnimation,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      'Ethio Events',
-                                      style: theme.textTheme.displaySmall
-                                          ?.copyWith(color: AppColors.white),
-                                    ),
-                                    SizedBox(height: 8.h),
-                                    Text(
-                                      'Where experiences connect',
-                                      style:
-                                          theme.textTheme.bodyMedium?.copyWith(
-                                        color: AppColors.white
-                                            .withValues(alpha: 0.7),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        FadeTransition(
-                          opacity: _progressAnimation,
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 32.h),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4.r),
-                              child: SizedBox(
-                                width: 120.w,
-                                height: 4.h,
-                                child: AnimatedBuilder(
-                                  animation: _progressAnimation,
-                                  builder: (context, _) =>
-                                      LinearProgressIndicator(
-                                    value: _progressAnimation.value,
-                                    backgroundColor: AppColors.white
-                                        .withValues(alpha: 0.15),
-                                    color: AppColors.accent,
+                          FadeTransition(
+                            opacity: _progressAnimation,
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 32.h),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4.r),
+                                child: SizedBox(
+                                  width: 120.w,
+                                  height: 4.h,
+                                  child: AnimatedBuilder(
+                                    animation: _progressAnimation,
+                                    builder: (context, _) =>
+                                        LinearProgressIndicator(
+                                      value: _progressAnimation.value,
+                                      backgroundColor: AppColors.white
+                                          .withValues(alpha: 0.15),
+                                      color: AppColors.accent,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

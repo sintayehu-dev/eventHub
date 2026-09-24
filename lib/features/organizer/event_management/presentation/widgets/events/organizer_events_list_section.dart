@@ -88,36 +88,44 @@ class _EmptyState extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return SliverFillRemaining(
+      hasScrollBody: false,
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.event_note, color: colorScheme.onSurfaceVariant, size: 64.sp),
-            SizedBox(height: 16.h),
-            Text(
-              'No events available',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 24.h),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 88.w,
+                height: 88.w,
+                decoration: BoxDecoration(
+                  color: colorScheme.secondaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.event_note_rounded,
+                    color: colorScheme.secondary, size: 40.sp),
               ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Create your first event to get started',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-            ),
-            SizedBox(height: 24.h),
-            ElevatedButton(
-              onPressed: () => context.pushNamed(RouteName.createEventScreen),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
+              SizedBox(height: 20.h),
+              Text('No events here yet', style: theme.textTheme.titleMedium),
+              SizedBox(height: 6.h),
+              Text(
+                'Create an event and it will show up in this list.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall,
               ),
-              child: Text('Create Event',
-                  style: TextStyle(color: colorScheme.onPrimary)),
-            ),
-          ],
+              SizedBox(height: 24.h),
+              ElevatedButton(
+                onPressed: () => context.pushNamed(RouteName.createEventScreen),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.secondary,
+                  foregroundColor: colorScheme.onSecondary,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
+                ),
+                child: const Text('Create event'),
+              ),
+            ],
+          ),
         ),
       ),
     );

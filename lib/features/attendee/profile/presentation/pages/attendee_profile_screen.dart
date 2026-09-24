@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/features/shared/profile/application/user_profile/bloc/user_profile_bloc.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
 import 'package:eventhub/features/shared/profile/presentation/pages/edit_profile_screen.dart';
@@ -51,40 +52,28 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Profile',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        centerTitle: false,
+        titleSpacing: 20.w,
+        title: Text('Profile', style: theme.textTheme.headlineMedium),
         actions: [
-          IconButton(
-            onPressed: () => _showEditProfileDialog(),
-            icon: Icon(
-              Icons.edit,
-              color: colorScheme.primary,
-              size: 24.sp,
-            ),
+          _CircleAction(
+            icon: Icons.edit_outlined,
+            onTap: _showEditProfileDialog,
           ),
+          SizedBox(width: 10.w),
           BlocBuilder<AppBloc, AppState>(
             builder: (context, appState) {
-              return IconButton(
-                onPressed: () {
-                  context.read<AppBloc>().add(
-                      AppEvent.changeTheme(isDarkMode: !appState.isDarkMode));
-                },
-                icon: Icon(
-                  appState.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  color: colorScheme.primary,
-                  size: 24.sp,
-                ),
+              return _CircleAction(
+                icon: appState.isDarkMode
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+                onTap: () => context.read<AppBloc>().add(
+                    AppEvent.changeTheme(isDarkMode: !appState.isDarkMode)),
               );
             },
           ),
+          SizedBox(width: 20.w),
         ],
       ),
       body: BlocBuilder<UserProfileBloc, UserProfileState>(
@@ -201,7 +190,11 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   Widget _buildProfileContent(UserProfileEntity profile) {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
-          20.w, 20.w, 20.w, 90.h), // Added bottom padding for nav bar
+        20.w,
+        12.h,
+        20.w,
+        FloatingPillNavigationBar.clearance(context),
+      ),
       child: Column(
         children: [
           AttendeeProfileHeader(
@@ -277,7 +270,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
         return AlertDialog(
           backgroundColor: colorScheme.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(28.r),
           ),
           title: Text(
             'Logout',
@@ -500,6 +493,30 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
           }
         });
       },
+    );
+  }
+}
+
+class _CircleAction extends StatelessWidget {
+  const _CircleAction({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42.w,
+        height: 42.w,
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: scheme.primary, size: 20.sp),
+      ),
     );
   }
 }

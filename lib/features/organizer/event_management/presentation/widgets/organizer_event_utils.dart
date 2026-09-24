@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
 class OrganizerEventUtils {
   static Color getStatusColor(BuildContext context, EventStatus status) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     switch (status) {
       case EventStatus.active:
-        return Colors.green; // Success color
+        return AppColors.success;
       case EventStatus.draft:
-        return colorScheme.secondary; // Warning/draft color
+        return AppColors.accentDark; // draft / needs attention
       case EventStatus.completed:
-        return colorScheme.tertiary; // Info color
+        return colorScheme.primary;
       case EventStatus.cancelled:
-        return colorScheme.error; // Error color
+        return colorScheme.error;
     }
   }
 
