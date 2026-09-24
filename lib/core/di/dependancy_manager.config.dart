@@ -277,6 +277,8 @@ extension GetItInjectableX on _i174.GetIt {
             gh<_i531.AttendeeManagementRepository>()));
     gh.factory<_i106.AnalyticsRepository>(() =>
         _i908.AnalyticsRepositoryImpl(gh<_i41.FirebaseAnalyticsDataSource>()));
+    gh.factory<_i914.DeleteAccountUseCase>(
+        () => _i914.DeleteAccountUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i17.GetCurrentUserUseCase>(
         () => _i17.GetCurrentUserUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i91.GoogleSignInUseCase>(
@@ -289,8 +291,6 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i259.SignInUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i915.SignOutUseCase>(
         () => _i915.SignOutUseCase(gh<_i787.AuthRepository>()));
-    gh.factory<_i914.DeleteAccountUseCase>(
-        () => _i914.DeleteAccountUseCase(gh<_i787.AuthRepository>()));
     gh.factory<_i743.TicketWalletRepository>(() =>
         _i820.TicketWalletRepositoryImpl(
             firebaseDataSource: gh<_i1021.FirebaseTicketDataSource>()));
