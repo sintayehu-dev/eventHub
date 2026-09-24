@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
@@ -313,7 +312,6 @@ final router = GoRouter(
       ],
     ),
 
-
     // QR Scanner Screen (separate from shell navigation)
     GoRoute(
       name: RouteName.qrScanner,
@@ -437,5 +435,3 @@ final router = GoRouter(
     ),
   ],
 );
-
-

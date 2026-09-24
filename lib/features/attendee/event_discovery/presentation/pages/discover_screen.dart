@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
@@ -134,7 +135,7 @@ class _DiscoverEventsList extends StatelessWidget {
     if (events.isEmpty) {
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
-      
+
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 60.h),
         child: Column(
@@ -170,10 +171,15 @@ class _DiscoverEventsList extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 0),
       child: Column(
         children: events
+            .asMap()
+            .entries
             .map(
-              (event) => Padding(
-                padding: EdgeInsets.only(bottom: 16.h),
-                child: DiscoverEventCard(event: event),
+              (e) => FadeSlideIn(
+                index: e.key,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 16.h),
+                  child: DiscoverEventCard(event: e.value),
+                ),
               ),
             )
             .toList(),

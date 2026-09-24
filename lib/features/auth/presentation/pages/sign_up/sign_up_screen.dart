@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:eventhub/core/presentation/widgets/app_button.dart';
 import 'package:eventhub/core/presentation/widgets/app_text_field.dart';
 import 'package:eventhub/core/presentation/widgets/auth_scaffold.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
@@ -64,17 +66,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       },
       builder: (context, state) {
-        final termsAccepted = state.termsAcceptance?.value
-                .fold((_) => false, (r) => r) ??
-            false;
+        final termsAccepted =
+            state.termsAcceptance?.value.fold((_) => false, (r) => r) ?? false;
 
         return AuthScaffold(
-          title: 'Create account',
-          subtitle: 'Join the scene and start exploring.',
-          headerHeight: 200.h,
+          eyebrow: 'Create your account',
+          title: 'Sign up',
+          headerHeight: 190.h,
           leading: const AppBackButton(),
           child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
+            padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -91,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: 18.h),
                 AppTextField(
                   label: 'Email address',
-                  hintText: 'you@example.com',
+                  hintText: 'Enter your email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.mail_outline_rounded,
@@ -161,7 +162,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Checkbox(
                         value: termsAccepted,
                         onChanged: (v) => context.read<RegistrationBloc>().add(
-                              RegistrationEvent.termsAcceptedChanged(v ?? false),
+                              RegistrationEvent.termsAcceptedChanged(
+                                  v ?? false),
                             ),
                       ),
                     ),
@@ -194,8 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 SizedBox(height: 28.h),
                 AppButton(
-                  label: 'Create account',
-                  icon: Icons.arrow_forward_rounded,
+                  label: 'Sign up',
                   isLoading: state.isLoading,
                   onPressed: () => context
                       .read<RegistrationBloc>()
@@ -215,7 +216,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           TextSpan(
                             text: 'Sign in',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: scheme.primary,
+                              color: AppColors.accentDark,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -249,7 +250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Text(
           text,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.primary,
+            color: AppColors.accentDark,
             fontWeight: FontWeight.w700,
             decoration: TextDecoration.underline,
           ),
@@ -277,7 +278,7 @@ class _RoleCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),

@@ -485,7 +485,7 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
 
         // Sign out and navigate to login page
         context.read<AuthStatusBloc>().add(const AuthStatusEvent.signOut());
-        
+
         // Navigate to login page
         Future.delayed(const Duration(milliseconds: 500), () {
           if (context.mounted) {

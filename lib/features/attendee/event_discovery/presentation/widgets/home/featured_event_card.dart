@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
@@ -15,15 +16,25 @@ class FeaturedEventCard extends StatelessWidget {
   });
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(22.w),
@@ -56,7 +67,8 @@ class FeaturedEventCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
                     color: AppColors.white.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(20.r),

@@ -126,7 +126,17 @@ class OrganizerAnalyticsView extends StatelessWidget {
   }
 
   Widget _buildShimmerContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    Widget metricTile() => ShimmerBox(
+          width: double.infinity,
+          height: 148.h,
+          borderRadius: BorderRadius.circular(28.r),
+        );
+
     return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         20.w,
         16.h,
@@ -136,243 +146,84 @@ class OrganizerAnalyticsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header shimmer
-          ShimmerText(
-            width: 120.w,
-            height: 32.h,
-          ),
-          SizedBox(height: 24.h),
+          // Static title, same as the loaded screen
+          Text('Insights', style: theme.textTheme.headlineMedium),
+          SizedBox(height: 20.h),
 
-          // Period selector shimmer
-          _buildPeriodSelectorShimmer(context),
-          SizedBox(height: 24.h),
-
-          // Key metrics grid shimmer
-          _buildKeyMetricsShimmer(context),
-          SizedBox(height: 28.h),
-
-          // Top performing events shimmer
-          _buildTopEventsShimmer(context),
-          SizedBox(height: 28.h),
-
-          // Category breakdown shimmer
-          _buildCategoryBreakdownShimmer(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPeriodSelectorShimmer(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.all(4.w),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(26.r),
-      ),
-      child: Row(
-        children: List.generate(
-          4,
-          (index) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
-              child: ShimmerBox(
-                height: 36.h,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
+          // Period selector
+          Container(
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(26.r),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildKeyMetricsShimmer(BuildContext context) {
-    final theme = Theme.of(context);
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 16.w,
-      mainAxisSpacing: 16.h,
-      childAspectRatio: 1.5,
-      children: List.generate(
-        4,
-        (index) => Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(28.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ShimmerCircle(size: 24.w),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: ShimmerText(
-                      height: 14.h,
-                      width: double.infinity,
+            child: Row(
+              children: List.generate(
+                3,
+                (_) => Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 2.w),
+                    child: ShimmerBox(
+                      height: 40.h,
+                      borderRadius: BorderRadius.circular(22.r),
                     ),
                   ),
-                ],
-              ),
-              const Spacer(),
-              ShimmerText(
-                width: 80.w,
-                height: 24.h,
-              ),
-              SizedBox(height: 4.h),
-              ShimmerText(
-                width: 60.w,
-                height: 12.h,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRevenueOverviewShimmer(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(28.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShimmerText(
-            width: 140.w,
-            height: 20.h,
-          ),
-          SizedBox(height: 20.h),
-          ShimmerBox(
-            width: double.infinity,
-            height: 200.h,
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopEventsShimmer(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(28.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShimmerText(
-            width: 180.w,
-            height: 20.h,
-          ),
-          SizedBox(height: 16.h),
-          ...List.generate(
-            3,
-            (index) => Padding(
-              padding: EdgeInsets.only(bottom: 16.h),
-              child: Row(
-                children: [
-                  ShimmerBox(
-                    width: 60.w,
-                    height: 60.h,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ShimmerText(
-                          width: double.infinity,
-                          height: 16.h,
-                        ),
-                        SizedBox(height: 4.h),
-                        ShimmerText(
-                          width: 100.w,
-                          height: 12.h,
-                        ),
-                        SizedBox(height: 4.h),
-                        ShimmerText(
-                          width: 80.w,
-                          height: 12.h,
-                        ),
-                      ],
-                    ),
-                  ),
-                  ShimmerText(
-                    width: 60.w,
-                    height: 16.h,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryBreakdownShimmer(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(28.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShimmerText(
-            width: 160.w,
-            height: 20.h,
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: ShimmerBox(
-                  height: 150.h,
-                  borderRadius: BorderRadius.circular(75.h),
                 ),
               ),
-              SizedBox(width: 20.w),
-              Expanded(
-                child: Column(
-                  children: List.generate(
-                    4,
-                    (index) => Padding(
-                      padding: EdgeInsets.only(bottom: 12.h),
-                      child: Row(
+            ),
+          ),
+          SizedBox(height: 24.h),
+
+          // Key metrics: 2 x 2 tinted cards
+          Row(
+            children: [
+              Expanded(child: metricTile()),
+              SizedBox(width: 12.w),
+              Expanded(child: metricTile()),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              Expanded(child: metricTile()),
+              SizedBox(width: 12.w),
+              Expanded(child: metricTile()),
+            ],
+          ),
+          SizedBox(height: 28.h),
+
+          // Top performing events
+          Text('Top performing events', style: theme.textTheme.titleLarge),
+          SizedBox(height: 14.h),
+          ...List.generate(
+            3,
+            (_) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: Container(
+                padding: EdgeInsets.all(14.w),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                child: Row(
+                  children: [
+                    ShimmerCircle(size: 36.w),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ShimmerCircle(size: 12.w),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: ShimmerText(
-                              height: 12.h,
-                              width: double.infinity,
-                            ),
-                          ),
+                          ShimmerText(width: 160.w, height: 14.h),
+                          SizedBox(height: 6.h),
+                          ShimmerText(width: 70.w, height: 12.h),
                         ],
                       ),
                     ),
-                  ),
+                    ShimmerText(width: 64.w, height: 16.h),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),

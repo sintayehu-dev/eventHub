@@ -6,6 +6,7 @@ import 'package:eventhub/core/presentation/widgets/app_button.dart';
 import 'package:eventhub/core/presentation/widgets/app_text_field.dart';
 import 'package:eventhub/core/presentation/widgets/auth_scaffold.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_bloc.dart';
 import 'package:eventhub/features/auth/application/login/bloc/login_event.dart';
@@ -60,23 +61,22 @@ class _SignInScreenState extends State<SignInScreen> {
       },
       builder: (context, state) {
         return AuthScaffold(
-          title: 'Welcome back',
-          subtitle: 'Sign in to find your next event.',
+          eyebrow: 'Welcome back!',
+          title: 'Sign in',
           child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(24.w, 32.h, 24.w, 24.h),
+            padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppTextField(
                   label: 'Email address',
-                  hintText: 'you@example.com',
+                  hintText: 'Enter your email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.mail_outline_rounded,
                   errorText: _errorFor(state, 'email'),
-                  onChanged: (v) => context
-                      .read<LoginBloc>()
-                      .add(LoginEvent.emailChanged(v)),
+                  onChanged: (v) =>
+                      context.read<LoginBloc>().add(LoginEvent.emailChanged(v)),
                 ),
                 SizedBox(height: 20.h),
                 AppTextField(
@@ -86,16 +86,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   obscureText: !state.showPassword,
                   prefixIcon: Icons.lock_outline_rounded,
                   errorText: _errorFor(state, 'password'),
-                  trailingLabel: GestureDetector(
-                    onTap: () => context
-                        .read<LoginBloc>()
-                        .add(const LoginEvent.passwordResetRequested()),
-                    child: Text(
-                      'Forgot password?',
-                      style: theme.textTheme.labelMedium
-                          ?.copyWith(color: scheme.primary),
-                    ),
-                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       state.showPassword
@@ -111,10 +101,28 @@ class _SignInScreenState extends State<SignInScreen> {
                       .read<LoginBloc>()
                       .add(LoginEvent.passwordChanged(v)),
                 ),
-                SizedBox(height: 28.h),
+                SizedBox(height: 10.h),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () => context
+                        .read<LoginBloc>()
+                        .add(const LoginEvent.passwordResetRequested()),
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
+                      child: Text(
+                        'Forgot password?',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                            color: AppColors.accentDark,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
                 AppButton(
                   label: 'Sign in',
-                  icon: Icons.arrow_forward_rounded,
                   isLoading: state.isLoading,
                   onPressed: () => context
                       .read<LoginBloc>()
@@ -126,8 +134,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const Expanded(child: Divider()),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text('or continue with',
-                          style: theme.textTheme.bodySmall),
+                      child: Text('or', style: theme.textTheme.bodySmall),
                     ),
                     const Expanded(child: Divider()),
                   ],
@@ -173,7 +180,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           TextSpan(
                             text: 'Sign up',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: scheme.primary,
+                              color: AppColors.accentDark,
                               fontWeight: FontWeight.w800,
                             ),
                           ),

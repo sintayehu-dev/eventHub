@@ -12,7 +12,8 @@ part 'ticket_purchase_state.dart';
 part 'ticket_purchase_bloc.freezed.dart';
 
 @injectable
-class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> {
+class TicketPurchaseBloc
+    extends Bloc<TicketPurchaseEvent, TicketPurchaseState> {
   final TicketPurchaseRepository _repository;
 
   TicketPurchaseBloc({
@@ -53,7 +54,8 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
       emit(state.copyWith(
         isPurchasing: false,
         hasError: true,
-        errorMessage: NetworkExceptions.getRawErrorMessage(const NetworkExceptions.unauthorisedRequest()),
+        errorMessage: NetworkExceptions.getRawErrorMessage(
+            const NetworkExceptions.unauthorisedRequest()),
       ));
       return;
     }
@@ -165,7 +167,8 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
       return;
     }
 
-    emit(state.copyWith(isLoadingDetails: true, hasError: false, errorMessage: ''));
+    emit(state.copyWith(
+        isLoadingDetails: true, hasError: false, errorMessage: ''));
 
     final result = await _repository.getTicketDetails(
       ticketId: event.ticketId,
@@ -229,7 +232,8 @@ class TicketPurchaseBloc extends Bloc<TicketPurchaseEvent, TicketPurchaseState> 
           emit(state.copyWith(
             isProcessing: false,
             hasError: true,
-            errorMessage: NetworkExceptions.getRawErrorMessage(const NetworkExceptions.unexpectedError()),
+            errorMessage: NetworkExceptions.getRawErrorMessage(
+                const NetworkExceptions.unexpectedError()),
           ));
         }
       },

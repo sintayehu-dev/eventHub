@@ -14,7 +14,7 @@ class PurchasedTicketsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       color: colorScheme.surface,
       elevation: 0,
@@ -55,7 +55,8 @@ class PurchasedTicketsList extends StatelessWidget {
                           Text(
                             ticket.eventTitle,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -65,7 +66,8 @@ class PurchasedTicketsList extends StatelessWidget {
                     ),
                     SizedBox(width: 12.w),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12.r),

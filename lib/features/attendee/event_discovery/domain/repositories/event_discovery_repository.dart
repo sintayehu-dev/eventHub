@@ -5,7 +5,8 @@ import 'package:eventhub/features/organizer/event_management/domain/entities/eve
 
 abstract class EventDiscoveryRepository {
   /// Get all upcoming events
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getUpcomingEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getUpcomingEvents({
     int? limit,
     String? lastEventId,
   });
@@ -17,7 +18,8 @@ abstract class EventDiscoveryRepository {
   });
 
   /// Get events by category
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getEventsByCategory({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getEventsByCategory({
     required EventCategory category,
     int? limit,
   });
@@ -29,12 +31,14 @@ abstract class EventDiscoveryRepository {
   });
 
   /// Get featured/popular events
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getFeaturedEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getFeaturedEvents({
     int? limit,
   });
 
   /// Get nearby events (if location is available)
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getNearbyEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getNearbyEvents({
     required double latitude,
     required double longitude,
     double? radiusKm,
@@ -48,10 +52,12 @@ abstract class EventDiscoveryRepository {
   });
 
   /// Get user's favorite events
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getFavoriteEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getFavoriteEvents({
     required String userId,
   });
 
   /// Stream upcoming events (real-time)
-  Stream<Either<NetworkExceptions, List<EventDiscoveryEntity>>> watchUpcomingEvents();
+  Stream<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      watchUpcomingEvents();
 }

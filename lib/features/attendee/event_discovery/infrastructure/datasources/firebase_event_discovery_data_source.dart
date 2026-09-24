@@ -48,9 +48,10 @@ abstract class FirebaseEventDiscoveryDataSource {
 }
 
 @Injectable(as: FirebaseEventDiscoveryDataSource)
-class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryDataSource {
+class FirebaseEventDiscoveryDataSourceImpl
+    implements FirebaseEventDiscoveryDataSource {
   final FirebaseFirestore _firestore;
-  
+
   // Cache for organizer names to avoid repeated database calls
   final Map<String, String> _organizerNameCache = {};
 
@@ -58,7 +59,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
   static const String _eventsCollection = 'events';
   static const String _favoritesCollection = 'user_favorites';
-  static const String _organizersCollection = 'users'; // Assuming organizers are in users collection
+  static const String _organizersCollection =
+      'users'; // Assuming organizers are in users collection
 
   @override
   Future<List<EventDiscoveryEntity>> getUpcomingEvents({
@@ -76,24 +78,24 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       }
 
       final querySnapshot = await query.get();
-      
+
       print(
           '🔍 DEBUG: Found ${querySnapshot.docs.length} active events in Firestore');
-      
+
       // Parse events with error handling
       final allEvents = <EventDiscoveryEntity>[];
       int parseErrorCount = 0;
-      
+
       for (final doc in querySnapshot.docs) {
         try {
           final data = doc.data() as Map<String, dynamic>;
           print('📄 DEBUG: Processing event ${doc.id}: ${data['title']}');
-          
+
           // Add document ID if missing
           if (!data.containsKey('id')) {
             data['id'] = doc.id;
           }
-          
+
           // Convert EventEntity data to EventDiscoveryEntity format if needed
           final discoveryData = await _convertEventDataToDiscoveryData(data);
           final event = EventDiscoveryEntity.fromFirestoreData(discoveryData);
@@ -160,7 +162,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       }
 
       final querySnapshot = await query.get();
-      
+
       // Parse events with error handling
       final allEvents = <EventDiscoveryEntity>[];
       for (final doc in querySnapshot.docs) {
@@ -169,7 +171,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
           if (!data.containsKey('id')) {
             data['id'] = doc.id;
           }
-          
+
           final discoveryData = await _convertEventDataToDiscoveryData(data);
           final event = EventDiscoveryEntity.fromFirestoreData(discoveryData);
           allEvents.add(event);
@@ -183,7 +185,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       var filteredEvents = _applyFiltersInMemory(allEvents, filters);
 
       // Apply sorting
-      filteredEvents = _applySorting(filteredEvents, filters.sortBy ?? EventSortBy.date);
+      filteredEvents =
+          _applySorting(filteredEvents, filters.sortBy ?? EventSortBy.date);
 
       // Apply limit
       if (limit != null && filteredEvents.length > limit) {
@@ -215,7 +218,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       }
 
       final querySnapshot = await query.get();
-      
+
       // Parse events with error handling
       final allEvents = <EventDiscoveryEntity>[];
       for (final doc in querySnapshot.docs) {
@@ -224,7 +227,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
           if (!data.containsKey('id')) {
             data['id'] = doc.id;
           }
-          
+
           final discoveryData = await _convertEventDataToDiscoveryData(data);
           final event = EventDiscoveryEntity.fromFirestoreData(discoveryData);
           allEvents.add(event);
@@ -257,10 +260,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     String? userId,
   }) async {
     try {
-      final eventDoc = await _firestore
-          .collection(_eventsCollection)
-          .doc(eventId)
-          .get();
+      final eventDoc =
+          await _firestore.collection(_eventsCollection).doc(eventId).get();
 
       if (!eventDoc.exists) {
         throw FirebaseException(
@@ -273,10 +274,10 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       if (!data.containsKey('id')) {
         data['id'] = eventId;
       }
-      
+
       // Convert to discovery data format
       final discoveryData = await _convertEventDataToDiscoveryData(data);
-      
+
       // Check if favorited by user
       if (userId != null) {
         discoveryData['isFavorite'] = await _isEventFavorited(userId, eventId);
@@ -315,8 +316,10 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
       // Sort by ticket sales (events with more sold tickets first)
       upcomingEvents.sort((a, b) {
-        final aSold = a.ticketTypes.fold<int>(0, (sum, t) => sum + (t.quantity - t.availableQuantity));
-        final bSold = b.ticketTypes.fold<int>(0, (sum, t) => sum + (t.quantity - t.availableQuantity));
+        final aSold = a.ticketTypes
+            .fold<int>(0, (sum, t) => sum + (t.quantity - t.availableQuantity));
+        final bSold = b.ticketTypes
+            .fold<int>(0, (sum, t) => sum + (t.quantity - t.availableQuantity));
         return bSold.compareTo(aSold);
       });
 
@@ -340,7 +343,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       // For MVP, return all upcoming events (location-based search would require geohash)
       // In production, you'd implement proper geospatial queries
       final upcomingEvents = await getUpcomingEvents(limit: limit);
-      
+
       // For now, just return upcoming events
       // TODO: Implement proper geospatial search with geohash or similar
       return upcomingEvents;
@@ -358,12 +361,11 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     required String eventId,
   }) async {
     try {
-      final favoriteDoc = _firestore
-          .collection(_favoritesCollection)
-          .doc('${userId}_$eventId');
+      final favoriteDoc =
+          _firestore.collection(_favoritesCollection).doc('${userId}_$eventId');
 
       final docSnapshot = await favoriteDoc.get();
-      
+
       if (docSnapshot.exists) {
         // Remove from favorites
         await favoriteDoc.delete();
@@ -406,7 +408,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
       // Get events by IDs (in batches if needed)
       final events = <EventEntity>[];
-      
+
       // Firestore 'in' queries are limited to 10 items
       for (int i = 0; i < eventIds.length; i += 10) {
         final batch = eventIds.skip(i).take(10).toList();
@@ -414,24 +416,26 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
             .collection(_eventsCollection)
             .where(FieldPath.documentId, whereIn: batch)
             .get();
-        
+
         final batchEvents = batchQuery.docs
             .map((doc) => EventEntity.fromFirestoreData(doc.data()))
             .toList();
-        
+
         events.addAll(batchEvents);
       }
 
       // Filter active and upcoming events
       final now = DateTime.now();
       final activeUpcomingEvents = events.where((event) {
-        return event.status == EventStatus.active && event.dateTime.isAfter(now);
+        return event.status == EventStatus.active &&
+            event.dateTime.isAfter(now);
       }).toList();
 
       // Sort by date
       activeUpcomingEvents.sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
-      return await _convertToDiscoveryEntities(activeUpcomingEvents, markAsFavorite: true);
+      return await _convertToDiscoveryEntities(activeUpcomingEvents,
+          markAsFavorite: true);
     } catch (e) {
       throw FirebaseException(
         plugin: 'cloud_firestore',
@@ -467,14 +471,15 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
   // Helper methods
 
   /// Convert EventEntity Firestore data to EventDiscoveryEntity format
-  Future<Map<String, dynamic>> _convertEventDataToDiscoveryData(Map<String, dynamic> eventData) async {
+  Future<Map<String, dynamic>> _convertEventDataToDiscoveryData(
+      Map<String, dynamic> eventData) async {
     try {
       print('🔄 DEBUG: Converting event data for ${eventData['id']}');
-      
+
       // Get organizer name - first check if it's already stored in the event
       final organizerId = eventData['organizerId'] as String;
       print('   👤 Organizer ID: $organizerId');
-      
+
       String? storedOrganizerName = eventData['organizerName'] as String?;
       print('   📝 Stored organizer name: $storedOrganizerName');
 
@@ -492,7 +497,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       // Calculate derived fields
       final ticketTypesData = eventData['ticketTypes'] as List<dynamic>;
       print('   🎫 Processing ${ticketTypesData.length} ticket types');
-      
+
       final ticketTypes = ticketTypesData.map((ticketData) {
         final data = ticketData as Map<String, dynamic>;
         return {
@@ -511,7 +516,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
         return sum + (ticket['availableQuantity'] as int);
       });
       print('   📊 Available tickets: $availableTickets');
-      
+
       // Calculate price range
       final prices = ticketTypes
           .map((t) => (t['price'] as num).toDouble())
@@ -522,7 +527,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       final maxPrice =
           prices.isEmpty ? 0.0 : prices.reduce((a, b) => a > b ? a : b);
       print('   💰 Price range: $minPrice - $maxPrice');
-      
+
       final result = {
         'id': eventData['id'],
         'organizerId': organizerId,
@@ -544,7 +549,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
         'isFavorite': null,
         'attendeeCount': null,
       };
-      
+
       print('   ✅ Conversion successful');
       return result;
     } catch (e, stackTrace) {
@@ -567,13 +572,13 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     for (final event in events) {
       final organizerName =
           _organizerNameCache[event.organizerId] ?? 'Unknown Organizer';
-      
+
       final discoveryEntity = EventDiscoveryEntity.fromEventEntity(
         event,
         organizerName: organizerName,
         isFavorite: markAsFavorite ? true : null,
       );
-      
+
       discoveryEntities.add(discoveryEntity);
     }
 
@@ -759,7 +764,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     if (_organizerNameCache.containsKey(organizerId)) {
       return _organizerNameCache[organizerId]!;
     }
-    
+
     try {
       final organizerDoc = await _firestore
           .collection(_organizersCollection)
@@ -770,7 +775,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
       if (organizerDoc.exists) {
         final data = organizerDoc.data()!;
-        
+
         // Priority order for organizer name:
         // 1. organizerData.organizationName (for business/organization names)
         // 2. name (user's display name)
@@ -818,11 +823,10 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       } else {
         print('Warning: Organizer profile not found for ID: $organizerId');
       }
-      
+
       // Cache the result
       _organizerNameCache[organizerId] = organizerName;
       return organizerName;
-      
     } catch (e) {
       print('Error fetching organizer name for $organizerId: $e');
       const fallbackName = 'Unknown Organizer';
@@ -837,14 +841,15 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
           .collection(_favoritesCollection)
           .doc('${userId}_$eventId')
           .get();
-      
+
       return favoriteDoc.exists;
     } catch (e) {
       return false;
     }
   }
 
-  List<EventDiscoveryEntity> _applyFiltersInMemory(List<EventDiscoveryEntity> events, EventSearchFilters filters) {
+  List<EventDiscoveryEntity> _applyFiltersInMemory(
+      List<EventDiscoveryEntity> events, EventSearchFilters filters) {
     var filteredEvents = events;
 
     // Text search
@@ -852,8 +857,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
       final query = filters.query!.toLowerCase();
       filteredEvents = filteredEvents.where((event) {
         return event.title.toLowerCase().contains(query) ||
-               event.description.toLowerCase().contains(query) ||
-               event.location.toLowerCase().contains(query);
+            event.description.toLowerCase().contains(query) ||
+            event.location.toLowerCase().contains(query);
       }).toList();
     }
 
@@ -861,14 +866,14 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     if (filters.startDate != null) {
       filteredEvents = filteredEvents.where((event) {
         return event.dateTime.isAfter(filters.startDate!) ||
-               event.dateTime.isAtSameMomentAs(filters.startDate!);
+            event.dateTime.isAtSameMomentAs(filters.startDate!);
       }).toList();
     }
 
     if (filters.endDate != null) {
       filteredEvents = filteredEvents.where((event) {
         return event.dateTime.isBefore(filters.endDate!) ||
-               event.dateTime.isAtSameMomentAs(filters.endDate!);
+            event.dateTime.isAtSameMomentAs(filters.endDate!);
       }).toList();
     }
 
@@ -876,10 +881,12 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     if (filters.minPrice != null || filters.maxPrice != null) {
       filteredEvents = filteredEvents.where((event) {
         if (event.isFree) return filters.freeOnly == true;
-        
-        bool matchesMin = filters.minPrice == null || event.minPrice >= filters.minPrice!;
-        bool matchesMax = filters.maxPrice == null || event.maxPrice <= filters.maxPrice!;
-        
+
+        bool matchesMin =
+            filters.minPrice == null || event.minPrice >= filters.minPrice!;
+        bool matchesMax =
+            filters.maxPrice == null || event.maxPrice <= filters.maxPrice!;
+
         return matchesMin && matchesMax;
       }).toList();
     }
@@ -891,7 +898,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
 
     // Available only
     if (filters.availableOnly == true) {
-      filteredEvents = filteredEvents.where((event) => !event.isSoldOut).toList();
+      filteredEvents =
+          filteredEvents.where((event) => !event.isSoldOut).toList();
     }
 
     // Upcoming only
@@ -903,7 +911,8 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
     return filteredEvents;
   }
 
-  List<EventDiscoveryEntity> _applySorting(List<EventDiscoveryEntity> events, EventSortBy sortBy) {
+  List<EventDiscoveryEntity> _applySorting(
+      List<EventDiscoveryEntity> events, EventSortBy sortBy) {
     switch (sortBy) {
       case EventSortBy.date:
         events.sort((a, b) => a.dateTime.compareTo(b.dateTime));
@@ -931,7 +940,7 @@ class FirebaseEventDiscoveryDataSourceImpl implements FirebaseEventDiscoveryData
         events.sort((a, b) => a.dateTime.compareTo(b.dateTime));
         break;
     }
-    
+
     return events;
   }
 }

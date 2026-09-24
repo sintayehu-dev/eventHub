@@ -5,16 +5,16 @@ import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticke
 abstract class FirebaseTicketWalletDataSource {
   /// Get all tickets for a user
   Future<List<TicketEntity>> getUserTickets({required String userId});
-  
+
   /// Stream user tickets for real-time updates
   Stream<List<TicketEntity>> watchUserTickets({required String userId});
-  
+
   /// Get tickets by status
   Future<List<TicketEntity>> getTicketsByStatus({
     required String userId,
     required TicketStatus status,
   });
-  
+
   /// Search tickets by query
   Future<List<TicketEntity>> searchTickets({
     required String userId,
@@ -23,7 +23,8 @@ abstract class FirebaseTicketWalletDataSource {
 }
 
 @Injectable(as: FirebaseTicketWalletDataSource)
-class FirebaseTicketWalletDataSourceImpl implements FirebaseTicketWalletDataSource {
+class FirebaseTicketWalletDataSourceImpl
+    implements FirebaseTicketWalletDataSource {
   final FirebaseFirestore _firestore;
 
   FirebaseTicketWalletDataSourceImpl({
@@ -89,7 +90,7 @@ class FirebaseTicketWalletDataSourceImpl implements FirebaseTicketWalletDataSour
       // Get all user tickets first, then filter in memory
       // This avoids complex Firestore queries that require indexes
       final allTickets = await getUserTickets(userId: userId);
-      
+
       final searchQuery = query.toLowerCase();
       return allTickets
           .where((ticket) =>

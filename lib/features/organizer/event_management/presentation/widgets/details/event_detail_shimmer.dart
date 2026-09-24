@@ -1,306 +1,193 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
+import 'event_detail_header.dart';
 
+/// Loading skeleton that mirrors the loaded organizer event detail: hero
+/// image, the overlapping sheet with performance, actions and information.
 class EventDetailShimmer extends StatelessWidget {
   const EventDetailShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          expandedHeight: 280.h,
-          pinned: true,
-          backgroundColor: colorScheme.surface,
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+    Widget card({required Widget child}) => Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(18.w),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(28.r),
           ),
-          title: Text(
-            'Event Details',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
+          child: child,
+        );
+
+    Widget infoRow() => Row(
+          children: [
+            ShimmerCircle(size: 40.w),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShimmerText(width: 70.w, height: 12.h),
+                  SizedBox(height: 6.h),
+                  ShimmerText(width: 180.w, height: 14.h),
+                ],
+              ),
             ),
-          ),
-          actions: [
-            ShimmerBox(
-              width: 40.w,
-              height: 40.h,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            SizedBox(width: 8.w),
-            ShimmerBox(
-              width: 40.w,
-              height: 40.h,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            SizedBox(width: 16.w),
           ],
-          flexibleSpace: FlexibleSpaceBar(
-            background: Stack(
-              fit: StackFit.expand,
-              children: [
-                ShimmerWidget(
-                  child: Container(
-                    color: colorScheme.onSurfaceVariant,
+        );
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              // Hero, same height as the loaded header
+              Stack(
+                children: [
+                  ShimmerBox(
+                    width: double.infinity,
+                    height: EventDetailHeader.expandedHeight,
+                    borderRadius: BorderRadius.zero,
                   ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        colorScheme.shadow.withValues(alpha: 0.3),
-                        colorScheme.shadow.withValues(alpha: 0.7),
+                  Positioned(
+                    left: 20.w,
+                    right: 20.w,
+                    bottom: 44.h,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ShimmerBox(
+                          width: 72.w,
+                          height: 22.h,
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        SizedBox(height: 10.h),
+                        ShimmerText(width: 240.w, height: 24.h),
                       ],
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 80.h,
-                  left: 20.w,
-                  right: 20.w,
+                ],
+              ),
+              Transform.translate(
+                offset: Offset(0, -28.h),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(32.r)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 20.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ShimmerBox(
-                        width: 80.w,
-                        height: 20.h,
-                        borderRadius: BorderRadius.circular(20.r),
+                      // Performance
+                      ShimmerText(width: 120.w, height: 20.h),
+                      SizedBox(height: 14.h),
+                      card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ShimmerText(width: 90.w, height: 12.h),
+                            SizedBox(height: 10.h),
+                            ShimmerText(width: 70.w, height: 32.h),
+                            SizedBox(height: 14.h),
+                            ShimmerBox(
+                              width: double.infinity,
+                              height: 8.h,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 12.h),
-                      ShimmerText(
-                        width: double.infinity,
-                        height: 28.h,
-                      ),
-                      SizedBox(height: 8.h),
                       Row(
                         children: [
-                          ShimmerBox(
-                            width: 16.w,
-                            height: 16.h,
-                            borderRadius: BorderRadius.circular(2.r),
-                          ),
-                          SizedBox(width: 4.w),
-                          ShimmerText(
-                            width: 200.w,
-                            height: 14.h,
-                          ),
+                          for (var i = 0; i < 2; i++) ...[
+                            if (i > 0) SizedBox(width: 12.w),
+                            Expanded(
+                              child: ShimmerBox(
+                                width: double.infinity,
+                                height: 116.h,
+                                borderRadius: BorderRadius.circular(24.r),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
+                      SizedBox(height: 32.h),
+
+                      // Actions
+                      ShimmerBox(
+                        width: double.infinity,
+                        height: 56.h,
+                        borderRadius: BorderRadius.circular(28.r),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        children: [
+                          for (var i = 0; i < 2; i++) ...[
+                            if (i > 0) SizedBox(width: 12.w),
+                            Expanded(
+                              child: ShimmerBox(
+                                width: double.infinity,
+                                height: 52.h,
+                                borderRadius: BorderRadius.circular(26.r),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      SizedBox(height: 24.h),
+
+                      // Information
+                      ShimmerText(width: 160.w, height: 20.h),
+                      SizedBox(height: 14.h),
+                      card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ShimmerText(width: 70.w, height: 12.h),
+                            SizedBox(height: 10.h),
+                            ShimmerText(width: double.infinity, height: 14.h),
+                            SizedBox(height: 6.h),
+                            ShimmerText(width: 220.w, height: 14.h),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      card(
+                        child: Column(
+                          children: [
+                            infoRow(),
+                            SizedBox(height: 16.h),
+                            infoRow(),
+                            SizedBox(height: 16.h),
+                            infoRow(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ShimmerText(
-                      width: 180.w,
-                      height: 18.h,
-                    ),
-                    ShimmerText(
-                      width: 60.w,
-                      height: 12.h,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                ...List.generate(
-                    3,
-                    (index) => Padding(
-                          padding: EdgeInsets.only(bottom: 12.h),
-                          child: _buildShimmerMetricCard(context),
-                        )),
-                SizedBox(height: 32.h),
-                ShimmerBox(
-                  width: double.infinity,
-                  height: 50.h,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                SizedBox(height: 12.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ShimmerBox(
-                        width: double.infinity,
-                        height: 42.h,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: ShimmerBox(
-                        width: double.infinity,
-                        height: 42.h,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 24.h),
-                ShimmerText(
-                  width: 150.w,
-                  height: 18.h,
-                ),
-                SizedBox(height: 16.h),
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ShimmerText(
-                        width: 80.w,
-                        height: 14.h,
-                      ),
-                      SizedBox(height: 8.h),
-                      ShimmerText(
-                        width: double.infinity,
-                        height: 14.h,
-                      ),
-                      SizedBox(height: 4.h),
-                      ShimmerText(
-                        width: double.infinity,
-                        height: 14.h,
-                      ),
-                      SizedBox(height: 4.h),
-                      ShimmerText(
-                        width: 200.w,
-                        height: 14.h,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Column(
-                    children: List.generate(
-                        4,
-                        (index) => Padding(
-                              padding:
-                                  EdgeInsets.only(bottom: index < 3 ? 12.h : 0),
-                              child: Row(
-                                children: [
-                                  ShimmerBox(
-                                    width: 16.w,
-                                    height: 16.h,
-                                    borderRadius: BorderRadius.circular(2.r),
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ShimmerText(
-                                          width: 80.w,
-                                          height: 12.h,
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        ShimmerText(
-                                          width: 150.w,
-                                          height: 14.h,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        // Back stays reachable while loading.
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8.h,
+          left: 20.w,
+          child: AppBackButton(onPressed: () => context.pop()),
         ),
       ],
-    );
-  }
-
-  Widget _buildShimmerMetricCard(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ShimmerText(
-                width: 100.w,
-                height: 14.h,
-              ),
-              ShimmerBox(
-                width: 28.w,
-                height: 28.h,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              ShimmerText(
-                width: 80.w,
-                height: 28.h,
-              ),
-              SizedBox(width: 8.w),
-              ShimmerBox(
-                width: 40.w,
-                height: 16.h,
-                borderRadius: BorderRadius.circular(4.r),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          ShimmerBox(
-            width: double.infinity,
-            height: 4.h,
-            borderRadius: BorderRadius.circular(2.r),
-          ),
-          SizedBox(height: 6.h),
-          ShimmerText(
-            width: 120.w,
-            height: 11.h,
-          ),
-        ],
-      ),
     );
   }
 }

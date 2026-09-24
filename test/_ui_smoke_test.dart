@@ -26,6 +26,11 @@ import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee
 import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee_logout_card.dart';
 import 'package:eventhub/features/auth/presentation/pages/onboarding/onboarding_screen.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/features/attendee/ticket_wallet/presentation/widgets/attendee_tickets/attendee_tickets_loading.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_shimmer.dart';
+import 'package:eventhub/features/organizer/profile/presentation/widgets/organizer_profile_shimmer.dart';
+import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee_profile_shimmer.dart';
+import 'package:eventhub/features/attendee/event_discovery/presentation/widgets/discover/discover_shimmer_card.dart';
 import 'package:eventhub/features/shared/event_details/presentation/widgets/event_detail_get_tickets_button.dart';
 import 'package:eventhub/features/shared/event_details/presentation/widgets/event_detail_info_card.dart';
 import 'package:eventhub/features/shared/profile/domain/entities/user_profile_entity.dart';
@@ -285,8 +290,7 @@ void main() {
       tester,
       'auth',
       AuthScaffold(
-        title: 'Welcome back',
-        subtitle: 'Sign in to find your next event.',
+        eyebrow: 'Welcome back!', title: 'Sign in',
         leading: const AppBackButton(),
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
@@ -294,7 +298,7 @@ void main() {
             children: [
               const AppTextField(
                 label: 'Email address',
-                hintText: 'you@example.com',
+                hintText: 'Enter your email',
                 prefixIcon: Icons.mail_outline_rounded,
               ),
               SizedBox(height: 20),
@@ -319,5 +323,16 @@ void main() {
 
   testWidgets('onboarding', (tester) async {
     await shoot(tester, 'onboarding', const OnboardingPage());
+  });
+
+  testWidgets('shimmers', (tester) async {
+    await shoot(tester, 'sh_wallet', const Scaffold(body: Padding(padding: EdgeInsets.only(top: 60), child: AttendeeTicketsLoading())));
+    await shoot(tester, 'sh_profile', const Scaffold(body: Padding(padding: EdgeInsets.only(top: 60), child: AttendeeProfileShimmer())));
+    await shoot(tester, 'sh_discover', const Scaffold(body: Padding(padding: EdgeInsets.all(20), child: DiscoverShimmerCard())));
+  });
+
+  testWidgets('org-shimmers', (tester) async {
+    await shoot(tester, 'sh_org_detail', const Scaffold(body: EventDetailShimmer()));
+    await shoot(tester, 'sh_org_profile', const Scaffold(body: Padding(padding: EdgeInsets.only(top: 60), child: OrganizerProfileShimmer())));
   });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
@@ -14,8 +15,18 @@ class DiscoverEventCard extends StatelessWidget {
   });
 
   static const _months = [
-    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
   ];
 
   @override
@@ -23,7 +34,7 @@ class DiscoverEventCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    return GestureDetector(
+    return Pressable(
       onTap: () => context.pushNamed(
         RouteName.eventDetail,
         pathParameters: {'eventId': event.id},

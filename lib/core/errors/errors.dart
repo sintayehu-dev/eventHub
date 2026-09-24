@@ -1,11 +1,8 @@
-
-
 import 'package:eventhub/core/value_failures/value_failures.dart';
 
 class NotAuthenticatedError extends Error {}
 
 class UnexpectedValueError extends Error {
-
   UnexpectedValueError(this.valueFailure);
   final ValueFailure valueFailure;
 

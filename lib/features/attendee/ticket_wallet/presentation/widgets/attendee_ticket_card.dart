@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
@@ -24,7 +25,7 @@ class AttendeeTicketCard extends StatelessWidget {
     final canShowQr = ticket.isActive && ticket.isUpcoming;
     final notch = 11.w;
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
@@ -193,8 +194,18 @@ class AttendeeTicketCard extends StatelessWidget {
 
   String _formatDateTime(DateTime dateTime) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     final time =
         '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
@@ -262,9 +273,10 @@ class _StatusPill extends StatelessWidget {
       TicketStatus.confirmed => (AppColors.mint, AppColors.success),
       TicketStatus.pending => (AppColors.peach, AppColors.accentDark),
       TicketStatus.used => (AppColors.sky, AppColors.primary),
-      TicketStatus.cancelled ||
-      TicketStatus.refunded =>
-        (const Color(0xFFFCE4E4), AppColors.error),
+      TicketStatus.cancelled || TicketStatus.refunded => (
+          const Color(0xFFFCE4E4),
+          AppColors.error
+        ),
     };
 
     return Container(

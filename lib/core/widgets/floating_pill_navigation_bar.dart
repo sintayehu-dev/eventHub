@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/theme/app_colors.dart';
@@ -57,10 +58,15 @@ class FloatingPillNavigationBar extends StatelessWidget {
               _NavButton(
                 item: items[i],
                 selected: navigationShell.currentIndex == i,
-                onTap: () => navigationShell.goBranch(
-                  i,
-                  initialLocation: i == navigationShell.currentIndex,
-                ),
+                onTap: () {
+                  if (i != navigationShell.currentIndex) {
+                    HapticFeedback.selectionClick();
+                  }
+                  navigationShell.goBranch(
+                    i,
+                    initialLocation: i == navigationShell.currentIndex,
+                  );
+                },
               ),
           ],
         ),

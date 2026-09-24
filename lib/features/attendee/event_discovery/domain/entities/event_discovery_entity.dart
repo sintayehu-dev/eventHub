@@ -45,7 +45,8 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
       'location': location,
       'dateTime': dateTime.toIso8601String(),
       'category': category.name,
-      'ticketTypes': ticketTypes.map((ticket) => ticket.toFirestoreData()).toList(),
+      'ticketTypes':
+          ticketTypes.map((ticket) => ticket.toFirestoreData()).toList(),
       'maxCapacity': maxCapacity,
       'availableTickets': availableTickets,
       'minPrice': minPrice,
@@ -69,7 +70,8 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
       bannerUrl: data['bannerUrl'] as String?,
       location: data['location'] as String,
       dateTime: DateTime.parse(data['dateTime'] as String),
-      category: EventCategory.values.firstWhere((e) => e.name == data['category']),
+      category:
+          EventCategory.values.firstWhere((e) => e.name == data['category']),
       ticketTypes: (data['ticketTypes'] as List<dynamic>)
           .map((ticketData) => TicketTypeInfo.fromFirestoreData(
               ticketData as Map<String, dynamic>))
@@ -80,7 +82,9 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
       maxPrice: (data['maxPrice'] as num).toDouble(),
       status: EventStatus.values.firstWhere((e) => e.name == data['status']),
       createdAt: DateTime.parse(data['createdAt'] as String),
-      distance: data['distance'] != null ? (data['distance'] as num).toDouble() : null,
+      distance: data['distance'] != null
+          ? (data['distance'] as num).toDouble()
+          : null,
       isFavorite: data['isFavorite'] as bool?,
       attendeeCount: data['attendeeCount'] as int?,
     );
@@ -98,9 +102,12 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
       (sum, ticket) => sum + ticket.availableQuantity,
     );
 
-    final prices = event.ticketTypes.map((t) => t.price).where((p) => p > 0).toList();
-    final minPrice = prices.isEmpty ? 0.0 : prices.reduce((a, b) => a < b ? a : b);
-    final maxPrice = prices.isEmpty ? 0.0 : prices.reduce((a, b) => a > b ? a : b);
+    final prices =
+        event.ticketTypes.map((t) => t.price).where((p) => p > 0).toList();
+    final minPrice =
+        prices.isEmpty ? 0.0 : prices.reduce((a, b) => a < b ? a : b);
+    final maxPrice =
+        prices.isEmpty ? 0.0 : prices.reduce((a, b) => a > b ? a : b);
 
     final ticketTypeInfos = event.ticketTypes.map((ticket) {
       return TicketTypeInfo(
@@ -150,8 +157,8 @@ class EventDiscoveryEntity with _$EventDiscoveryEntity {
 
   bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
-           date1.month == date2.month &&
-           date1.day == date2.day;
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 }
 
@@ -200,7 +207,9 @@ class TicketTypeInfo with _$TicketTypeInfo {
 
   bool get isSoldOut => availableQuantity == 0;
   bool get isAvailable => isActive && !isSoldOut;
-  double get soldPercentage => totalQuantity > 0 ? (totalQuantity - availableQuantity) / totalQuantity : 0.0;
+  double get soldPercentage => totalQuantity > 0
+      ? (totalQuantity - availableQuantity) / totalQuantity
+      : 0.0;
 }
 
 @freezed

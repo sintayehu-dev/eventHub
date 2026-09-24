@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// A reusable widget for displaying validation error messages with different types.
-/// 
+///
 /// Usage examples:
 /// ```dart
 /// // Error message (default)
 /// AppValidationErrorWidget(errorMessage: 'Email is required')
-/// 
+///
 /// // Warning message
 /// AppValidationErrorWidget(
 ///   errorMessage: 'Password should be stronger',
 ///   type: ValidationErrorType.warning,
 /// )
-/// 
+///
 /// // Info message
 /// AppValidationErrorWidget(
 ///   errorMessage: 'Password must be at least 8 characters',

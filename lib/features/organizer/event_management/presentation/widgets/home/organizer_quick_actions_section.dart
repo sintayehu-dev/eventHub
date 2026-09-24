@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
@@ -68,7 +69,7 @@ class _QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),

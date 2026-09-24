@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:eventhub/core/widgets/shimmer_widget.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
 class EventDetailHeader extends StatelessWidget {
+  static double get expandedHeight => 300.h;
+
   final EventEntity event;
   final VoidCallback onEdit;
   final VoidCallback onMore;
@@ -19,78 +21,59 @@ class EventDetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
     return SliverAppBar(
-      expandedHeight: 280.h,
+      expandedHeight: expandedHeight,
       pinned: true,
-      backgroundColor: colorScheme.surface,
-      leading: IconButton(
-        onPressed: () => context.pop(),
-        icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-      ),
-      title: Text(
-        'Event Details',
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w600,
+      backgroundColor: AppColors.primaryDark,
+      surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+      leadingWidth: 64.w,
+      leading: Padding(
+        padding: EdgeInsets.only(left: 20.w),
+        child: _RoundAction(
+          icon: Icons.arrow_back_ios_new_rounded,
+          onTap: () => context.pop(),
         ),
       ),
       actions: [
-        if (event.status.isEditable)
-          IconButton(
-            onPressed: onEdit,
-            icon: Icon(Icons.edit_outlined, color: colorScheme.onSurface),
-          ),
-        IconButton(
-          onPressed: onMore,
-          icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
-        ),
+        if (event.status.isEditable) ...[
+          _RoundAction(icon: Icons.edit_outlined, onTap: onEdit),
+          SizedBox(width: 10.w),
+        ],
+        _RoundAction(icon: Icons.more_horiz_rounded, onTap: onMore),
+        SizedBox(width: 20.w),
       ],
       flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.parallax,
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // Event Banner Image or Placeholder
             event.bannerUrl != null && event.bannerUrl!.isNotEmpty
                 ? Image.network(
                     event.bannerUrl!,
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: colorScheme.surface,
-                        child: ShimmerWidget(
-                          child: Container(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildEventBannerPlaceholder(context);
-                    },
+                    errorBuilder: (_, __, ___) => _placeholder(),
                   )
-                : _buildEventBannerPlaceholder(context),
-
-            // Gradient overlay
-            Container(
+                : _placeholder(),
+            // Darken top and bottom so buttons and the title stay legible.
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
+                    Colors.black.withValues(alpha: 0.35),
                     Colors.transparent,
-                    colorScheme.shadow.withValues(alpha: 0.3),
-                    colorScheme.shadow.withValues(alpha: 0.7),
+                    Colors.black.withValues(alpha: 0.65),
                   ],
+                  stops: const [0, 0.4, 1],
                 ),
               ),
             ),
-
-            // Content overlay
             Positioned(
-              bottom: 80.h,
+              bottom: 44.h,
               left: 20.w,
               right: 20.w,
               child: Column(
@@ -98,47 +81,27 @@ class EventDetailHeader extends StatelessWidget {
                 children: [
                   Container(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(colorScheme, event.status),
-                      borderRadius: BorderRadius.circular(20.r),
+                      color: _statusColor(scheme, event.status),
+                      borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Text(
                       event.status.displayName.toUpperCase(),
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 10.h),
                   Text(
                     event.title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          event.location,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineSmall
+                        ?.copyWith(color: AppColors.white),
                   ),
                 ],
               ),
@@ -149,105 +112,55 @@ class EventDetailHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildEventBannerPlaceholder(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colorScheme.surface,
-            colorScheme.surfaceContainerHighest,
-            colorScheme.primary.withValues(alpha: 0.3),
-          ],
+  Widget _placeholder() {
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      child: Center(
+        child: Icon(
+          Icons.celebration_rounded,
+          size: 72.sp,
+          color: AppColors.white.withValues(alpha: 0.3),
         ),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.primary.withValues(alpha: 0.1),
-                    colorScheme.tertiary.withValues(alpha: 0.1),
-                  ],
-                ),
-              ),
-              child: CustomPaint(
-                painter: _EventBackgroundPainter(),
-              ),
-            ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.image_outlined,
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                  size: 64.sp,
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'No Banner Image',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Color _getStatusColor(ColorScheme colorScheme, EventStatus status) {
+  Color _statusColor(ColorScheme scheme, EventStatus status) {
     switch (status) {
       case EventStatus.active:
-        return colorScheme.tertiary;
+        return AppColors.success;
       case EventStatus.draft:
-        return colorScheme.secondary;
+        return AppColors.accentDark;
       case EventStatus.completed:
-        return colorScheme.primary;
+        return scheme.primary;
       case EventStatus.cancelled:
-        return colorScheme.error;
+        return scheme.error;
     }
   }
 }
 
-class _EventBackgroundPainter extends CustomPainter {
+class _RoundAction extends StatelessWidget {
+  const _RoundAction({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.05)
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height * 0.7);
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.5,
-      size.width * 0.5,
-      size.height * 0.6,
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Center(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 42.w,
+          height: 42.w,
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 18.sp, color: scheme.onSurface),
+        ),
+      ),
     );
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.7,
-      size.width,
-      size.height * 0.5,
-    );
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
   }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

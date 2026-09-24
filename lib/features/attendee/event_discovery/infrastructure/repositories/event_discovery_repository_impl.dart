@@ -13,7 +13,8 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   EventDiscoveryRepositoryImpl(this._firebaseDataSource);
 
   @override
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getUpcomingEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getUpcomingEvents({
     int? limit,
     String? lastEventId,
   }) async {
@@ -45,7 +46,8 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   }
 
   @override
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getEventsByCategory({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getEventsByCategory({
     required EventCategory category,
     int? limit,
   }) async {
@@ -77,7 +79,8 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   }
 
   @override
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getFeaturedEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getFeaturedEvents({
     int? limit,
   }) async {
     try {
@@ -91,7 +94,8 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   }
 
   @override
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getNearbyEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getNearbyEvents({
     required double latitude,
     required double longitude,
     double? radiusKm,
@@ -127,7 +131,8 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   }
 
   @override
-  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>> getFavoriteEvents({
+  Future<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      getFavoriteEvents({
     required String userId,
   }) async {
     try {
@@ -141,11 +146,13 @@ class EventDiscoveryRepositoryImpl implements EventDiscoveryRepository {
   }
 
   @override
-  Stream<Either<NetworkExceptions, List<EventDiscoveryEntity>>> watchUpcomingEvents() {
+  Stream<Either<NetworkExceptions, List<EventDiscoveryEntity>>>
+      watchUpcomingEvents() {
     try {
       return _firebaseDataSource
           .watchUpcomingEvents()
-          .map((events) => right<NetworkExceptions, List<EventDiscoveryEntity>>(events))
+          .map((events) =>
+              right<NetworkExceptions, List<EventDiscoveryEntity>>(events))
           .handleError((error) {
         return Stream.value(left<NetworkExceptions, List<EventDiscoveryEntity>>(
           NetworkExceptions.getDioException(error),

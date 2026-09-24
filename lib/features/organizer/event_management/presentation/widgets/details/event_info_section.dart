@@ -13,82 +13,74 @@ class EventInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
+
+    BoxDecoration cardDecoration() => BoxDecoration(
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
+          boxShadow: [
+            BoxShadow(
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Event Information',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 16.h),
+        Text('Event information', style: theme.textTheme.titleLarge),
+        SizedBox(height: 14.h),
         Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
+          width: double.infinity,
+          padding: EdgeInsets.all(18.w),
+          decoration: cardDecoration(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Description',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              Text('Description', style: theme.textTheme.bodySmall),
               SizedBox(height: 8.h),
               Text(
                 event.description,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  height: 1.5,
-                ),
+                style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
               ),
             ],
           ),
         ),
         SizedBox(height: 12.h),
         Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
+          padding: EdgeInsets.all(18.w),
+          decoration: cardDecoration(),
           child: Column(
             children: [
               _buildInfoRow(
                 context,
-                'Date & Time',
+                'Date & time',
                 _formatDateTime(event.dateTime),
-                Icons.calendar_today,
+                Icons.calendar_today_rounded,
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 16.h),
               _buildInfoRow(
                 context,
                 'Location',
                 event.location,
-                Icons.location_on,
+                Icons.location_on_rounded,
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 16.h),
               _buildInfoRow(
                 context,
                 'Capacity',
                 '${event.maxCapacity} attendees',
-                Icons.people,
+                Icons.people_rounded,
               ),
               if (event.ticketTypes.isNotEmpty) ...[
-                SizedBox(height: 12.h),
+                SizedBox(height: 16.h),
                 _buildInfoRow(
                   context,
-                  'Ticket Types',
+                  'Ticket types',
                   '${event.ticketTypes.length} type${event.ticketTypes.length > 1 ? 's' : ''}',
-                  Icons.confirmation_number,
+                  Icons.confirmation_number_rounded,
                 ),
               ],
             ],
@@ -101,33 +93,27 @@ class EventInfoSection extends StatelessWidget {
   Widget _buildInfoRow(
       BuildContext context, String label, String value, IconData icon) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
     return Row(
       children: [
-        Icon(
-          icon,
-          color: colorScheme.primary,
-          size: 16.sp,
+        Container(
+          width: 40.w,
+          height: 40.w,
+          decoration: BoxDecoration(
+            color: scheme.secondaryContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: scheme.primary, size: 18.sp),
         ),
-        SizedBox(width: 12.w),
+        SizedBox(width: 14.w),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                value,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              Text(label, style: theme.textTheme.bodySmall),
+              SizedBox(height: 2.h),
+              Text(value, style: theme.textTheme.titleSmall),
             ],
           ),
         ),
@@ -136,19 +122,9 @@ class EventInfoSection extends StatelessWidget {
   }
 
   String _formatDateTime(DateTime dateTime) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
 
     final month = months[dateTime.month - 1];

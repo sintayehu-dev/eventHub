@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -60,10 +61,13 @@ class AttendeeHomeView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AttendeeHomeHeader(),
+              const FadeSlideIn(child: AttendeeHomeHeader()),
               SizedBox(height: 20.h),
-              AttendeeSearchBar(
-                onTap: () => context.goNamed(RouteName.attendeeDiscover),
+              FadeSlideIn(
+                index: 1,
+                child: AttendeeSearchBar(
+                  onTap: () => context.goNamed(RouteName.attendeeDiscover),
+                ),
               ),
               SizedBox(height: 20.h),
               BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
@@ -71,7 +75,7 @@ class AttendeeHomeView extends StatelessWidget {
                   if (state.isLoading || state.isLoadingDetails) {
                     return ShimmerBox(
                       width: double.infinity,
-                      height: 210.h,
+                      height: 232.h,
                       borderRadius: BorderRadius.circular(32.r),
                     );
                   }
@@ -79,26 +83,35 @@ class AttendeeHomeView extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
                   final event = state.events.first;
-                  return FeaturedEventCard(
-                    event: event,
-                    onTap: () => _openEvent(context, event.id),
+                  return FadeSlideIn(
+                    index: 2,
+                    child: FeaturedEventCard(
+                      event: event,
+                      onTap: () => _openEvent(context, event.id),
+                    ),
                   );
                 },
               ),
               SizedBox(height: 28.h),
-              AttendeeCategoriesSection(
-                onCategoryTap: (category) {
-                  context.read<EventDiscoveryBloc>().add(
-                        EventDiscoveryEvent.loadEventsByCategory(
-                          category: category,
-                        ),
-                      );
-                  context.pushNamed(RouteName.attendeeDiscover);
-                },
+              FadeSlideIn(
+                index: 3,
+                child: AttendeeCategoriesSection(
+                  onCategoryTap: (category) {
+                    context.read<EventDiscoveryBloc>().add(
+                          EventDiscoveryEvent.loadEventsByCategory(
+                            category: category,
+                          ),
+                        );
+                    context.pushNamed(RouteName.attendeeDiscover);
+                  },
+                ),
               ),
               SizedBox(height: 28.h),
-              UpcomingEventsSection(
-                onEventTap: (eventId) => _openEvent(context, eventId),
+              FadeSlideIn(
+                index: 4,
+                child: UpcomingEventsSection(
+                  onEventTap: (eventId) => _openEvent(context, eventId),
+                ),
               ),
             ],
           ),

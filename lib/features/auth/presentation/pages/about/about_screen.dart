@@ -64,7 +64,8 @@ class AboutScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: colorScheme.primary.withValues(alpha: 0.3),
+                                color:
+                                    colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
@@ -85,14 +86,16 @@ class AboutScreen extends StatelessWidget {
                             children: [
                               TextSpan(
                                 text: 'Ethio ',
-                                style: darkTheme.textTheme.displaySmall?.copyWith(
+                                style:
+                                    darkTheme.textTheme.displaySmall?.copyWith(
                                   color: colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               TextSpan(
                                 text: 'Events',
-                                style: darkTheme.textTheme.displaySmall?.copyWith(
+                                style:
+                                    darkTheme.textTheme.displaySmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   foreground: Paint()
                                     ..shader = LinearGradient(
@@ -101,7 +104,8 @@ class AboutScreen extends StatelessWidget {
                                         colorScheme.secondary,
                                       ],
                                     ).createShader(
-                                      const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
+                                      const Rect.fromLTWH(
+                                          0.0, 0.0, 200.0, 70.0),
                                     ),
                                 ),
                               ),
@@ -147,7 +151,8 @@ class AboutScreen extends StatelessWidget {
                         _buildFeatureCard(
                           icon: Icons.event_available,
                           title: 'Discover Events',
-                          description: 'Find and attend amazing events happening around you',
+                          description:
+                              'Find and attend amazing events happening around you',
                           darkTheme: darkTheme,
                           colorScheme: colorScheme,
                         ),
@@ -157,7 +162,8 @@ class AboutScreen extends StatelessWidget {
                         _buildFeatureCard(
                           icon: Icons.confirmation_number,
                           title: 'Digital Tickets',
-                          description: 'Secure QR code tickets for seamless event entry',
+                          description:
+                              'Secure QR code tickets for seamless event entry',
                           darkTheme: darkTheme,
                           colorScheme: colorScheme,
                         ),
@@ -167,7 +173,8 @@ class AboutScreen extends StatelessWidget {
                         _buildFeatureCard(
                           icon: Icons.event_note,
                           title: 'Organize Events',
-                          description: 'Create and manage events with powerful tools',
+                          description:
+                              'Create and manage events with powerful tools',
                           darkTheme: darkTheme,
                           colorScheme: colorScheme,
                         ),
@@ -177,7 +184,8 @@ class AboutScreen extends StatelessWidget {
                         _buildFeatureCard(
                           icon: Icons.analytics,
                           title: 'Real-time Analytics',
-                          description: 'Track event performance and attendee insights',
+                          description:
+                              'Track event performance and attendee insights',
                           darkTheme: darkTheme,
                           colorScheme: colorScheme,
                         ),
@@ -188,10 +196,12 @@ class AboutScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(20.w),
                           decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                            color: colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(16.r),
                             border: Border.all(
-                              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                              color: colorScheme.outlineVariant
+                                  .withValues(alpha: 0.3),
                             ),
                           ),
                           child: Column(

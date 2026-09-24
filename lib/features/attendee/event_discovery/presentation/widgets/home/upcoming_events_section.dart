@@ -62,38 +62,44 @@ class UpcomingEventsSection extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Column(
-      children: List.generate(
-        2,
-        (_) => Container(
-          margin: EdgeInsets.only(bottom: 16.h),
-          padding: EdgeInsets.all(10.w),
-          decoration: BoxDecoration(
-            color: scheme.surface,
-            borderRadius: BorderRadius.circular(28.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ShimmerBox(
-                width: double.infinity,
-                height: 168.h,
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(8.w, 14.h, 8.w, 6.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShimmerText(width: 220.w, height: 18.h),
-                    SizedBox(height: 10.h),
-                    ShimmerText(width: 140.w, height: 14.h),
-                  ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Same header as the loaded state so nothing jumps when data arrives.
+        const SectionHeader(title: 'Upcoming events'),
+        SizedBox(height: 14.h),
+        for (var i = 0; i < 2; i++)
+          Container(
+            margin: EdgeInsets.only(bottom: 16.h),
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(28.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ShimmerBox(
+                  width: double.infinity,
+                  height: 168.h,
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.fromLTRB(8.w, 14.h, 8.w, 6.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerText(width: 230.w, height: 18.h),
+                      SizedBox(height: 8.h),
+                      ShimmerText(width: 150.w, height: 14.h),
+                      SizedBox(height: 4.h),
+                      ShimmerText(width: 110.w, height: 14.h),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+      ],
     );
   }
 

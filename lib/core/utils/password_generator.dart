@@ -6,7 +6,7 @@ class PasswordGenerator {
   static const String _uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   static const String _numbers = '0123456789';
   static const String _symbols = '!@#\$%^&*';
-  
+
   /// Generates a secure password with specified length and character types
   static String generateSecurePassword({
     int length = 12,
@@ -18,26 +18,29 @@ class PasswordGenerator {
     if (length < 4) {
       throw ArgumentError('Password length must be at least 4 characters');
     }
-    
+
     String chars = '';
     if (includeLowercase) chars += _lowercase;
     if (includeUppercase) chars += _uppercase;
     if (includeNumbers) chars += _numbers;
     if (includeSymbols) chars += _symbols;
-    
+
     if (chars.isEmpty) {
       throw ArgumentError('At least one character type must be included');
     }
-    
+
     final random = Random.secure();
-    final password = List.generate(length, (index) => chars[random.nextInt(chars.length)]);
-    
+    final password =
+        List.generate(length, (index) => chars[random.nextInt(chars.length)]);
+
     // Ensure at least one character from each selected type is included
     int position = 0;
-    if (includeLowercase && !password.any((char) => _lowercase.contains(char))) {
+    if (includeLowercase &&
+        !password.any((char) => _lowercase.contains(char))) {
       password[position++] = _lowercase[random.nextInt(_lowercase.length)];
     }
-    if (includeUppercase && !password.any((char) => _uppercase.contains(char))) {
+    if (includeUppercase &&
+        !password.any((char) => _uppercase.contains(char))) {
       password[position++] = _uppercase[random.nextInt(_uppercase.length)];
     }
     if (includeNumbers && !password.any((char) => _numbers.contains(char))) {
@@ -46,13 +49,13 @@ class PasswordGenerator {
     if (includeSymbols && !password.any((char) => _symbols.contains(char))) {
       password[position++] = _symbols[random.nextInt(_symbols.length)];
     }
-    
+
     // Shuffle the password to randomize positions
     password.shuffle(random);
-    
+
     return password.join();
   }
-  
+
   /// Generates a staff password with default settings (12 chars, mixed case, numbers, symbols)
   static String generateStaffPassword() {
     return generateSecurePassword(
@@ -63,7 +66,7 @@ class PasswordGenerator {
       includeSymbols: true,
     );
   }
-  
+
   /// Generates a simple password without symbols (easier to type)
   static String generateSimplePassword({int length = 10}) {
     return generateSecurePassword(
@@ -74,16 +77,16 @@ class PasswordGenerator {
       includeSymbols: false,
     );
   }
-  
+
   /// Checks password strength
   static PasswordStrength checkPasswordStrength(String password) {
     if (password.length < 6) return PasswordStrength.weak;
-    
+
     bool hasLower = password.contains(RegExp(r'[a-z]'));
     bool hasUpper = password.contains(RegExp(r'[A-Z]'));
     bool hasNumber = password.contains(RegExp(r'[0-9]'));
     bool hasSymbol = password.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
-    
+
     int score = 0;
     if (hasLower) score++;
     if (hasUpper) score++;
@@ -91,7 +94,7 @@ class PasswordGenerator {
     if (hasSymbol) score++;
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
-    
+
     if (score <= 2) return PasswordStrength.weak;
     if (score <= 4) return PasswordStrength.medium;
     return PasswordStrength.strong;
@@ -115,7 +118,7 @@ extension PasswordStrengthExtension on PasswordStrength {
         return 'Strong';
     }
   }
-  
+
   Color get color {
     switch (this) {
       case PasswordStrength.weak:

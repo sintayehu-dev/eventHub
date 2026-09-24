@@ -14,7 +14,7 @@ class PurchaseDetailsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       color: colorScheme.surface,
       elevation: 0,
@@ -58,7 +58,8 @@ class PurchaseDetailsCard extends StatelessWidget {
               purchaseResult.paymentStatus.displayName,
               theme,
               colorScheme,
-              statusColor: _getStatusColor(purchaseResult.paymentStatus, colorScheme),
+              statusColor:
+                  _getStatusColor(purchaseResult.paymentStatus, colorScheme),
             ),
           ],
         ),
@@ -88,8 +89,11 @@ class PurchaseDetailsCard extends StatelessWidget {
           Text(
             value,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: statusColor ?? (isTotal ? colorScheme.primary : colorScheme.onSurface),
-              fontWeight: (isTotal || statusColor != null) ? FontWeight.bold : FontWeight.w500,
+              color: statusColor ??
+                  (isTotal ? colorScheme.primary : colorScheme.onSurface),
+              fontWeight: (isTotal || statusColor != null)
+                  ? FontWeight.bold
+                  : FontWeight.w500,
             ),
           ),
         ],

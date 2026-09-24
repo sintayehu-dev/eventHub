@@ -37,7 +37,7 @@ class TicketWalletRepositoryImpl implements TicketWalletRepository {
           .where((t) => t.isActive && t.eventDateTime.isAfter(now))
           .toList()
         ..sort((a, b) => a.eventDateTime.compareTo(b.eventDateTime));
-      
+
       return Right(upcomingTickets);
     } catch (e) {
       return Left(NetworkExceptions.getDioException(e));
@@ -55,7 +55,7 @@ class TicketWalletRepositoryImpl implements TicketWalletRepository {
           .where((t) => t.eventDateTime.isBefore(now))
           .toList()
         ..sort((a, b) => b.eventDateTime.compareTo(a.eventDateTime));
-      
+
       return Right(pastTickets);
     } catch (e) {
       return Left(NetworkExceptions.getDioException(e));
@@ -69,11 +69,9 @@ class TicketWalletRepositoryImpl implements TicketWalletRepository {
   }) async {
     try {
       final tickets = await _firebaseDataSource.getUserTickets(userId: userId);
-      final filteredTickets = tickets
-          .where((t) => t.status == status)
-          .toList()
+      final filteredTickets = tickets.where((t) => t.status == status).toList()
         ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      
+
       return Right(filteredTickets);
     } catch (e) {
       return Left(NetworkExceptions.getDioException(e));
@@ -88,14 +86,13 @@ class TicketWalletRepositoryImpl implements TicketWalletRepository {
     try {
       final tickets = await _firebaseDataSource.getUserTickets(userId: userId);
       final searchResults = tickets
-          .where((t) => 
-            t.eventTitle.toLowerCase().contains(query.toLowerCase()) ||
-            t.eventLocation.toLowerCase().contains(query.toLowerCase()) ||
-            t.ticketTypeName.toLowerCase().contains(query.toLowerCase())
-          )
+          .where((t) =>
+              t.eventTitle.toLowerCase().contains(query.toLowerCase()) ||
+              t.eventLocation.toLowerCase().contains(query.toLowerCase()) ||
+              t.ticketTypeName.toLowerCase().contains(query.toLowerCase()))
           .toList()
         ..sort((a, b) => b.eventDateTime.compareTo(a.eventDateTime));
-      
+
       return Right(searchResults);
     } catch (e) {
       return Left(NetworkExceptions.getDioException(e));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
@@ -81,7 +82,7 @@ class OrganizerHomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const OrganizerHeader(),
+                const FadeSlideIn(child: OrganizerHeader()),
                 SizedBox(height: 24.h),
                 BlocBuilder<UserProfileBloc, UserProfileState>(
                   builder: (context, state) {
@@ -98,11 +99,13 @@ class OrganizerHomeView extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 24.h),
-                const OrganizerStatsSection(),
+                const FadeSlideIn(index: 2, child: OrganizerStatsSection()),
                 SizedBox(height: 24.h),
-                const OrganizerQuickActionsSection(),
+                const FadeSlideIn(
+                    index: 3, child: OrganizerQuickActionsSection()),
                 SizedBox(height: 24.h),
-                const OrganizerActiveEventsSection(),
+                const FadeSlideIn(
+                    index: 4, child: OrganizerActiveEventsSection()),
               ],
             ),
           ),

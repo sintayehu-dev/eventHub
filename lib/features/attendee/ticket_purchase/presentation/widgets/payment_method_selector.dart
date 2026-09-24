@@ -16,7 +16,7 @@ class PaymentMethodSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       color: colorScheme.surface,
       elevation: 0,
@@ -41,13 +41,13 @@ class PaymentMethodSelector extends StatelessWidget {
               return Container(
                 margin: EdgeInsets.only(bottom: 8.h),
                 decoration: BoxDecoration(
-                  color: isSelected 
+                  color: isSelected
                       ? colorScheme.primary.withValues(alpha: 0.05)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: isSelected 
-                        ? colorScheme.primary 
+                    color: isSelected
+                        ? colorScheme.primary
                         : colorScheme.outline.withValues(alpha: 0.1),
                   ),
                 ),
@@ -56,12 +56,15 @@ class PaymentMethodSelector extends StatelessWidget {
                     method.displayName,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   secondary: Icon(
                     _getPaymentIcon(method),
-                    color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                    color: isSelected
+                        ? colorScheme.onSurface
+                        : colorScheme.onSurfaceVariant,
                   ),
                   value: method,
                   groupValue: selectedMethod,

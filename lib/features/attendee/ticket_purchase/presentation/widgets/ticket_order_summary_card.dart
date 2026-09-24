@@ -13,7 +13,7 @@ class TicketOrderSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       color: colorScheme.surface,
       elevation: 0,
@@ -43,7 +43,8 @@ class TicketOrderSummaryCard extends StatelessWidget {
                       child: Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.h),
                             decoration: BoxDecoration(
                               color: colorScheme.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8.r),

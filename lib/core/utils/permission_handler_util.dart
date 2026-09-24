@@ -6,12 +6,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 /// A utility class to handle permissions throughout the app
 class PermissionHandlerUtil {
-
   static Future<bool> requestCameraPermission(BuildContext context) async {
     if (!context.mounted) return false;
-    
+
     PermissionStatus status = await Permission.camera.status;
-    
+
     if (status.isGranted) {
       return true;
     }
@@ -19,7 +18,7 @@ class PermissionHandlerUtil {
       status = await Permission.camera.request();
       return status.isGranted;
     }
-    
+
     if (status.isPermanentlyDenied) {
       if (context.mounted) {
         _showPermissionDeniedDialog(
@@ -30,7 +29,7 @@ class PermissionHandlerUtil {
       }
       return false;
     }
-    
+
     if (status.isRestricted || status.isLimited) {
       if (context.mounted) {
         _showPermissionDeniedDialog(
@@ -41,23 +40,24 @@ class PermissionHandlerUtil {
       }
       return false;
     }
-    
+
     return false;
   }
-  
+
   /// Check and request photo library/storage permission
-  static Future<bool> requestPhotoLibraryPermission(BuildContext context) async {
+  static Future<bool> requestPhotoLibraryPermission(
+      BuildContext context) async {
     if (!context.mounted) return false;
-    
+
     PermissionStatus status;
-    
+
     if (Platform.isIOS) {
       status = await Permission.photos.status;
-      
+
       if (status.isGranted) {
         return true;
       }
-      
+
       if (status.isDenied) {
         status = await Permission.photos.request();
         return status.isGranted;
@@ -102,7 +102,7 @@ class PermissionHandlerUtil {
         return status.isGranted;
       }
     }
-    
+
     if (status.isPermanentlyDenied) {
       if (context.mounted) {
         _showPermissionDeniedDialog(
@@ -113,7 +113,7 @@ class PermissionHandlerUtil {
       }
       return false;
     }
-    
+
     if (status.isRestricted || status.isLimited) {
       if (context.mounted) {
         _showPermissionDeniedDialog(
@@ -124,18 +124,18 @@ class PermissionHandlerUtil {
       }
       return false;
     }
-    
+
     return false;
   }
 
   static Future<bool> requestMicPermission(BuildContext context) async {
     if (!context.mounted) return false;
-    
+
     var status = await Permission.microphone.status;
     // If permission is undetermined (not granted, not denied, not permanently denied)
     if (!status.isGranted && !status.isDenied && !status.isPermanentlyDenied) {
       if (!context.mounted) return false;
-      
+
       final proceed = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -190,7 +190,7 @@ class PermissionHandlerUtil {
     }
     return status.isGranted;
   }
-  
+
   /// Helper method to check if the device is running Android 13 (API 33) or higher
   static Future<bool> _isAndroid13OrAbove() async {
     if (Platform.isAndroid) {
@@ -200,11 +200,11 @@ class PermissionHandlerUtil {
     }
     return false;
   }
-  
+
   /// Show a dialog when permission is permanently denied
   static void _showPermissionDeniedDialog(
-    BuildContext context, 
-    String title, 
+    BuildContext context,
+    String title,
     String message,
   ) {
     showDialog<void>(
@@ -247,11 +247,11 @@ class PermissionHandlerUtil {
       ),
     );
   }
-  
+
   /// Show error dialog for permission-related errors
   static void showErrorDialog(
-    BuildContext context, 
-    String title, 
+    BuildContext context,
+    String title,
     String message,
   ) {
     showDialog<void>(
@@ -286,7 +286,7 @@ class PermissionHandlerUtil {
   /// Check and request activity recognition and body sensors permissions for health data
   static Future<bool> requestHealthPermissions(BuildContext context) async {
     if (!context.mounted) return false;
-    
+
     bool granted = true;
     // Request ACTIVITY_RECOGNITION
     var activityStatus = await Permission.activityRecognition.status;
@@ -320,4 +320,4 @@ class PermissionHandlerUtil {
     }
     return granted;
   }
-} 
+}

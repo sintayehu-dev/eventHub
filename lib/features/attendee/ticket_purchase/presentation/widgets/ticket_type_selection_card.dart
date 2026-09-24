@@ -77,9 +77,7 @@ class TicketTypeSelectionCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: isAvailable
-                      ? AppColors.mint
-                      : const Color(0xFFFCE4E4),
+                  color: isAvailable ? AppColors.mint : const Color(0xFFFCE4E4),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
@@ -113,7 +111,9 @@ class TicketTypeSelectionCard extends StatelessWidget {
           height: 36.w,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: filled && enabled ? scheme.secondary : scheme.surfaceContainerHighest,
+            color: filled && enabled
+                ? scheme.secondary
+                : scheme.surfaceContainerHighest,
           ),
           child: Icon(
             icon,
@@ -139,8 +139,8 @@ class TicketTypeSelectionCard extends StatelessWidget {
             style: theme.textTheme.titleMedium,
           ),
         ),
-        stepper(Icons.add_rounded, canAdd,
-            () => onQuantityChanged(quantity + 1),
+        stepper(
+            Icons.add_rounded, canAdd, () => onQuantityChanged(quantity + 1),
             filled: true),
       ],
     );

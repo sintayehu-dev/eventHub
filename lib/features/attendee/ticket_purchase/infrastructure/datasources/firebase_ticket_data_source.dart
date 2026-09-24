@@ -87,7 +87,7 @@ class FirebaseTicketDataSourceImpl implements FirebaseTicketDataSource {
       }
 
       final event = EventEntity.fromFirestoreData(eventDoc.data()!);
-      
+
       // Find the ticket type
       final ticketType = event.ticketTypes.firstWhere(
         (t) => t.id == request.ticketTypeId,
@@ -192,7 +192,8 @@ class FirebaseTicketDataSourceImpl implements FirebaseTicketDataSource {
 
       final querySnapshot = await query.get();
       var tickets = querySnapshot.docs
-          .map((doc) => TicketEntity.fromFirestoreData(doc.data() as Map<String, dynamic>))
+          .map((doc) => TicketEntity.fromFirestoreData(
+              doc.data() as Map<String, dynamic>))
           .toList();
 
       // Filter by status in memory if specified
@@ -218,10 +219,8 @@ class FirebaseTicketDataSourceImpl implements FirebaseTicketDataSource {
     required String userId,
   }) async {
     try {
-      final doc = await _firestore
-          .collection(_ticketsCollection)
-          .doc(ticketId)
-          .get();
+      final doc =
+          await _firestore.collection(_ticketsCollection).doc(ticketId).get();
 
       if (!doc.exists) {
         throw FirebaseException(

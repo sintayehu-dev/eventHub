@@ -1,6 +1,6 @@
 class RouteName {
   RouteName._();
-  
+
   // Main routes
   static const splash = 'splash';
   static const mainScreen = 'mainScreen';
@@ -29,7 +29,7 @@ class RouteName {
   static const attendeeHome = 'attendee_home';
   static const attendeeDiscover = 'attendee_discover';
   static const attendeeProfile = 'attendee_profile';
-  
+
   // Ticket purchase routes
   static const ticketSelection = 'ticket_selection';
   static const purchaseConfirmation = 'purchase_confirmation';

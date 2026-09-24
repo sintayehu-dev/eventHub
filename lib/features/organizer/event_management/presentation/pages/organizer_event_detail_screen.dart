@@ -18,7 +18,7 @@ import 'package:eventhub/features/organizer/event_management/presentation/widget
 
 class OrganizerEventDetailScreen extends StatelessWidget {
   final String eventId;
-  
+
   const OrganizerEventDetailScreen({
     super.key,
     required this.eventId,
@@ -58,10 +58,9 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
       },
       builder: (context, state) {
         final colorScheme = Theme.of(context).colorScheme;
-        
+
         if (state.isLoading && !state.isDeleting) {
           return Scaffold(
-            backgroundColor: colorScheme.surface,
             body: const EventDetailShimmer(),
           );
         }
@@ -92,7 +91,6 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           SafeArea(
@@ -105,24 +103,33 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
                   onMore: () => _showMoreOptions(context, event),
                 ),
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EventPerformanceMetrics(event: event),
-                        SizedBox(height: 32.h),
-                        EventDetailActions(
-                          event: event,
-                          onViewAttendees: () =>
-                              _viewAllAttendees(context, event.id),
-                          onBroadcast: () => _broadcastMessage(context, event),
-                          onCancel: () => _cancelEvent(context, event),
-                        ),
-                        SizedBox(height: 24.h),
-                        EventInfoSection(event: event),
-                        SizedBox(height: 20.h),
-                      ],
+                  // Pull the sheet up over the hero image.
+                  child: Transform.translate(
+                    offset: Offset(0, -28.h),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(32.r)),
+                      ),
+                      padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 20.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          EventPerformanceMetrics(event: event),
+                          SizedBox(height: 28.h),
+                          EventDetailActions(
+                            event: event,
+                            onViewAttendees: () =>
+                                _viewAllAttendees(context, event.id),
+                            onBroadcast: () =>
+                                _broadcastMessage(context, event),
+                            onCancel: () => _cancelEvent(context, event),
+                          ),
+                          SizedBox(height: 24.h),
+                          EventInfoSection(event: event),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -209,10 +216,10 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   void _showMoreOptions(BuildContext context, EventEntity event) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // Capture the bloc reference before showing the bottom sheet
     final eventManagementBloc = context.read<EventManagementBloc>();
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: colorScheme.surfaceContainerHighest,
@@ -282,7 +289,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.of(bottomSheetContext).pop();
@@ -300,8 +307,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
           children: [
             Icon(
               icon,
-              color: isDestructive
-                  ? colorScheme.error : colorScheme.primary,
+              color: isDestructive ? colorScheme.error : colorScheme.primary,
               size: 20.sp,
             ),
             SizedBox(width: 16.w),
@@ -340,7 +346,8 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: colorScheme.surfaceContainerHighest,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Cancel Event',
           style: theme.textTheme.titleMedium?.copyWith(
@@ -485,7 +492,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
                   organizerId: event.organizerId,
                 ),
               );
-              
+
               // Listen for the delete completion and handle navigation
               _handleDeleteCompletion(
                   context, eventManagementBloc, event.title);

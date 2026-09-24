@@ -64,7 +64,7 @@ class _ShimmerWidgetState extends State<ShimmerWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (!widget.enabled) {
       return widget.child;
     }
@@ -105,7 +105,7 @@ class ShimmerBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return ShimmerWidget(
       child: Container(
         width: width,

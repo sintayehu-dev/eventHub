@@ -80,4 +80,4 @@ class AppErrorRetryWidget extends StatelessWidget {
       ),
     );
   }
-} 
+}

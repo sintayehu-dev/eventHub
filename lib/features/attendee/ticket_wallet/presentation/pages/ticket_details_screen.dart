@@ -16,7 +16,7 @@ class TicketDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -44,7 +44,7 @@ class TicketDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             Expanded(
               child: TicketDetailsBody(ticket: ticket),
             ),

@@ -13,7 +13,7 @@ class EditEventStatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(status);
+    final statusColor = _getStatusColor(context, status);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -58,7 +58,7 @@ class EditEventStatusSection extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(EventStatus status) {
+  Color _getStatusColor(BuildContext context, EventStatus status) {
     switch (status) {
       case EventStatus.active:
         return AppColors.success;

@@ -10,24 +10,26 @@ import 'dart:async';
 /// A service class to handle image picking functionality
 class ImagePickerService {
   final ImagePicker _imagePicker = ImagePicker();
-  
+
   /// Take a photo using the device camera
   /// Returns the file path if successful, null otherwise
-  Future<String?> takePhoto(BuildContext context, {
+  Future<String?> takePhoto(
+    BuildContext context, {
     double maxWidth = 800,
     double maxHeight = 800,
     int imageQuality = 85,
   }) async {
     dev.log('ImagePickerService: Starting takePhoto');
-    
-    final hasPermission = await PermissionHandlerUtil.requestCameraPermission(context);
+
+    final hasPermission =
+        await PermissionHandlerUtil.requestCameraPermission(context);
     dev.log('ImagePickerService: Camera permission granted: $hasPermission');
-    
+
     if (!hasPermission) {
       dev.log('ImagePickerService: Camera permission denied');
       return null;
     }
-    
+
     try {
       dev.log('ImagePickerService: Attempting to take photo');
       final XFile? pickedImage = await _imagePicker.pickImage(
@@ -36,15 +38,16 @@ class ImagePickerService {
         maxHeight: maxHeight,
         imageQuality: imageQuality,
       );
-      
+
       if (pickedImage != null) {
-        dev.log('ImagePickerService: Photo taken successfully: ${pickedImage.path}');
-        
+        dev.log(
+            'ImagePickerService: Photo taken successfully: ${pickedImage.path}');
+
         // Verify file exists
         final file = File(pickedImage.path);
         final exists = await file.exists();
         dev.log('ImagePickerService: File exists: $exists');
-        
+
         return pickedImage.path;
       } else {
         dev.log('ImagePickerService: No photo was taken (pickedImage is null)');
@@ -63,24 +66,26 @@ class ImagePickerService {
       return null;
     }
   }
-  
+
   /// Choose an image from the device gallery
   /// Returns the file path if successful, null otherwise
-  Future<String?> chooseFromGallery(BuildContext context, {
+  Future<String?> chooseFromGallery(
+    BuildContext context, {
     double maxWidth = 800,
     double maxHeight = 800,
     int imageQuality = 85,
   }) async {
     dev.log('ImagePickerService: Starting chooseFromGallery');
-    
-    final hasPermission = await PermissionHandlerUtil.requestPhotoLibraryPermission(context);
+
+    final hasPermission =
+        await PermissionHandlerUtil.requestPhotoLibraryPermission(context);
     dev.log('ImagePickerService: Gallery permission granted: $hasPermission');
-    
+
     if (!hasPermission) {
       dev.log('ImagePickerService: Gallery permission denied');
       return null;
     }
-    
+
     try {
       dev.log('ImagePickerService: Attempting to pick image from gallery');
       final XFile? pickedImage = await _imagePicker.pickImage(
@@ -89,18 +94,21 @@ class ImagePickerService {
         maxHeight: maxHeight,
         imageQuality: imageQuality,
       );
-      
+
       if (pickedImage != null) {
-        dev.log('ImagePickerService: Image picked successfully: ${pickedImage.path}');
-        
+        dev.log(
+            'ImagePickerService: Image picked successfully: ${pickedImage.path}');
+
         // Verify file exists
         final file = File(pickedImage.path);
         final exists = await file.exists();
-        dev.log('ImagePickerService: File exists: $exists, file size: ${await file.length()} bytes');
-        
+        dev.log(
+            'ImagePickerService: File exists: $exists, file size: ${await file.length()} bytes');
+
         return pickedImage.path;
       } else {
-        dev.log('ImagePickerService: No image was picked (pickedImage is null)');
+        dev.log(
+            'ImagePickerService: No image was picked (pickedImage is null)');
         return null;
       }
     } catch (e) {
@@ -116,7 +124,7 @@ class ImagePickerService {
       return null;
     }
   }
-  
+
   /// Show a dialog to select image source (camera or gallery)
   /// Returns the selected image path, or null if canceled or error
   Future<String?> showImageSourceSelectionDialog(
@@ -127,10 +135,10 @@ class ImagePickerService {
     int imageQuality = 85,
   }) async {
     dev.log('ImagePickerService: Showing image source selection dialog');
-    
+
     final Completer<String?> completer = Completer<String?>();
     bool optionSelected = false;
-    
+
     await showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -153,7 +161,7 @@ class ImagePickerService {
                 onTap: () async {
                   if (optionSelected) return;
                   optionSelected = true;
-                  
+
                   dev.log('ImagePickerService: Camera option selected');
                   Navigator.pop(dialogContext);
 
@@ -164,7 +172,7 @@ class ImagePickerService {
                     imageQuality: imageQuality,
                   );
                   dev.log('ImagePickerService: Camera result: $result');
-                  
+
                   if (!completer.isCompleted) {
                     completer.complete(result);
                   }
@@ -176,7 +184,7 @@ class ImagePickerService {
                 onTap: () async {
                   if (optionSelected) return;
                   optionSelected = true;
-                  
+
                   dev.log('ImagePickerService: Gallery option selected');
                   Navigator.pop(dialogContext);
 
@@ -187,7 +195,7 @@ class ImagePickerService {
                     imageQuality: imageQuality,
                   );
                   dev.log('ImagePickerService: Gallery result: $result');
-                  
+
                   if (!completer.isCompleted) {
                     completer.complete(result);
                   }
@@ -195,12 +203,14 @@ class ImagePickerService {
               ),
               if (currentImagePath != null)
                 ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                  title: Text('Remove Photo', style: GoogleFonts.outfit(color: Colors.red)),
+                  leading: const Icon(Icons.delete_outline_rounded,
+                      color: Colors.red),
+                  title: Text('Remove Photo',
+                      style: GoogleFonts.outfit(color: Colors.red)),
                   onTap: () {
                     if (optionSelected) return;
                     optionSelected = true;
-                    
+
                     dev.log('ImagePickerService: Remove photo option selected');
                     Navigator.pop(dialogContext);
 
@@ -221,9 +231,9 @@ class ImagePickerService {
         completer.complete(null);
       }
     });
-    
+
     final result = await completer.future;
     dev.log('ImagePickerService: Dialog closed, final result: $result');
     return result;
   }
-} 
+}

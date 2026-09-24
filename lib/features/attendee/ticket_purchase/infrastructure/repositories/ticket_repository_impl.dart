@@ -116,7 +116,8 @@ class TicketRepositoryImpl implements TicketRepository {
     try {
       return _firebaseDataSource
           .watchUserTickets(userId: userId)
-          .map((tickets) => right<NetworkExceptions, List<TicketEntity>>(tickets))
+          .map((tickets) =>
+              right<NetworkExceptions, List<TicketEntity>>(tickets))
           .handleError((error) {
         return Stream.value(left<NetworkExceptions, List<TicketEntity>>(
           NetworkExceptions.getDioException(error),

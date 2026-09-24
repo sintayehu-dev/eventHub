@@ -13,7 +13,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppInitialized>(_onAppInitialized);
   }
 
-  Future<void> _onGetThemeMode(GetThemeMode event, Emitter<AppState> emit) async {
+  Future<void> _onGetThemeMode(
+      GetThemeMode event, Emitter<AppState> emit) async {
     final isDarkMode = LocalStorage.instance.getAppThemeMode();
     emit(state.copyWith(isDarkMode: isDarkMode));
   }
@@ -26,4 +27,4 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   void _onAppInitialized(AppInitialized event, Emitter<AppState> emit) {
     emit(state.copyWith(isInitialized: true));
   }
-} 
+}

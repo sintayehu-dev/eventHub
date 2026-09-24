@@ -65,4 +65,3 @@ abstract class AbstractValueObject<T> implements IValidatable {
 
 //   const UniqueId._(this.value);
 // }
-

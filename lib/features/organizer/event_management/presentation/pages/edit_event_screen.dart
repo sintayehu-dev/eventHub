@@ -152,7 +152,7 @@ class _EditEventViewState extends State<EditEventView> {
           }
         },
         child: Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: EditEventHeader(
@@ -301,7 +301,7 @@ class _EditEventViewState extends State<EditEventView> {
                       : Theme.of(context).colorScheme.outlineVariant,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(28.r),
                   ),
                 ),
                 child: Text(
@@ -309,7 +309,7 @@ class _EditEventViewState extends State<EditEventView> {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),

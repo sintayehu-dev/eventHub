@@ -8,4 +8,4 @@ abstract class AppState with _$AppState {
   }) = _AppState;
 
   const AppState._();
-} 
+}

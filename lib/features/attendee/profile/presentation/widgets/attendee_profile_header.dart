@@ -87,8 +87,8 @@ class AttendeeProfileHeader extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 4.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                       decoration: BoxDecoration(
                         color: AppColors.white.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(14.r),

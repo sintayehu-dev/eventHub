@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
@@ -67,22 +68,25 @@ class AttendeeTicketsListView extends StatelessWidget {
       separatorBuilder: (context, index) => SizedBox(height: 16.h),
       itemBuilder: (context, index) {
         final ticket = tickets[index];
-        return AttendeeTicketCard(
-          ticket: ticket,
-          onTap: () {
-            context.pushNamed(
-              RouteName.ticketDetails,
-              pathParameters: {'ticketId': ticket.id},
-              extra: ticket,
-            );
-          },
-          onShowQR: () {
-            context.pushNamed(
-              RouteName.ticketQR,
-              pathParameters: {'ticketId': ticket.id},
-              extra: ticket,
-            );
-          },
+        return FadeSlideIn(
+          index: index,
+          child: AttendeeTicketCard(
+            ticket: ticket,
+            onTap: () {
+              context.pushNamed(
+                RouteName.ticketDetails,
+                pathParameters: {'ticketId': ticket.id},
+                extra: ticket,
+              );
+            },
+            onShowQR: () {
+              context.pushNamed(
+                RouteName.ticketQR,
+                pathParameters: {'ticketId': ticket.id},
+                extra: ticket,
+              );
+            },
+          ),
         );
       },
     );

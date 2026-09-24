@@ -356,7 +356,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   ? Text(
                       staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -373,7 +373,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   Text(
                     staff.name,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),

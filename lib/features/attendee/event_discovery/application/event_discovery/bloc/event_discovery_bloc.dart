@@ -12,7 +12,8 @@ part 'event_discovery_state.dart';
 part 'event_discovery_bloc.freezed.dart';
 
 @injectable
-class EventDiscoveryBloc extends Bloc<EventDiscoveryEvent, EventDiscoveryState> {
+class EventDiscoveryBloc
+    extends Bloc<EventDiscoveryEvent, EventDiscoveryState> {
   final EventDiscoveryRepository _repository;
 
   EventDiscoveryBloc({

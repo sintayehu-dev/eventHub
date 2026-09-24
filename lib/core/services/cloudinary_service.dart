@@ -6,11 +6,12 @@ import 'dart:developer' as dev;
 @lazySingleton
 class CloudinaryService {
   late final Cloudinary _cloudinary;
-  
+
   CloudinaryService() {
     _cloudinary = Cloudinary.signedConfig(
       apiKey: '574654384352583', // Replace with your actual API key
-      apiSecret: 'qrbKtg46kbUtwQByyyAghHxLhks', // Replace with your actual API secret
+      apiSecret:
+          'qrbKtg46kbUtwQByyyAghHxLhks', // Replace with your actual API secret
       cloudName: 'dxdbs46r8', // Replace with your actual cloud name
     );
   }
@@ -24,7 +25,7 @@ class CloudinaryService {
   }) async {
     try {
       dev.log('Cloudinary: Starting upload for image: $imagePath');
-      
+
       final file = File(imagePath);
       if (!file.existsSync()) {
         throw Exception('Image file not found at path: $imagePath');
@@ -59,9 +60,9 @@ class CloudinaryService {
   Future<bool> deleteImage(String publicId) async {
     try {
       dev.log('Cloudinary: Deleting image with publicId: $publicId');
-      
+
       final response = await _cloudinary.destroy(publicId);
-      
+
       if (response.isSuccessful) {
         dev.log('Cloudinary: Delete successful');
         return true;
@@ -80,21 +81,21 @@ class CloudinaryService {
     try {
       final uri = Uri.parse(cloudinaryUrl);
       final pathSegments = uri.pathSegments;
-      
+
       // Find the index after 'upload' or version
       int startIndex = 0;
       for (int i = 0; i < pathSegments.length; i++) {
         if (pathSegments[i] == 'upload') {
           startIndex = i + 1;
           // Skip version if present (starts with 'v')
-          if (startIndex < pathSegments.length && 
+          if (startIndex < pathSegments.length &&
               pathSegments[startIndex].startsWith('v')) {
             startIndex++;
           }
           break;
         }
       }
-      
+
       if (startIndex < pathSegments.length) {
         final pathWithoutExtension = pathSegments
             .sublist(startIndex)
@@ -102,7 +103,7 @@ class CloudinaryService {
             .replaceAll(RegExp(r'\.[^.]+$'), ''); // Remove file extension
         return pathWithoutExtension;
       }
-      
+
       return null;
     } catch (e) {
       dev.log('Cloudinary: Error extracting public ID: $e');

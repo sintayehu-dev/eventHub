@@ -106,7 +106,7 @@ class EditTicketSection extends StatelessWidget {
           type,
           style: TextStyle(
             color: isSelected
-                ? Theme.of(context).colorScheme.onSurface
+                ? Theme.of(context).colorScheme.onPrimary
                 : (canEditType ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.outlineVariant),
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,

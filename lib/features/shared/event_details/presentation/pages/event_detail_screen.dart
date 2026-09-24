@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
@@ -62,11 +63,9 @@ class EventDetailView extends StatelessWidget {
       bottomNavigationBar: BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
         builder: (context, state) {
           final event = state.selectedEvent;
-          if (state.hasError ||
-              state.isLoading ||
-              state.isLoadingDetails ||
-              event == null) {
-            return const SizedBox.shrink();
+          if (state.hasError) return const SizedBox.shrink();
+          if (state.isLoading || state.isLoadingDetails || event == null) {
+            return _buildBottomBarShimmer(context);
           }
           return EventDetailGetTicketsButton(event: event);
         },
@@ -92,36 +91,132 @@ class EventDetailView extends StatelessWidget {
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(20.w),
-      child: Column(
-        children: [
-          ShimmerBox(
-            width: double.infinity,
-            height: 200.h,
-            borderRadius: BorderRadius.circular(28.r),
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    Widget infoCard() => Container(
+          padding: EdgeInsets.all(14.w),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(24.r),
           ),
-          SizedBox(height: 20.h),
-          ShimmerText(width: double.infinity, height: 24.h),
-          SizedBox(height: 12.h),
-          ShimmerText(width: double.infinity, height: 16.h),
-          SizedBox(height: 8.h),
-          ShimmerText(width: 250.w, height: 16.h),
-          SizedBox(height: 20.h),
-          ...List.generate(
-              4,
-              (index) => Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: Row(
-                      children: [
-                        ShimmerBox(width: 20.w, height: 20.h, borderRadius: BorderRadius.circular(4.r)),
-                        SizedBox(width: 12.w),
-                        ShimmerText(width: 200.w, height: 16.h),
-                      ],
-                    ),
-                  )),
-          const Spacer(),
-          ShimmerBox(width: double.infinity, height: 50.h, borderRadius: BorderRadius.circular(12.r)),
+          child: Row(
+            children: [
+              ShimmerCircle(size: 46.w),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShimmerText(width: 70.w, height: 12.h),
+                    SizedBox(height: 6.h),
+                    ShimmerText(width: 190.w, height: 16.h),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              // Hero image, same height as the loaded header
+              ShimmerBox(
+                width: double.infinity,
+                height: 320.h,
+                borderRadius: BorderRadius.zero,
+              ),
+              Transform.translate(
+                offset: Offset(0, -28.h),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(32.r)),
+                  ),
+                  padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerBox(
+                        width: 84.w,
+                        height: 26.h,
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      SizedBox(height: 14.h),
+                      ShimmerText(width: double.infinity, height: 26.h),
+                      SizedBox(height: 8.h),
+                      ShimmerText(width: 220.w, height: 26.h),
+                      SizedBox(height: 22.h),
+                      infoCard(),
+                      SizedBox(height: 12.h),
+                      infoCard(),
+                      SizedBox(height: 28.h),
+                      ShimmerText(width: 100.w, height: 20.h),
+                      SizedBox(height: 12.h),
+                      infoCard(),
+                      SizedBox(height: 28.h),
+                      ShimmerText(width: 150.w, height: 20.h),
+                      SizedBox(height: 12.h),
+                      ShimmerText(width: double.infinity, height: 14.h),
+                      SizedBox(height: 8.h),
+                      ShimmerText(width: double.infinity, height: 14.h),
+                      SizedBox(height: 8.h),
+                      ShimmerText(width: 200.w, height: 14.h),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Keep the back button reachable while loading.
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8.h,
+          left: 20.w,
+          child: const AppBackButton(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomBarShimmer(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        24.w,
+        16.h,
+        24.w,
+        MediaQuery.of(context).padding.bottom + 16.h,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ShimmerText(width: 36.w, height: 12.h),
+              SizedBox(height: 6.h),
+              ShimmerText(width: 100.w, height: 18.h),
+            ],
+          ),
+          SizedBox(width: 20.w),
+          Expanded(
+            child: ShimmerBox(
+              width: double.infinity,
+              height: 56.h,
+              borderRadius: BorderRadius.circular(28.r),
+            ),
+          ),
         ],
       ),
     );

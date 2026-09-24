@@ -102,7 +102,8 @@ class _TicketWalletContent extends StatelessWidget {
     );
   }
 
-  Widget _buildWalletContent(BuildContext context, TicketWalletData walletData) {
+  Widget _buildWalletContent(
+      BuildContext context, TicketWalletData walletData) {
     // Get the TabController from the parent TicketWalletBody
     final ticketWalletBody =
         context.findAncestorStateOfType<_TicketWalletBodyState>();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'organizer_event_utils.dart';
@@ -39,7 +40,7 @@ class ActiveEventCard extends StatelessWidget {
     final progress =
         totalTickets > 0 ? (soldTickets / totalTickets).clamp(0.0, 1.0) : 0.0;
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(12.w),

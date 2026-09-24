@@ -1,174 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/core/widgets/shimmer_widget.dart';
 
+/// Skeleton that mirrors the loaded organizer profile: hero header card, the
+/// "Manage" group (6 rows), the legal group (3 rows) and the sign-out button.
 class OrganizerProfileShimmer extends StatelessWidget {
   const OrganizerProfileShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
-      child: Column(
-        children: [
-          // Profile Header Shimmer
-          _buildProfileHeaderShimmer(),
-          SizedBox(height: 32.h),
-          
-          // Stats Cards Shimmer
-          _buildStatsCardsShimmer(),
-          SizedBox(height: 32.h),
-          
-          // Profile Menu Shimmer
-          _buildProfileMenuShimmer(),
-          SizedBox(height: 32.h),
-          
-          // Logout Card Shimmer
-          _buildLogoutCardShimmer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileHeaderShimmer() {
-    return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(
+        20.w,
+        12.h,
+        20.w,
+        FloatingPillNavigationBar.clearance(context),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile Image Shimmer
-          ShimmerCircle(size: 100.w),
-          SizedBox(height: 16.h),
-          
-          // Name Shimmer
-          ShimmerText(
-            width: 150.w,
-            height: 20.h,
+          ShimmerBox(
+            width: double.infinity,
+            height: 108.h,
+            borderRadius: BorderRadius.circular(32.r),
           ),
-          SizedBox(height: 8.h),
-          
-          // Organization Shimmer
-          ShimmerText(
-            width: 120.w,
-            height: 16.h,
-          ),
-          SizedBox(height: 8.h),
-          
-          // Email Shimmer
-          ShimmerText(
-            width: 200.w,
-            height: 16.h,
+          SizedBox(height: 24.h),
+          _group(context, titleWidth: 70.w, rows: 6),
+          SizedBox(height: 20.h),
+          _group(context, titleWidth: 130.w, rows: 3),
+          SizedBox(height: 24.h),
+          ShimmerBox(
+            width: double.infinity,
+            height: 56.h,
+            borderRadius: BorderRadius.circular(28.r),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsCardsShimmer() {
-    return Row(
-      children: [
-        Expanded(child: _buildStatCardShimmer()),
-        SizedBox(width: 16.w),
-        Expanded(child: _buildStatCardShimmer()),
-      ],
-    );
-  }
+  Widget _group(BuildContext context,
+      {required double titleWidth, required int rows}) {
+    final scheme = Theme.of(context).colorScheme;
 
-  Widget _buildStatCardShimmer() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Column(
-        children: [
-          ShimmerText(
-            width: 40.w,
-            height: 24.h,
-          ),
-          SizedBox(height: 8.h),
-          ShimmerText(
-            width: 80.w,
-            height: 14.h,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileMenuShimmer() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Menu Items
-        ...List.generate(5, (index) => _buildMenuItemShimmer()),
+        Padding(
+          padding: EdgeInsets.only(left: 8.w, bottom: 10.h),
+          child: ShimmerText(width: titleWidth, height: 14.h),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(28.r),
+          ),
+          child: Column(
+            children: [
+              for (var i = 0; i < rows; i++) ...[
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  child: Row(
+                    children: [
+                      ShimmerCircle(size: 38.w),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: ShimmerText(width: double.infinity, height: 14.h),
+                      ),
+                      SizedBox(width: 14.w),
+                      ShimmerCircle(size: 16.w),
+                    ],
+                  ),
+                ),
+                if (i != rows - 1) Divider(indent: 68.w, endIndent: 20.w),
+              ],
+            ],
+          ),
+        ),
       ],
-    );
-  }
-
-  Widget _buildMenuItemShimmer() {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Row(
-        children: [
-          // Icon Shimmer
-          ShimmerBox(
-            width: 24.w,
-            height: 24.h,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          SizedBox(width: 16.w),
-          
-          // Title Shimmer
-          Expanded(
-            child: ShimmerText(
-              width: double.infinity,
-              height: 16.h,
-            ),
-          ),
-          SizedBox(width: 16.w),
-          
-          // Arrow Shimmer
-          ShimmerBox(
-            width: 16.w,
-            height: 16.h,
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLogoutCardShimmer() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-      child: Row(
-        children: [
-          // Icon Shimmer
-          ShimmerBox(
-            width: 24.w,
-            height: 24.h,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          SizedBox(width: 16.w),
-          
-          // Text Shimmer
-          Expanded(
-            child: ShimmerText(
-              width: double.infinity,
-              height: 16.h,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

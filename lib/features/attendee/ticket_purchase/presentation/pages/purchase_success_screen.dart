@@ -20,7 +20,7 @@ class PurchaseSuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Purchase complete'),
@@ -56,7 +56,8 @@ class PurchaseSuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildActionButtons(
+      BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: EdgeInsets.fromLTRB(
           24.w, 16.h, 24.w, MediaQuery.of(context).padding.bottom + 20.h),

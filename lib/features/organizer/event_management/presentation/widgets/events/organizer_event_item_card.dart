@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -149,7 +150,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
     final progress = totalTickets > 0 ? soldTickets / totalTickets : 0.0;
 
-    return GestureDetector(
+    return Pressable(
       onTap: () => _handleAction(context, 'details'),
       child: Container(
         padding: EdgeInsets.all(10.w),
@@ -175,7 +176,7 @@ class OrganizerEventItemCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(context, theme, colorScheme, statusColor, context),
+                  _buildHeader(context, theme, colorScheme, statusColor),
                   SizedBox(height: 16.h),
                   Text(
                     event.title,
@@ -225,7 +226,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ThemeData theme, ColorScheme colorScheme, Color statusColor, BuildContext context) {
+  Widget _buildHeader(BuildContext context, ThemeData theme, ColorScheme colorScheme, Color statusColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

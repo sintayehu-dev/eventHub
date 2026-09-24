@@ -31,10 +31,9 @@ class AttendeeProfileMenu extends StatelessWidget {
         _MenuGroup(
           title: 'Account',
           items: [
-            _MenuEntry('My tickets', Icons.confirmation_number_outlined,
-                onTicketsTap),
             _MenuEntry(
-                'Payment methods', Icons.payment_outlined, onPaymentTap),
+                'My tickets', Icons.confirmation_number_outlined, onTicketsTap),
+            _MenuEntry('Payment methods', Icons.payment_outlined, onPaymentTap),
             _MenuEntry('Notifications', Icons.notifications_none_outlined,
                 onNotificationsTap),
             _MenuEntry(

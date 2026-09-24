@@ -81,13 +81,14 @@ class NetworkExceptions with _$NetworkExceptions {
       // Extract just the error message from NetworkExceptions
       return _extractMessageFromNetworkExceptions(error);
     }
-    
+
     // Fallback to standard error handling
     return error.toString();
   }
 
   // Helper method to extract just the message from NetworkExceptions
-  static String _extractMessageFromNetworkExceptions(NetworkExceptions networkExceptions) {
+  static String _extractMessageFromNetworkExceptions(
+      NetworkExceptions networkExceptions) {
     return networkExceptions.when(
       connectionError: () => "Connection error",
       requestCancelled: () => "Request cancelled",
@@ -134,7 +135,8 @@ class NetworkExceptions with _$NetworkExceptions {
               return const NetworkExceptions.sendTimeout();
             case DioExceptionType.badResponse:
               // For responses, always extract and return the backend error message
-              String backendError = _extractBackendErrorMessage(error.response?.data);
+              String backendError =
+                  _extractBackendErrorMessage(error.response?.data);
               return NetworkExceptions.defaultError(backendError);
           }
         } else if (error is SocketException) {
@@ -160,7 +162,7 @@ class NetworkExceptions with _$NetworkExceptions {
   // Helper method to extract backend error messages
   static String _extractBackendErrorMessage(dynamic data) {
     if (data == null) return "Unknown error occurred";
-    
+
     try {
       // For JSON error responses
       if (data is Map<String, dynamic>) {

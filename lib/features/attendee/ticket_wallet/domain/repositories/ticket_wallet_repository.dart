@@ -53,22 +53,22 @@ class TicketWalletData {
 
   factory TicketWalletData.fromTickets(List<TicketEntity> tickets) {
     final now = DateTime.now();
-    
+
     final upcoming = tickets
         .where((t) => t.isActive && t.eventDateTime.isAfter(now))
         .toList()
       ..sort((a, b) => a.eventDateTime.compareTo(b.eventDateTime));
-    
-    final past = tickets
-        .where((t) => t.eventDateTime.isBefore(now))
-        .toList()
+
+    final past = tickets.where((t) => t.eventDateTime.isBefore(now)).toList()
       ..sort((a, b) => b.eventDateTime.compareTo(a.eventDateTime));
-    
+
     final cancelled = tickets
-        .where((t) => t.status == TicketStatus.cancelled || t.status == TicketStatus.refunded)
+        .where((t) =>
+            t.status == TicketStatus.cancelled ||
+            t.status == TicketStatus.refunded)
         .toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    
+
     final activeTickets = tickets.where((t) => t.isActive).length;
 
     return TicketWalletData(

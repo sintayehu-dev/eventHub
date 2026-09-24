@@ -128,7 +128,8 @@ class TicketPurchaseRepositoryImpl implements TicketPurchaseRepository {
     try {
       return _firebaseDataSource
           .watchUserTickets(userId: userId)
-          .map((tickets) => Right<NetworkExceptions, List<TicketEntity>>(tickets))
+          .map((tickets) =>
+              Right<NetworkExceptions, List<TicketEntity>>(tickets))
           .handleError((error) {
         return Stream.value(Left<NetworkExceptions, List<TicketEntity>>(
           NetworkExceptions.getDioException(error),

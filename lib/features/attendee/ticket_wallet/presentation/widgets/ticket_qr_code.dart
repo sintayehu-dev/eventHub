@@ -15,7 +15,7 @@ class TicketQRCode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Container(
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(

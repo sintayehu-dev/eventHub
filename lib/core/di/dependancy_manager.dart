@@ -14,7 +14,7 @@ final GetIt getIt = GetIt.instance;
 )
 void configureDependencies() {
   getIt.init();
-  
+
   // Register services manually
   getIt.registerLazySingleton<ImagePickerService>(() => ImagePickerService());
 }

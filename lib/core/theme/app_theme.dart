@@ -108,6 +108,12 @@ class AppTheme {
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       splashFactory: InkRipple.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -139,7 +145,7 @@ class AppTheme {
         suffixIconColor: scheme.onSurfaceVariant,
         border: border(Colors.transparent),
         enabledBorder: border(Colors.transparent),
-        focusedBorder: border(scheme.primary, 1.5),
+        focusedBorder: border(scheme.secondary, 1.5),
         errorBorder: border(scheme.error),
         focusedErrorBorder: border(scheme.error, 1.5),
       ),
@@ -213,8 +219,9 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         side: BorderSide(color: scheme.outline, width: 1.5),
         fillColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? scheme.primary : null,
+          (s) => s.contains(WidgetState.selected) ? scheme.secondary : null,
         ),
+        checkColor: WidgetStatePropertyAll(scheme.onSecondary),
       ),
     );
   }
@@ -242,8 +249,7 @@ class AppTheme {
       titleSmall: s(base.titleSmall, 14, FontWeight.w600, h: 1.35),
       bodyLarge: s(base.bodyLarge, 16, FontWeight.w500, h: 1.5),
       bodyMedium: s(base.bodyMedium, 14, FontWeight.w500, h: 1.45),
-      bodySmall:
-          s(base.bodySmall, 12, FontWeight.w500, h: 1.4, color: muted),
+      bodySmall: s(base.bodySmall, 12, FontWeight.w500, h: 1.4, color: muted),
       labelLarge: s(base.labelLarge, 14, FontWeight.w600, h: 1.3),
       labelMedium: s(base.labelMedium, 12, FontWeight.w600, h: 1.3),
       labelSmall: s(base.labelSmall, 11, FontWeight.w600, h: 1.3, ls: 0.2),

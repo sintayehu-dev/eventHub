@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/motion.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -68,9 +69,12 @@ class OrganizerEventsListSection extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) => Padding(
-            padding: EdgeInsets.only(bottom: 16.h),
-            child: OrganizerEventItemCard(event: events[index]),
+          (context, index) => FadeSlideIn(
+            index: index,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 16.h),
+              child: OrganizerEventItemCard(event: events[index]),
+            ),
           ),
           childCount: events.length,
         ),

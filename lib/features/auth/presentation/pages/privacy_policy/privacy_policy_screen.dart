@@ -88,8 +88,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         // How We Use Your Information
                         _buildSection(
                           title: '3. How We Use Your Information',
-                          content:
-                              'We use your information to:\n\n'
+                          content: 'We use your information to:\n\n'
                               '• Provide and maintain our services\n'
                               '• Process your event registrations and ticket purchases\n'
                               '• Send you event notifications and updates\n'
@@ -104,8 +103,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         // Data Sharing
                         _buildSection(
                           title: '4. Data Sharing and Disclosure',
-                          content:
-                              'We may share your information with:\n\n'
+                          content: 'We may share your information with:\n\n'
                               '• Event Organizers: When you register for their events\n'
                               '• Service Providers: Who help us operate our app\n'
                               '• Payment Processors: To process your transactions\n'
@@ -127,8 +125,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         // Your Rights
                         _buildSection(
                           title: '6. Your Rights',
-                          content:
-                              'You have the right to:\n\n'
+                          content: 'You have the right to:\n\n'
                               '• Access your personal data\n'
                               '• Correct inaccurate data\n'
                               '• Request deletion of your data\n'

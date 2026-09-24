@@ -20,11 +20,11 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final bottomPadding = mediaQuery.padding.bottom;
-    
+
     // Calculate adaptive dimensions based on screen size and item count
     final adaptiveDimensions = _calculateAdaptiveDimensions(
         context, screenWidth, items.length, bottomPadding);
-    
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -76,7 +76,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
                       final index = entry.key;
                       final item = entry.value;
                       final isSelected = navigationShell.currentIndex == index;
-                      
+
                       return Expanded(
                         child: _buildNavItem(
                           context,
@@ -102,14 +102,14 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
     final isSmallScreen = screenWidth < 360;
     final isMediumScreen = screenWidth >= 360 && screenWidth < 400;
     final hasManySections = itemCount > 4;
-    
+
     // Get theme for icon sizes
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
     // Base dimensions - using theme font sizes
     double iconSize, fontSize, baseHeight, horizontalPadding, verticalPadding;
-    
+
     if (isSmallScreen) {
       iconSize = hasManySections
           ? (textTheme.titleSmall?.fontSize ?? 14)
@@ -141,10 +141,11 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
       horizontalPadding = 6.w;
       verticalPadding = 6.h;
     }
-    
+
     // Minimal safe area padding
-    final totalHeight = baseHeight + (bottomPadding > 0 ? bottomPadding * 0.2 : 0);
-    
+    final totalHeight =
+        baseHeight + (bottomPadding > 0 ? bottomPadding * 0.2 : 0);
+
     return AdaptiveDimensions(
       iconSize: iconSize,
       fontSize: fontSize,
@@ -164,7 +165,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return InkWell(
       onTap: () => _onTap(index, context),
       borderRadius: BorderRadius.circular(6.r),
@@ -181,7 +182,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(2.w), // Minimal padding
                   decoration: BoxDecoration(
-                    color: isSelected 
+                    color: isSelected
                         ? colorScheme.primary.withValues(alpha: 0.12)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(4.r),
@@ -189,7 +190,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
                   child: Icon(
                     isSelected ? item.activeIcon : item.icon,
                     size: dimensions.iconSize,
-                    color: isSelected 
+                    color: isSelected
                         ? colorScheme.primary
                         : colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -203,9 +204,9 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
                   ),
               ],
             ),
-            
+
             SizedBox(height: 2.h), // Minimal spacing
-            
+
             // Label with proper constraints
             SizedBox(
               width: dimensions.maxTextWidth,
@@ -214,7 +215,7 @@ class AdaptiveBottomNavigationBar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: dimensions.fontSize,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected 
+                  color: isSelected
                       ? colorScheme.primary
                       : colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 0.9, // Very tight line height
@@ -289,7 +290,7 @@ class AdaptiveBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    
+
     if (showDot && (text == null || text!.isEmpty)) {
       return Container(
         width: 5.w,
@@ -304,15 +305,15 @@ class AdaptiveBadge extends StatelessWidget {
         ),
       );
     }
-    
+
     if (text == null || text!.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
     final isSmallScreen = MediaQuery.of(context).size.width < 360;
     final badgeSize = isSmallScreen ? 10.w : 12.w;
     final fontSize = (textTheme.labelSmall?.fontSize ?? 11) * 0.7;
-    
+
     return Container(
       constraints: BoxConstraints(
         minWidth: badgeSize,

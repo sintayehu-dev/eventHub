@@ -73,8 +73,7 @@ class DiscoverCategoryChips extends StatelessWidget {
                     Text(
                       name,
                       style: theme.textTheme.labelLarge?.copyWith(
-                        color:
-                            isSelected ? scheme.onPrimary : scheme.onSurface,
+                        color: isSelected ? scheme.onPrimary : scheme.onSurface,
                       ),
                     ),
                   ],

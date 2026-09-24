@@ -23,7 +23,8 @@ class _TicketWalletScreenContent extends StatefulWidget {
   const _TicketWalletScreenContent();
 
   @override
-  State<_TicketWalletScreenContent> createState() => _TicketWalletScreenContentState();
+  State<_TicketWalletScreenContent> createState() =>
+      _TicketWalletScreenContentState();
 }
 
 class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
@@ -49,7 +50,8 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
 
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 16.h),
+        padding:
+            EdgeInsets.only(top: MediaQuery.of(context).padding.top + 16.h),
         child: Column(
           children: [
             Padding(
@@ -92,7 +94,7 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
     if (userId != null) {
       context.read<TicketWalletBloc>().add(
             TicketWalletEvent.refreshWallet(userId: userId),
-      );
+          );
     }
   }
 }
