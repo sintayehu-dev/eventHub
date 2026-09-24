@@ -12,61 +12,17 @@ class OrganizerProfileLogoutCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: colorScheme.error.withValues(alpha: 0.3),
-          width: 1,
+      height: 56.h,
+      child: OutlinedButton.icon(
+        onPressed: () => _showLogoutDialog(context),
+        icon: Icon(Icons.logout_rounded, size: 20.sp),
+        label: const Text('Sign out'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.error,
+          side: BorderSide(color: colorScheme.error.withValues(alpha: 0.4)),
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.logout,
-            color: colorScheme.error,
-            size: 24.sp,
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            'Sign Out',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.error,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            'Sign out of your account',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onErrorContainer,
-            ),
-          ),
-          SizedBox(height: 12.h),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _showLogoutDialog(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-              ),
-              child: Text(
-                'Sign Out',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onError,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -81,7 +37,7 @@ class OrganizerProfileLogoutCard extends StatelessWidget {
         return AlertDialog(
           backgroundColor: colorScheme.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(28.r),
           ),
           title: Text(
             'Logout',

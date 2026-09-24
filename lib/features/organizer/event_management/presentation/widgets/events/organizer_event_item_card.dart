@@ -152,19 +152,26 @@ class OrganizerEventItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => _handleAction(context, 'details'),
       child: Container(
+        padding: EdgeInsets.all(10.w),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 1),
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Banner
             _buildBanner(colorScheme),
-            
+
             Padding(
-              padding: EdgeInsets.all(20.w),
+              padding: EdgeInsets.fromLTRB(10.w, 14.h, 10.w, 8.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
