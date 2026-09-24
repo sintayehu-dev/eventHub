@@ -27,6 +27,7 @@ import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee
 import 'package:eventhub/features/auth/presentation/pages/onboarding/onboarding_screen.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 import 'package:eventhub/core/presentation/widgets/confirm_sheet.dart';
+import 'package:eventhub/features/auth/presentation/pages/splash/splash_screen.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_basic_info_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_banner_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_location_date_time_section.dart';
@@ -398,5 +399,16 @@ void main() {
     await tester.tap(find.text('go'));
     await tester.pumpAndSettle();
     await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('_shots/sheet.png'));
+  });
+
+  testWidgets('splash', (tester) async {
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = const Size(375, 812);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(RepaintBoundary(child: _host(const SplashPage())));
+    await tester.pump(const Duration(milliseconds: 1500));
+    await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('_shots/splash_mid.png'));
+    await tester.pump(const Duration(milliseconds: 1300));
+    await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('_shots/splash_end.png'));
   });
 }

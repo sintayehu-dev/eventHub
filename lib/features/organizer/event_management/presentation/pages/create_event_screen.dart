@@ -154,8 +154,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     );
   }
 
-    final colorScheme = theme.colorScheme;
-
+  Widget _buildForm(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
       child: Form(

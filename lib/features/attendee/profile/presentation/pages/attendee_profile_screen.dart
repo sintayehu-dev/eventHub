@@ -264,8 +264,6 @@ class _AttendeeProfileViewState extends State<AttendeeProfileView> {
   Future<void> _showLogoutDialog(BuildContext context) async {
     final confirmed = await showConfirmSheet(
       context,
-      title: 'Sign out?',
-      message: 'You will need to sign in again to see your account.',
       confirmLabel: 'Sign out',
       icon: Icons.logout_rounded,
       destructive: true,
