@@ -52,7 +52,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
       final staff = await staffRepository.getOrganizerStaff(
         organizerId: widget.organizerId,
       );
-      
+
       setState(() {
         _availableStaff = staff;
         _isLoadingStaff = false;
@@ -165,7 +165,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: Row(
           children: [
@@ -197,7 +198,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: Column(
           children: [
@@ -233,7 +235,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Column(
         children: [
@@ -309,7 +312,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
     );
   }
 
-  Widget _buildStaffCheckboxItem(BuildContext context, StaffEntity staff, bool isSelected) {
+  Widget _buildStaffCheckboxItem(
+      BuildContext context, StaffEntity staff, bool isSelected) {
     return GestureDetector(
       onTap: () => _toggleStaffSelection(staff.id),
       child: Container(
@@ -326,11 +330,13 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
               width: 20.w,
               height: 20.h,
               decoration: BoxDecoration(
-                color:
-                    isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 border: Border.all(
-                  color:
-                      isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outlineVariant,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(4.r),
@@ -396,13 +402,14 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
 
   Widget _buildSelectedStaffCard(BuildContext context, StaffEntity staff) {
     final role = _staffRoles[staff.id] ?? StaffRole.staff;
-    
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         children: [
@@ -456,21 +463,27 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  width: 1),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<StaffRole>(
                 value: role,
                 isDense: true,
-                dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                dropdownColor:
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                 icon: Icon(Icons.keyboard_arrow_down,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    size: 16.sp),
                 items: StaffRole.values.map((r) {
                   return DropdownMenuItem(
                     value: r,
                     child: Text(
                       r.displayName,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 12.sp),
                     ),
                   );
                 }).toList(),
@@ -490,7 +503,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             child: Container(
               padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+                color:
+                    Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Icon(

@@ -16,7 +16,7 @@ import 'package:eventhub/features/organizer/event_management/presentation/widget
 
 class EditEventScreen extends StatelessWidget {
   final EventEntity event;
-  
+
   const EditEventScreen({
     super.key,
     required this.event,
@@ -33,7 +33,7 @@ class EditEventScreen extends StatelessWidget {
 
 class EditEventView extends StatefulWidget {
   final EventEntity event;
-  
+
   const EditEventView({
     super.key,
     required this.event,
@@ -50,7 +50,7 @@ class _EditEventViewState extends State<EditEventView> {
   late final TextEditingController _locationController;
   late final TextEditingController _priceController;
   late final TextEditingController _capacityController;
-  
+
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   String _selectedTicketType = 'Paid';
@@ -66,10 +66,12 @@ class _EditEventViewState extends State<EditEventView> {
   void _initializeControllers() {
     // Pre-fill form with existing event data
     _titleController = TextEditingController(text: widget.event.title);
-    _descriptionController = TextEditingController(text: widget.event.description);
+    _descriptionController =
+        TextEditingController(text: widget.event.description);
     _locationController = TextEditingController(text: widget.event.location);
-    _capacityController = TextEditingController(text: widget.event.maxCapacity.toString());
-    
+    _capacityController =
+        TextEditingController(text: widget.event.maxCapacity.toString());
+
     // Set date and time from existing event
     _selectedDate = DateTime(
       widget.event.dateTime.year,
@@ -80,7 +82,7 @@ class _EditEventViewState extends State<EditEventView> {
       hour: widget.event.dateTime.hour,
       minute: widget.event.dateTime.minute,
     );
-    
+
     // Set ticket type and price from first ticket type
     if (widget.event.ticketTypes.isNotEmpty) {
       final firstTicket = widget.event.ticketTypes.first;
@@ -91,10 +93,10 @@ class _EditEventViewState extends State<EditEventView> {
     } else {
       _priceController = TextEditingController();
     }
-    
+
     // Set existing banner URL (we'll handle this differently since it's a URL, not a local path)
     _selectedImagePath = widget.event.bannerUrl;
-    
+
     // Add listeners to detect changes
     _titleController.addListener(_onFieldChanged);
     _descriptionController.addListener(_onFieldChanged);
@@ -173,7 +175,7 @@ class _EditEventViewState extends State<EditEventView> {
           body: BlocBuilder<EventManagementBloc, EventManagementState>(
             builder: (context, state) {
               final isLoading = state.isUpdating;
-              
+
               return Stack(
                 children: [
                   _buildForm(context),
@@ -197,36 +199,46 @@ class _EditEventViewState extends State<EditEventView> {
 
   Future<bool> _showDiscardChangesDialog(BuildContext context) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: Text(
-          'Discard Changes?',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
-        ),
-        content: Text(
-          'You have unsaved changes. Are you sure you want to discard them?',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Keep Editing',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r)),
+            title: Text(
+              'Discard Changes?',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16.sp),
             ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              'Discard',
-              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14.sp),
+            content: Text(
+              'You have unsaved changes. Are you sure you want to discard them?',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 14.sp),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Keep Editing',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 14.sp),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  'Discard',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontSize: 14.sp),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   Widget _buildForm(BuildContext context) {
@@ -296,8 +308,8 @@ class _EditEventViewState extends State<EditEventView> {
               child: ElevatedButton(
                 onPressed: _hasChanges ? () => _updateEvent(context) : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _hasChanges 
-                      ? Theme.of(context).colorScheme.primary 
+                  backgroundColor: _hasChanges
+                      ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.outlineVariant,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(

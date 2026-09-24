@@ -28,7 +28,8 @@ class EditTicketSection extends StatelessWidget {
         _buildTicketTypeSelector(context),
         SizedBox(height: 16.h),
         if (selectedTicketType == 'Paid') ...[
-          _buildTextField(context, 
+          _buildTextField(
+            context,
             controller: priceController,
             hintText: 'Ticket price (Birr)',
             keyboardType: TextInputType.number,
@@ -72,10 +73,14 @@ class EditTicketSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: canEditType ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+        color: canEditType
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: canEditType ? Theme.of(context).colorScheme.outlineVariant : Theme.of(context).colorScheme.outlineVariant,
+          color: canEditType
+              ? Theme.of(context).colorScheme.outlineVariant
+              : Theme.of(context).colorScheme.outlineVariant,
           width: 1,
         ),
       ),
@@ -99,7 +104,9 @@ class EditTicketSection extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Text(
@@ -107,7 +114,9 @@ class EditTicketSection extends StatelessWidget {
           style: TextStyle(
             color: isSelected
                 ? Theme.of(context).colorScheme.onPrimary
-                : (canEditType ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.outlineVariant),
+                : (canEditType
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : Theme.of(context).colorScheme.outlineVariant),
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
           ),
@@ -117,7 +126,8 @@ class EditTicketSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(BuildContext context, {
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     bool enabled = true,
@@ -128,30 +138,38 @@ class EditTicketSection extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       style: TextStyle(
-        color: enabled ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: enabled
+            ? Theme.of(context).colorScheme.onSurface
+            : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       keyboardType: keyboardType,
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        hintStyle:
+            TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         filled: true,
-        fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+        fillColor: enabled
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),

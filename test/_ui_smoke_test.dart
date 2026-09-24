@@ -26,6 +26,13 @@ import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee
 import 'package:eventhub/features/attendee/profile/presentation/widgets/attendee_logout_card.dart';
 import 'package:eventhub/features/auth/presentation/pages/onboarding/onboarding_screen.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
+import 'package:eventhub/core/presentation/widgets/confirm_sheet.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_basic_info_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_banner_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_location_date_time_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/ticket_types_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/event_capacity_section.dart';
+import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/ticket_type_data.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/presentation/widgets/attendee_tickets/attendee_tickets_loading.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/details/event_detail_shimmer.dart';
 import 'package:eventhub/features/organizer/profile/presentation/widgets/organizer_profile_shimmer.dart';
@@ -334,5 +341,62 @@ void main() {
   testWidgets('org-shimmers', (tester) async {
     await shoot(tester, 'sh_org_detail', const Scaffold(body: EventDetailShimmer()));
     await shoot(tester, 'sh_org_profile', const Scaffold(body: Padding(padding: EdgeInsets.only(top: 60), child: OrganizerProfileShimmer())));
+  });
+
+  testWidgets('create-form', (tester) async {
+    final t = TextEditingController(text: 'Addis Jazz Night');
+    final d = TextEditingController();
+    final l = TextEditingController();
+    final c = TextEditingController();
+    final tickets = [TicketTypeData(name: 'General', description: 'Standard', price: 0, quantity: 100, isActive: true)];
+    await shoot(
+      tester,
+      'create_form',
+      Scaffold(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+          child: Column(children: [
+            EventBasicInfoSection(
+              titleController: t,
+              descriptionController: d,
+              selectedCategory: 'Music',
+              categories: EventCategory.values.map((e) => e.displayName).toList(),
+              onCategoryChanged: (_) {},
+            ),
+            const SizedBox(height: 16),
+            EventBannerSection(selectedImagePath: null, onImageSelected: (_) {}),
+            const SizedBox(height: 16),
+            EventLocationDateTimeSection(
+              locationController: l,
+              selectedDate: DateTime(2026, 10, 12),
+              selectedTime: null,
+              onSelectDate: () {},
+              onSelectTime: () {},
+            ),
+            const SizedBox(height: 16),
+            TicketTypesSection(ticketTypes: tickets, onAddTicketType: () {}, onRemoveTicketType: (_) {}),
+            const SizedBox(height: 16),
+            EventCapacitySection(capacityController: c),
+          ]),
+        ),
+      ),
+    );
+  });
+
+  testWidgets('sheet', (tester) async {
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = const Size(375, 812);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(RepaintBoundary(
+      child: _host(Builder(builder: (context) => Scaffold(
+        body: Center(child: ElevatedButton(
+          onPressed: () => showConfirmSheet(context, title: 'Sign out?', message: 'You will need to sign in again to see your account.', confirmLabel: 'Sign out', icon: Icons.logout_rounded, destructive: true),
+          child: const Text('go'),
+        )),
+      ))),
+    ));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('_shots/sheet.png'));
   });
 }

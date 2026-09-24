@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/form_section.dart';
 
 class EventBasicInfoSection extends StatelessWidget {
   final TextEditingController titleController;
@@ -21,165 +22,104 @@ class EventBasicInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(context, 'Event Title'),
-        SizedBox(height: 8.h),
-        _buildTextField(
-          context,
-          controller: titleController,
-          hintText: 'Enter event title',
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Event title is required';
-            }
-            return null;
-          },
-        ),
-        SizedBox(height: 24.h),
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
-        _buildSectionTitle(context, 'Event Category'),
-        SizedBox(height: 8.h),
-        _buildCategoryDropdown(context),
-        if (categoryError != null) ...[
-          SizedBox(height: 8.h),
-          Text(
-            categoryError!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.error,
+    return FormSection(
+      title: 'Event basics',
+      subtitle: 'What is your event about?',
+      icon: Icons.edit_note_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FieldLabel('Event title'),
+          TextFormField(
+            controller: titleController,
+            style: theme.textTheme.bodyLarge,
+            textCapitalization: TextCapitalization.sentences,
+            decoration:
+                const InputDecoration(hintText: 'e.g. Addis Jazz Night'),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Event title is required';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 20.h),
+          const FieldLabel('Category'),
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: [
+              for (final category in categories)
+                _CategoryChip(
+                  label: category,
+                  selected: category == selectedCategory,
+                  onTap: () => onCategoryChanged(category),
                 ),
+            ],
+          ),
+          if (categoryError != null) ...[
+            SizedBox(height: 8.h),
+            Text(
+              categoryError!,
+              style: theme.textTheme.bodySmall?.copyWith(color: scheme.error),
+            ),
+          ],
+          SizedBox(height: 20.h),
+          const FieldLabel('Description'),
+          TextFormField(
+            controller: descriptionController,
+            style: theme.textTheme.bodyLarge,
+            maxLines: 4,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+              hintText: 'Tell people what to expect',
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Event description is required';
+              }
+              return null;
+            },
           ),
         ],
-        SizedBox(height: 24.h),
-
-        _buildSectionTitle(context, 'Description'),
-        SizedBox(height: 8.h),
-        _buildTextField(
-          context,
-          controller: descriptionController,
-          hintText: 'Describe your event',
-          maxLines: 4,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Event description is required';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Text(
-      title,
-      style: theme.textTheme.titleMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
       ),
     );
   }
+}
 
-  Widget _buildTextField(
-    BuildContext context, {
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return TextFormField(
-      controller: controller,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurface,
-      ),
-      maxLines: maxLines,
-      validator: validator,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-        ),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.error, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.error, width: 2),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      ),
-    );
-  }
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
-  Widget _buildCategoryDropdown(BuildContext context) {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-          width: 1,
+    final scheme = theme.colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
+        decoration: BoxDecoration(
+          color: selected ? scheme.primary : scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(20.r),
         ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: selectedCategory,
-          hint: Text(
-            'Select a category',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-            ),
+        child: Text(
+          label,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: selected ? scheme.onPrimary : scheme.onSurface,
           ),
-          dropdownColor: colorScheme.surfaceContainerHighest,
-          isExpanded: true,
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-          items: categories.map((String category) {
-            return DropdownMenuItem<String>(
-              value: category,
-              child: Text(
-                category,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            );
-          }).toList(),
-          onChanged: onCategoryChanged,
         ),
       ),
     );

@@ -119,7 +119,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           ],
         ),
         SizedBox(height: 8.h),
-        
+
         Text(
           'Create staff members with login credentials for your event',
           style: TextStyle(
@@ -139,7 +139,10 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.3),
                 width: 2,
                 style: BorderStyle.solid,
               ),
@@ -182,13 +185,15 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildStaffMemberCard(BuildContext context, int index, StaffCreationData staffMember) {
+  Widget _buildStaffMemberCard(
+      BuildContext context, int index, StaffCreationData staffMember) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +215,10 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
                 child: Container(
                   padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .error
+                        .withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                   child: Icon(
@@ -225,7 +233,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 16.h),
 
           // Name Field
-          _buildTextField(context, 
+          _buildTextField(
+            context,
             label: 'Full Name',
             value: staffMember.name,
             onChanged: (value) {
@@ -239,7 +248,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 12.h),
 
           // Email Field
-          _buildTextField(context, 
+          _buildTextField(
+            context,
             label: 'Email Address',
             value: staffMember.email,
             onChanged: (value) {
@@ -254,7 +264,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 12.h),
 
           // Password Field (Manual entry with auto-generate option)
-          _buildPasswordField(context, 
+          _buildPasswordField(
+            context,
             index: index,
             label: 'Password',
             value: staffMember.password,
@@ -277,10 +288,14 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6.r),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -308,7 +323,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildPasswordField(BuildContext context, {
+  Widget _buildPasswordField(
+    BuildContext context, {
     required int index,
     required String label,
     required String value,
@@ -335,7 +351,10 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
@@ -371,19 +390,25 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant,
+                  color: value.isEmpty
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.outlineVariant,
                   width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant,
+                  color: value.isEmpty
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.outlineVariant,
                   width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                  color: value.isEmpty
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.primary,
                   width: 2),
             ),
             contentPadding:
@@ -409,7 +434,9 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
                 ? 'Password is required for staff login'
                 : 'Staff member will use this password to login',
             style: TextStyle(
-              color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurfaceVariant,
+              color: value.isEmpty
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 10.sp,
               fontStyle: FontStyle.italic,
             ),
@@ -419,7 +446,8 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildTextField(BuildContext context, {
+  Widget _buildTextField(
+    BuildContext context, {
     required String label,
     required String value,
     required Function(String) onChanged,
@@ -467,20 +495,29 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant, width: 1),
+                  color: !isValid
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.outlineVariant,
+                  width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant, width: 1),
+                  color: !isValid
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.outlineVariant,
+                  width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                  color: !isValid
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.primary,
                   width: 2),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             errorText: errorText,
             errorStyle: TextStyle(
               color: Theme.of(context).colorScheme.error,

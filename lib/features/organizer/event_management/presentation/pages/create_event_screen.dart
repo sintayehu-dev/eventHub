@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/presentation/widgets/app_button.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
@@ -122,7 +123,6 @@ class _CreateEventViewState extends State<CreateEventView> {
         }
       },
       child: Scaffold(
-        backgroundColor: colorScheme.surface,
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: CreateEventHeader(),
@@ -133,7 +133,12 @@ class _CreateEventViewState extends State<CreateEventView> {
 
             return Stack(
               children: [
-                _buildForm(context),
+                Column(
+                  children: [
+                    Expanded(child: _buildForm(context)),
+                    _buildBottomBar(context),
+                  ],
+                ),
                 if (isLoading)
                   Container(
                     color: colorScheme.surface.withValues(alpha: 0.8),
@@ -149,12 +154,10 @@ class _CreateEventViewState extends State<CreateEventView> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
-    final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
+      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
       child: Form(
         key: _formKey,
         child: Column(
@@ -164,7 +167,8 @@ class _CreateEventViewState extends State<CreateEventView> {
               titleController: _titleController,
               descriptionController: _descriptionController,
               selectedCategory: _selectedCategory?.displayName,
-              categories: EventCategory.values.map((e) => e.displayName).toList(),
+              categories:
+                  EventCategory.values.map((e) => e.displayName).toList(),
               onCategoryChanged: (newValue) {
                 setState(() {
                   _selectedCategory = EventCategory.values.firstWhere(
@@ -176,8 +180,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               },
               categoryError: _showValidationErrors ? _categoryError : null,
             ),
-            SizedBox(height: 24.h),
-
+            SizedBox(height: 16.h),
             EventBannerSection(
               selectedImagePath: _selectedImagePath,
               onImageSelected: (imagePath) {
@@ -186,8 +189,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 });
               },
             ),
-            SizedBox(height: 24.h),
-
+            SizedBox(height: 16.h),
             EventLocationDateTimeSection(
               locationController: _locationController,
               selectedDate: _selectedDate,
@@ -196,51 +198,27 @@ class _CreateEventViewState extends State<CreateEventView> {
               onSelectTime: () => _selectTime(context),
               dateTimeError: _showValidationErrors ? _dateTimeError : null,
             ),
-            SizedBox(height: 24.h),
-
+            SizedBox(height: 16.h),
             TicketTypesSection(
               ticketTypes: _ticketTypes,
               onAddTicketType: _addTicketType,
               onRemoveTicketType: _removeTicketType,
             ),
-            SizedBox(height: 24.h),
-
-            StaffCreationWidget(
-              initialStaffMembers: _staffMembers,
-              onStaffMembersChanged: (staffMembers) {
-                setState(() {
-                  _staffMembers.clear();
-                  _staffMembers.addAll(staffMembers);
-                });
-              },
+            SizedBox(height: 16.h),
+            _StaffCard(
+              child: StaffCreationWidget(
+                initialStaffMembers: _staffMembers,
+                onStaffMembersChanged: (staffMembers) {
+                  setState(() {
+                    _staffMembers.clear();
+                    _staffMembers.addAll(staffMembers);
+                  });
+                },
+              ),
             ),
-            SizedBox(height: 24.h),
-
+            SizedBox(height: 16.h),
             EventCapacitySection(
               capacityController: _capacityController,
-            ),
-            SizedBox(height: 40.h),
-
-            // Create Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _createEvent(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Text(
-                  'Create Event',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimary,
-                  ),
-                ),
-              ),
             ),
             SizedBox(height: 20.h),
           ],
@@ -249,10 +227,40 @@ class _CreateEventViewState extends State<CreateEventView> {
     );
   }
 
+  Widget _buildBottomBar(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        20.w,
+        14.h,
+        20.w,
+        MediaQuery.of(context).padding.bottom + 14.h,
+      ),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.shadow.withValues(alpha: 0.10),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
+      child: AppButton(
+        label: 'Create event',
+        icon: Icons.arrow_forward_rounded,
+        variant: AppButtonVariant.accent,
+        onPressed: () => _createEvent(context),
+      ),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
@@ -283,7 +291,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   Future<void> _selectTime(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -395,8 +403,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
 
     if (hasTicketError) {
-      AppHelpers.showErrorSnackBar(
-          context, 'Please fix ticket type errors');
+      AppHelpers.showErrorSnackBar(context, 'Please fix ticket type errors');
       _scrollToFirstError();
       return;
     }
@@ -426,8 +433,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
 
     if (hasStaffError) {
-      AppHelpers.showErrorSnackBar(
-          context, 'Please fix staff member errors');
+      AppHelpers.showErrorSnackBar(context, 'Please fix staff member errors');
       _scrollToFirstError();
       return;
     }
@@ -504,5 +510,34 @@ class _CreateEventViewState extends State<CreateEventView> {
         );
       }
     });
+  }
+}
+
+/// White card that gives the staff block the same look as the other sections.
+class _StaffCard extends StatelessWidget {
+  const _StaffCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(18.w),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: child,
+    );
   }
 }

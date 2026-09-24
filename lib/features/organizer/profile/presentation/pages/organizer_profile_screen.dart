@@ -48,7 +48,7 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
       appBar: AppBar(
         centerTitle: false,
         titleSpacing: 20.w,
-        title: Text('Profile', style: theme.textTheme.headlineMedium),
+        title: Text('Profile', style: theme.textTheme.titleMedium),
         actions: [
           _CircleAction(
             icon: Icons.edit_outlined,

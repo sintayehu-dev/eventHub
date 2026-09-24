@@ -17,7 +17,7 @@ class TicketWalletHeader extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(title, style: theme.textTheme.headlineMedium),
+          child: Text(title, style: theme.textTheme.titleMedium),
         ),
         if (action != null) action!,
       ],

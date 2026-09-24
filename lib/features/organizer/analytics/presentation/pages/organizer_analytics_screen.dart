@@ -95,7 +95,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Text('Insights', style: theme.textTheme.headlineMedium),
+            Text('Insights', style: theme.textTheme.titleMedium),
             SizedBox(height: 20.h),
 
             const AnalyticsPeriodSelector(),
@@ -147,7 +147,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Static title, same as the loaded screen
-          Text('Insights', style: theme.textTheme.headlineMedium),
+          Text('Insights', style: theme.textTheme.titleMedium),
           SizedBox(height: 20.h),
 
           // Period selector

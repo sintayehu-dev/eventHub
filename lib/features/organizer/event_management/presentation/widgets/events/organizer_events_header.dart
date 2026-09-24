@@ -14,7 +14,7 @@ class OrganizerEventsHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('My events', style: theme.textTheme.headlineMedium),
+        Text('My events', style: theme.textTheme.titleMedium),
         GestureDetector(
           onTap: () => context.pushNamed(RouteName.createEventScreen),
           child: Container(
@@ -31,7 +31,8 @@ class OrganizerEventsHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(Icons.add_rounded, color: scheme.onSecondary, size: 24.sp),
+            child:
+                Icon(Icons.add_rounded, color: scheme.onSecondary, size: 24.sp),
           ),
         ),
       ],

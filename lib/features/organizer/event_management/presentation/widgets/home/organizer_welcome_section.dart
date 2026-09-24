@@ -19,7 +19,7 @@ class OrganizerWelcomeSection extends StatelessWidget {
       children: [
         Text('Hello, $firstName', style: theme.textTheme.bodyMedium),
         SizedBox(height: 4.h),
-        Text('Your dashboard', style: theme.textTheme.headlineMedium),
+        Text('Your dashboard', style: theme.textTheme.titleMedium),
       ],
     );
   }

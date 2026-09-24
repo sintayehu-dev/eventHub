@@ -48,7 +48,8 @@ class EditEventBannerSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: selectedImagePath != null
             ? Stack(
@@ -136,8 +137,9 @@ class EditEventBannerSection extends StatelessWidget {
     final imagePickerService = getIt<ImagePickerService>();
     final imagePath = await imagePickerService.showImageSourceSelectionDialog(
       context,
-      currentImagePath:
-          selectedImagePath?.startsWith('http') == true ? null : selectedImagePath,
+      currentImagePath: selectedImagePath?.startsWith('http') == true
+          ? null
+          : selectedImagePath,
       maxWidth: 1200,
       maxHeight: 800,
       imageQuality: 90,

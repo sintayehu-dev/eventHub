@@ -27,7 +27,8 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
       children: [
         _buildSectionTitle(context, 'Location'),
         SizedBox(height: 8.h),
-        _buildTextField(context, 
+        _buildTextField(
+          context,
           controller: locationController,
           hintText: 'Event venue or address',
           enabled: enabled,
@@ -39,7 +40,6 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
           },
         ),
         SizedBox(height: 24.h),
-
         _buildSectionTitle(context, 'Date & Time'),
         SizedBox(height: 8.h),
         Row(
@@ -68,7 +68,8 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(BuildContext context, {
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     bool enabled = true,
@@ -78,29 +79,37 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       style: TextStyle(
-        color: enabled ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: enabled
+            ? Theme.of(context).colorScheme.onSurface
+            : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        hintStyle:
+            TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         filled: true,
-        fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+        fillColor: enabled
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
@@ -121,10 +130,14 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+          color: enabled
+              ? Theme.of(context).colorScheme.surface
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: enabled ? Theme.of(context).colorScheme.outlineVariant : Theme.of(context).colorScheme.outlineVariant,
+            color: enabled
+                ? Theme.of(context).colorScheme.outlineVariant
+                : Theme.of(context).colorScheme.outlineVariant,
             width: 1,
           ),
         ),
@@ -132,7 +145,9 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
           children: [
             Icon(
               Icons.calendar_today,
-              color: enabled ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.outlineVariant,
+              color: enabled
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : Theme.of(context).colorScheme.outlineVariant,
               size: 20.sp,
             ),
             SizedBox(width: 12.w),
@@ -143,7 +158,9 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
                     : 'Select date',
                 style: TextStyle(
                   color: selectedDate != null
-                      ? (enabled ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant)
+                      ? (enabled
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurfaceVariant)
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 14.sp,
                 ),
@@ -161,10 +178,14 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+          color: enabled
+              ? Theme.of(context).colorScheme.surface
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: enabled ? Theme.of(context).colorScheme.outlineVariant : Theme.of(context).colorScheme.outlineVariant,
+            color: enabled
+                ? Theme.of(context).colorScheme.outlineVariant
+                : Theme.of(context).colorScheme.outlineVariant,
             width: 1,
           ),
         ),
@@ -172,7 +193,9 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
           children: [
             Icon(
               Icons.access_time,
-              color: enabled ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.outlineVariant,
+              color: enabled
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : Theme.of(context).colorScheme.outlineVariant,
               size: 20.sp,
             ),
             SizedBox(width: 12.w),
@@ -183,7 +206,9 @@ class EditEventLocationDateTimeSection extends StatelessWidget {
                     : 'Select time',
                 style: TextStyle(
                   color: selectedTime != null
-                      ? (enabled ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant)
+                      ? (enabled
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurfaceVariant)
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 14.sp,
                 ),

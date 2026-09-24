@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/form_section.dart';
 
 class EventLocationDateTimeSection extends StatelessWidget {
   final TextEditingController locationController;
@@ -19,190 +20,130 @@ class EventLocationDateTimeSection extends StatelessWidget {
     this.dateTimeError,
   });
 
+  static const _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(context, 'Location'),
-        SizedBox(height: 8.h),
-        _buildTextField(
-          context,
-          controller: locationController,
-          hintText: 'Event venue or address',
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Event location is required';
-            }
-            return null;
-          },
-        ),
-        SizedBox(height: 24.h),
+    final theme = Theme.of(context);
 
-        _buildSectionTitle(context, 'Date & Time'),
-        SizedBox(height: 8.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildDateSelector(context),
+    return FormSection(
+      title: 'When & where',
+      subtitle: 'Date, time and venue',
+      icon: Icons.place_rounded,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FieldLabel('Venue'),
+          TextFormField(
+            controller: locationController,
+            style: theme.textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: 'Venue or address',
+              prefixIcon: Icon(Icons.location_on_outlined, size: 20.sp),
             ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _buildTimeSelector(context),
-            ),
-          ],
-        ),
-        if (dateTimeError != null) ...[
-          SizedBox(height: 8.h),
-          Text(
-            dateTimeError!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.error,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Event location is required';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 20.h),
+          const FieldLabel('Date & time'),
+          Row(
+            children: [
+              Expanded(
+                child: _PickerTile(
+                  icon: Icons.calendar_today_rounded,
+                  placeholder: 'Select date',
+                  value: selectedDate == null
+                      ? null
+                      : '${_months[selectedDate!.month - 1]} ${selectedDate!.day}, ${selectedDate!.year}',
+                  onTap: onSelectDate,
                 ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Text(
-      title,
-      style: theme.textTheme.titleMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    BuildContext context, {
-    required TextEditingController controller,
-    required String hintText,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return TextFormField(
-      controller: controller,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurface,
-      ),
-      validator: validator,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-        ),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.error, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.error, width: 2),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      ),
-    );
-  }
-
-  Widget _buildDateSelector(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return GestureDetector(
-      onTap: onSelectDate,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today,
-              color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Text(
-                selectedDate != null
-                    ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
-                    : 'Select date',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: selectedDate != null
-                      ? colorScheme.onSurface
-                      : colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _PickerTile(
+                  icon: Icons.schedule_rounded,
+                  placeholder: 'Select time',
+                  value: selectedTime?.format(context),
+                  onTap: onSelectTime,
                 ),
+              ),
+            ],
+          ),
+          if (dateTimeError != null) ...[
+            SizedBox(height: 8.h),
+            Text(
+              dateTimeError!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
               ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildTimeSelector(BuildContext context) {
+class _PickerTile extends StatelessWidget {
+  const _PickerTile({
+    required this.icon,
+    required this.placeholder,
+    required this.value,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String placeholder;
+  final String? value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+    final filled = value != null;
+
     return GestureDetector(
-      onTap: onSelectTime,
+      onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1,
-          ),
+          color: filled
+              ? scheme.secondaryContainer
+              : scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16.r),
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.access_time,
-              color: colorScheme.onSurfaceVariant,
-              size: 20.sp,
-            ),
-            SizedBox(width: 12.w),
+            Icon(icon,
+                size: 18.sp,
+                color: filled ? scheme.primary : scheme.onSurfaceVariant),
+            SizedBox(width: 10.w),
             Expanded(
               child: Text(
-                selectedTime != null
-                    ? selectedTime!.format(context)
-                    : 'Select time',
+                value ?? placeholder,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: selectedTime != null
-                      ? colorScheme.onSurface
-                      : colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  color: filled ? scheme.onSurface : scheme.onSurfaceVariant,
+                  fontWeight: filled ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ),

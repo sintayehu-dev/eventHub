@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/presentation/widgets/confirm_sheet.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -578,65 +579,17 @@ class _StaffProfileViewState extends State<StaffProfileView> {
     });
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          title: Text(
-            'Logout',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            'Are you sure you want to logout?',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                'Cancel',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context
-                    .read<AuthStatusBloc>()
-                    .add(const AuthStatusEvent.signOut());
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-              ),
-              child: Text(
-                'Logout',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onError,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final confirmed = await showConfirmSheet(
+      context,
+      title: 'Sign out?',
+      message: 'You will need to sign in again to see your account.',
+      confirmLabel: 'Sign out',
+      icon: Icons.logout_rounded,
+      destructive: true,
     );
+    if (confirmed && context.mounted) {
+      context.read<AuthStatusBloc>().add(const AuthStatusEvent.signOut());
+    }
   }
 }

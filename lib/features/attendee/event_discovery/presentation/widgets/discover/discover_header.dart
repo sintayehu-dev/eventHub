@@ -13,7 +13,7 @@ class DiscoverHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Explore', style: theme.textTheme.headlineMedium),
+          Text('Explore', style: theme.textTheme.titleMedium),
           SizedBox(height: 4.h),
           Text(
             'Find something worth leaving the house for.',

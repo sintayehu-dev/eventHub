@@ -16,7 +16,7 @@ class EditEventHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,

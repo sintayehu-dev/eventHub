@@ -21,7 +21,8 @@ class EditEventBasicInfoSection extends StatelessWidget {
       children: [
         _buildSectionTitle(context, 'Event Title'),
         SizedBox(height: 8.h),
-        _buildTextField(context, 
+        _buildTextField(
+          context,
           controller: titleController,
           hintText: 'Enter event title',
           enabled: enabled,
@@ -33,10 +34,10 @@ class EditEventBasicInfoSection extends StatelessWidget {
           },
         ),
         SizedBox(height: 24.h),
-
         _buildSectionTitle(context, 'Description'),
         SizedBox(height: 8.h),
-        _buildTextField(context, 
+        _buildTextField(
+          context,
           controller: descriptionController,
           hintText: 'Describe your event',
           maxLines: 4,
@@ -63,7 +64,8 @@ class EditEventBasicInfoSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(BuildContext context, {
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hintText,
     int maxLines = 1,
@@ -74,30 +76,38 @@ class EditEventBasicInfoSection extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       style: TextStyle(
-        color: enabled ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
+        color: enabled
+            ? Theme.of(context).colorScheme.onSurface
+            : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       maxLines: maxLines,
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        hintStyle:
+            TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         filled: true,
-        fillColor: enabled ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
+        fillColor: enabled
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),

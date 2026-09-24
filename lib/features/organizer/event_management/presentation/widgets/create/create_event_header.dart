@@ -1,27 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 
 class CreateEventHeader extends StatelessWidget {
   const CreateEventHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
     return AppBar(
-      backgroundColor: colorScheme.surface,
-      elevation: 0,
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
-      ),
-      title: Text(
-        'Create New Event',
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.bold,
+      leadingWidth: 64.w,
+      leading: Padding(
+        padding: EdgeInsets.only(left: 20.w),
+        child: Center(
+          child: AppBackButton(onPressed: () => Navigator.of(context).pop()),
         ),
       ),
+      title: const Text('Create event'),
     );
   }
 }

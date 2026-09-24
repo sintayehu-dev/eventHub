@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/form_section.dart';
 import 'package:eventhub/features/organizer/event_management/presentation/widgets/create/ticket_type_data.dart';
 
 class TicketTypesSection extends StatelessWidget {
@@ -17,47 +18,39 @@ class TicketTypesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildSectionTitle(context, 'Ticket Types'),
-            TextButton.icon(
-              onPressed: onAddTicketType,
-              icon: Icon(Icons.add, size: 18.sp, color: colorScheme.primary),
-              label: Text(
-                'Add Type',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        ...ticketTypes.asMap().entries.map((entry) {
-          final index = entry.key;
-          final ticketType = entry.value;
-          return _buildTicketTypeCard(context, index, ticketType);
-        }),
-      ],
-    );
-  }
+    final scheme = theme.colorScheme;
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Text(
-      title,
-      style: theme.textTheme.titleMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
+    return FormSection(
+      title: 'Tickets',
+      subtitle: 'Set a price of 0 for a free ticket',
+      icon: Icons.confirmation_number_rounded,
+      trailing: GestureDetector(
+        onTap: onAddTicketType,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: scheme.secondary,
+            borderRadius: BorderRadius.circular(18.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.add_rounded, size: 16.sp, color: scheme.onSecondary),
+              SizedBox(width: 4.w),
+              Text(
+                'Add',
+                style: theme.textTheme.labelLarge
+                    ?.copyWith(color: scheme.onSecondary),
+              ),
+            ],
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          for (final entry in ticketTypes.asMap().entries)
+            _buildTicketTypeCard(context, entry.key, entry.value),
+        ],
       ),
     );
   }
@@ -65,18 +58,15 @@ class TicketTypesSection extends StatelessWidget {
   Widget _buildTicketTypeCard(
       BuildContext context, int index, TicketTypeData ticketType) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(16.w),
+      margin:
+          EdgeInsets.only(bottom: index == ticketTypes.length - 1 ? 0 : 14.h),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(22.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,38 +74,38 @@ class TicketTypesSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Ticket Type ${index + 1}',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  'Ticket ${index + 1}',
+                  style: theme.textTheme.labelMedium
+                      ?.copyWith(color: scheme.primary),
                 ),
               ),
               if (ticketTypes.length > 1)
-                IconButton(
-                  onPressed: () => onRemoveTicketType(index),
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: colorScheme.error,
-                    size: 20.sp,
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                GestureDetector(
+                  onTap: () => onRemoveTicketType(index),
+                  child: Icon(Icons.delete_outline_rounded,
+                      color: scheme.error, size: 22.sp),
                 ),
             ],
           ),
           SizedBox(height: 12.h),
-          _buildTextField(
+          _field(
             context,
             controller: ticketType.nameController,
-            hintText: 'Ticket name (e.g. Early Bird, VIP)',
+            hintText: 'e.g. Early Bird, VIP',
             label: 'Name',
           ),
           SizedBox(height: 12.h),
-          _buildTextField(
+          _field(
             context,
             controller: ticketType.descriptionController,
-            hintText: 'What\'s included in this ticket?',
+            hintText: "What's included?",
             label: 'Description',
             maxLines: 2,
           ),
@@ -123,17 +113,17 @@ class TicketTypesSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildTextField(
+                child: _field(
                   context,
                   controller: ticketType.priceController,
-                  hintText: '0.00',
+                  hintText: '0',
                   label: 'Price (Birr)',
                   keyboardType: TextInputType.number,
                 ),
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: _buildTextField(
+                child: _field(
                   context,
                   controller: ticketType.quantityController,
                   hintText: '100',
@@ -148,7 +138,7 @@ class TicketTypesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
+  Widget _field(
     BuildContext context, {
     required TextEditingController controller,
     required String hintText,
@@ -157,53 +147,23 @@ class TicketTypesSection extends StatelessWidget {
     TextInputType? keyboardType,
   }) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        SizedBox(height: 4.h),
+        Text(label, style: theme.textTheme.labelMedium),
+        SizedBox(height: 6.h),
         TextFormField(
           controller: controller,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
-          ),
+          style: theme.textTheme.bodyMedium,
           maxLines: maxLines,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-            ),
-            filled: true,
-            fillColor: colorScheme.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(
-                color: colorScheme.outline.withValues(alpha: 0.3),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(
-                color: colorScheme.outline.withValues(alpha: 0.3),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
-            ),
+            // White field on the grey ticket card.
+            fillColor: theme.colorScheme.surface,
             contentPadding:
-                EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
           ),
         ),
       ],

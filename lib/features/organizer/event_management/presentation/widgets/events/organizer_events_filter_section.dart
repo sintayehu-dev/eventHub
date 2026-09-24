@@ -16,7 +16,7 @@ class OrganizerEventsFilterSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
@@ -33,7 +33,8 @@ class OrganizerEventsFilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterTab(BuildContext context, String title, EventStatus status) {
+  Widget _buildFilterTab(
+      BuildContext context, String title, EventStatus status) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isSelected = selectedStatus == status;
@@ -50,7 +51,9 @@ class OrganizerEventsFilterSection extends StatelessWidget {
           child: Text(
             title,
             style: theme.textTheme.labelLarge?.copyWith(
-              color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),

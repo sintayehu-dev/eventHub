@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
+import 'package:eventhub/core/presentation/widgets/form_section.dart';
 import 'package:eventhub/core/services/image_picker_service.dart';
 import 'dart:io';
 
@@ -16,105 +17,83 @@ class EventBannerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle(context, 'Event Banner'),
-        SizedBox(height: 8.h),
-        _buildImagePicker(context),
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Text(
-      title,
-      style: theme.textTheme.titleMedium?.copyWith(
-        color: colorScheme.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
+    return FormSection(
+      title: 'Cover image',
+      subtitle: 'A good photo gets more people to open your event',
+      icon: Icons.image_rounded,
+      child: _buildImagePicker(context),
     );
   }
 
   Widget _buildImagePicker(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () => _selectImage(context),
-      child: Container(
-        width: double.infinity,
-        height: 200.h,
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: selectedImagePath != null
-            ? Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: Image.file(
-                      File(selectedImagePath!),
-                      width: double.infinity,
-                      height: 200.h,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    top: 8.h,
-                    right: 8.w,
-                    child: GestureDetector(
-                      onTap: () => onImageSelected(null),
-                      child: Container(
-                        padding: EdgeInsets.all(4.w),
-                        decoration: BoxDecoration(
-                          color: colorScheme.scrim.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          color: colorScheme.onInverseSurface,
-                          size: 16.sp,
-                        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22.r),
+        child: SizedBox(
+          width: double.infinity,
+          height: 190.h,
+          child: selectedImagePath != null
+              ? Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.file(File(selectedImagePath!), fit: BoxFit.cover),
+                    Positioned(
+                      top: 10.h,
+                      right: 10.w,
+                      child: Row(
+                        children: [
+                          _RoundButton(
+                            icon: Icons.edit_rounded,
+                            onTap: () => _selectImage(context),
+                          ),
+                          SizedBox(width: 8.w),
+                          _RoundButton(
+                            icon: Icons.close_rounded,
+                            onTap: () => onImageSelected(null),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_photo_alternate_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 48.sp,
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    'Add Event Banner',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                  ],
+                )
+              : DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(22.r),
+                    border: Border.all(
+                      color: scheme.outlineVariant,
+                      width: 1.5,
                     ),
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Tap to select an image',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color:
-                          colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 56.w,
+                        height: 56.w,
+                        decoration: BoxDecoration(
+                          color: scheme.secondary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.add_photo_alternate_rounded,
+                            color: scheme.onSecondary, size: 26.sp),
+                      ),
+                      SizedBox(height: 12.h),
+                      Text('Add cover image',
+                          style: theme.textTheme.titleSmall),
+                      SizedBox(height: 2.h),
+                      Text(
+                        'Take a photo or choose from gallery',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+        ),
       ),
     );
   }
@@ -132,5 +111,29 @@ class EventBannerSection extends StatelessWidget {
     if (imagePath != null) {
       onImageSelected(imagePath);
     }
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 36.w,
+        height: 36.w,
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 18.sp, color: scheme.onSurface),
+      ),
+    );
   }
 }
