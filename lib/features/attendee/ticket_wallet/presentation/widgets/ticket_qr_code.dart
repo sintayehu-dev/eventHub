@@ -19,14 +19,14 @@ class TicketQRCode extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
+        // Always dark-on-white so scanners can read it in any theme.
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28.r),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.1),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -34,15 +34,15 @@ class TicketQRCode extends StatelessWidget {
         data: qrData,
         version: QrVersions.auto,
         size: size ?? 240.w,
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Colors.white,
         errorCorrectionLevel: QrErrorCorrectLevel.H,
         eyeStyle: QrEyeStyle(
           eyeShape: QrEyeShape.square,
-          color: colorScheme.onSurface,
+          color: const Color(0xFF14303A),
         ),
         dataModuleStyle: QrDataModuleStyle(
           dataModuleShape: QrDataModuleShape.square,
-          color: colorScheme.onSurface,
+          color: const Color(0xFF14303A),
         ),
       ),
     );

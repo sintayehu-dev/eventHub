@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:eventhub/features/attendee/ticket_wallet/application/ticket_wallet/bloc/ticket_wallet_bloc.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/ticket_wallet/domain/repositories/ticket_wallet_repository.dart';
 import '../ticket_wallet_summary_card.dart';
 
@@ -14,11 +14,8 @@ class TicketWalletSummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 8.h),
       child: Row(
         children: [
           Expanded(
@@ -26,7 +23,7 @@ class TicketWalletSummarySection extends StatelessWidget {
               title: 'Total',
               value: walletData.totalTickets.toString(),
               icon: Icons.confirmation_number_rounded,
-              color: colorScheme.primary,
+              tint: AppColors.sky,
             ),
           ),
           SizedBox(width: 12.w),
@@ -35,7 +32,7 @@ class TicketWalletSummarySection extends StatelessWidget {
               title: 'Active',
               value: walletData.activeTickets.toString(),
               icon: Icons.check_circle_rounded,
-              color: Colors.green,
+              tint: AppColors.mint,
             ),
           ),
           SizedBox(width: 12.w),
@@ -44,7 +41,7 @@ class TicketWalletSummarySection extends StatelessWidget {
               title: 'Upcoming',
               value: walletData.upcomingTickets.length.toString(),
               icon: Icons.schedule_rounded,
-              color: Colors.orange,
+              tint: AppColors.peach,
             ),
           ),
         ],

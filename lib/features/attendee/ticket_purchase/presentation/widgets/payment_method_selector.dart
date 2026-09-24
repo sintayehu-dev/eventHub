@@ -18,13 +18,13 @@ class PaymentMethodSelector extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Card(
-      color: colorScheme.primaryContainer,
+      color: colorScheme.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,17 +61,17 @@ class PaymentMethodSelector extends StatelessWidget {
                   ),
                   secondary: Icon(
                     _getPaymentIcon(method),
-                    color: isSelected ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
                   ),
                   value: method,
                   groupValue: selectedMethod,
                   onChanged: (value) {
                     if (value != null) onMethodChanged(value);
                   },
-                  activeColor: colorScheme.primary,
+                  activeColor: colorScheme.secondary,
                   contentPadding: EdgeInsets.symmetric(horizontal: 8.w),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(18.r),
                   ),
                 ),
               );

@@ -15,49 +15,50 @@ class DiscoverSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+        height: 56.h,
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
         decoration: BoxDecoration(
-          color: colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.3),
-            width: 1,
-          ),
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
+          boxShadow: [
+            BoxShadow(
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.search,
-              color: colorScheme.primary,
-              size: 20.sp,
-            ),
+            Icon(Icons.search_rounded,
+                color: scheme.onSurfaceVariant, size: 22.sp),
             SizedBox(width: 12.w),
             Expanded(
               child: TextField(
                 controller: controller,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
+                style: theme.textTheme.bodyMedium,
+                textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
+                  filled: false,
                   border: InputBorder.none,
-                  hintText: 'Search events...',
-                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  hintText: 'Search events, venues...',
                 ),
                 onSubmitted: (query) {
                   if (query.isNotEmpty) {
                     context.read<EventDiscoveryBloc>().add(
-                      EventDiscoveryEvent.searchEvents(
-                        filters: EventSearchFilters(query: query),
-                        limit: 20,
-                      ),
-                    );
+                          EventDiscoveryEvent.searchEvents(
+                            filters: EventSearchFilters(query: query),
+                            limit: 20,
+                          ),
+                        );
                   }
                 },
               ),
@@ -66,12 +67,13 @@ class DiscoverSearchBar extends StatelessWidget {
               onTap: () {
                 controller.clear();
                 context.read<EventDiscoveryBloc>().add(
-                  const EventDiscoveryEvent.loadUpcomingEvents(limit: 20),
-                );
+                      const EventDiscoveryEvent.loadUpcomingEvents(limit: 20),
+                    );
               },
+              behavior: HitTestBehavior.opaque,
               child: Icon(
-                Icons.close,
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
+                Icons.close_rounded,
+                color: scheme.onSurfaceVariant,
                 size: 20.sp,
               ),
             ),

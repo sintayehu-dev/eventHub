@@ -12,62 +12,46 @@ class AttendeeSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final brightness = theme.brightness;
-    
+    final scheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
+        height: 56.h,
+        padding: EdgeInsets.only(left: 20.w, right: 8.w),
         decoration: BoxDecoration(
-          color: brightness == Brightness.light
-              ? colorScheme.surface
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: brightness == Brightness.light
-                ? colorScheme.outline.withValues(alpha: 0.2)
-                : colorScheme.outline.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
-          boxShadow: brightness == Brightness.light
-              ? [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
+          boxShadow: [
+            BoxShadow(
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.search,
-                color: colorScheme.primary,
-                size: 20.sp,
-              ),
-            ),
-            SizedBox(width: 16.w),
+            Icon(Icons.search_rounded,
+                color: scheme.onSurfaceVariant, size: 22.sp),
+            SizedBox(width: 12.w),
             Expanded(
               child: Text(
-                'Search events, venues, organizers...',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface.withValues(alpha: 0.5),
-                  fontWeight: FontWeight.w500,
+                'Search events, venues...',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
                 ),
               ),
             ),
-            Icon(
-              Icons.tune,
-              color: colorScheme.onSurface.withValues(alpha: 0.4),
-              size: 20.sp,
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: scheme.secondary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.tune_rounded,
+                  color: scheme.onSecondary, size: 20.sp),
             ),
           ],
         ),

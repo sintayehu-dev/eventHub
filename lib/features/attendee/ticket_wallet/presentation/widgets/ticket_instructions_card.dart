@@ -13,7 +13,7 @@ class TicketInstructionsCard extends StatelessWidget {
       color: colorScheme.primaryContainer,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(24.r),
       ),
       child: Padding(
         padding: EdgeInsets.all(16.w),

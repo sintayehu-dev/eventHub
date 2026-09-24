@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 
+/// Ticket-stub card: event summary on top, a perforated tear line, then the
+/// ticket type, price and the QR action.
 class AttendeeTicketCard extends StatelessWidget {
   final TicketEntity ticket;
   final VoidCallback onTap;
@@ -17,299 +20,140 @@ class AttendeeTicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+    final canShowQr = ticket.isActive && ticket.isUpcoming;
+    final notch = 11.w;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          color: colorScheme.surface,
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
           ],
-          border: Border.all(
-            color: colorScheme.outline.withValues(alpha: 0.1),
-            width: 1,
-          ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Event Image with Dark Overlay and QR Code
-            Container(
-              height: 160.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-              ),
-              child: Stack(
+            Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Event Banner Image
-                  if (ticket.eventBannerUrl != null &&
-                      ticket.eventBannerUrl!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20.r)),
-                      child: Image.network(
-                        ticket.eventBannerUrl!,
-                        width: double.infinity,
-                        height: 160.h,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildFallbackBackground(colorScheme);
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return _buildFallbackBackground(colorScheme);
-                        },
-                      ),
-                    )
-                  else
-                    _buildFallbackBackground(colorScheme),
-
-                  // Dark overlay
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20.r)),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.3),
-                          Colors.black.withValues(alpha: 0.6),
-                          Colors.black.withValues(alpha: 0.8),
-                        ],
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(18.r),
+                    child: SizedBox(
+                      width: 84.w,
+                      height: 84.w,
+                      child: _banner(scheme),
                     ),
                   ),
-
-                  // QR Code Icon in center
-                  if (ticket.isActive && ticket.isUpcoming)
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Center(
-                        child: Container(
-                          width: 70.w,
-                          height: 70.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.95),
-                            borderRadius: BorderRadius.circular(12.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.qr_code_rounded,
-                            color: Colors.black87,
-                            size: 45.sp,
-                          ),
+                  SizedBox(width: 14.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _StatusPill(status: ticket.status),
+                        SizedBox(height: 8.h),
+                        Text(
+                          ticket.eventTitle,
+                          style: theme.textTheme.titleMedium,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ),
-
-                  // Status badge
-                  Positioned(
-                    top: 16.h,
-                    right: 16.w,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(context, ticket.status),
-                        borderRadius: BorderRadius.circular(16.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        ticket.status.displayName,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                        SizedBox(height: 6.h),
+                        _InfoRow(
+                          icon: Icons.schedule_rounded,
+                          text: _formatDateTime(ticket.eventDateTime),
                         ),
-                      ),
+                        SizedBox(height: 2.h),
+                        _InfoRow(
+                          icon: Icons.location_on_rounded,
+                          text: ticket.eventLocation,
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Event Details
-            Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            // Tear line with side notches that cut into the canvas colour.
+            SizedBox(
+              height: notch * 2,
+              child: Row(
                 children: [
-                  // Event Title
-                  Text(
-                    ticket.eventTitle,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+                  _Notch(size: notch, left: false),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, box) {
+                        final count = (box.maxWidth / 10).floor();
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(
+                            count,
+                            (_) => Container(
+                              width: 5,
+                              height: 1.5,
+                              color: scheme.outlineVariant,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(height: 8.h),
-
-                  // Date and Time
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        _formatDateTime(ticket.eventDateTime),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  _Notch(size: notch, left: true),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 4.h, 20.w, 18.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(ticket.ticketTypeName,
+                            style: theme.textTheme.titleSmall),
+                        SizedBox(height: 2.h),
+                        Text(
+                          ticket.ticketPrice == 0
+                              ? 'Free'
+                              : '${ticket.ticketPrice.toStringAsFixed(2)} Birr',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: scheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 8.h),
-
-                  // Location
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          ticket.eventLocation,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.7),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  
-                  // Ticket Type and Price
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'TICKET TYPE',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            ticket.ticketTypeName,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'PRICE',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            '${ticket.ticketPrice.toStringAsFixed(2)} Birr',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-
-                  // View QR Code Button
-                  if (ticket.isActive && ticket.isUpcoming)
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16.r),
-                        gradient: LinearGradient(
-                          colors: [
-                            colorScheme.primary,
-                            colorScheme.primary.withValues(alpha: 0.8),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: onShowQR,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          foregroundColor: colorScheme.onPrimary,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.r),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                          elevation: 0,
+                  if (canShowQr)
+                    GestureDetector(
+                      onTap: onShowQR,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 18.w, vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: scheme.secondary,
+                          borderRadius: BorderRadius.circular(24.r),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(4.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Icon(
-                                Icons.qr_code_scanner_rounded,
-                                color: colorScheme.onPrimary,
-                                size: 20.sp,
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
+                            Icon(Icons.qr_code_2_rounded,
+                                size: 18.sp, color: scheme.onSecondary),
+                            SizedBox(width: 8.w),
                             Text(
-                              'Show QR Code',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.w600,
+                              'Show QR',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: scheme.onSecondary,
+                                fontWeight: FontWeight.w800,
                               ),
                             ),
                           ],
@@ -325,71 +169,115 @@ class AttendeeTicketCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(BuildContext context, TicketStatus status) {
-    switch (status) {
-      case TicketStatus.confirmed:
-        return Theme.of(context).colorScheme.primary;
-      case TicketStatus.pending:
-        return Colors.orange;
-      case TicketStatus.cancelled:
-      case TicketStatus.refunded:
-        return Colors.red;
-      case TicketStatus.used:
-        return Colors.blue;
+  Widget _banner(ColorScheme scheme) {
+    final url = ticket.eventBannerUrl;
+    if (url != null && url.isNotEmpty) {
+      return Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _fallback(scheme),
+        loadingBuilder: (_, child, progress) =>
+            progress == null ? child : _fallback(scheme),
+      );
     }
+    return _fallback(scheme);
+  }
+
+  Widget _fallback(ColorScheme scheme) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      child: Icon(Icons.celebration_rounded,
+          size: 30.sp, color: AppColors.white.withValues(alpha: 0.8)),
+    );
   }
 
   String _formatDateTime(DateTime dateTime) {
-    final months = [
+    const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
-
-    final month = months[dateTime.month - 1];
-    final day = dateTime.day;
-    final year = dateTime.year;
-    final hour = dateTime.hour;
-    final minute = dateTime.minute;
-
-    final timeString =
-        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
-
-    return '$month $day, $year • $timeString';
+    final time =
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    return '${months[dateTime.month - 1]} ${dateTime.day} • $time';
   }
+}
 
-  Widget _buildFallbackBackground(ColorScheme colorScheme) {
+class _Notch extends StatelessWidget {
+  const _Notch({required this.size, required this.left});
+
+  final double size;
+  final bool left;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
+      width: size,
+      height: size * 2,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colorScheme.primaryContainer,
-            colorScheme.primary.withValues(alpha: 0.8),
-            colorScheme.secondary.withValues(alpha: 0.6),
-          ],
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.horizontal(
+          left: left ? Radius.circular(size) : Radius.zero,
+          right: left ? Radius.zero : Radius.circular(size),
         ),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-          gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 1.2,
-            colors: [
-              Colors.transparent,
-              colorScheme.primary.withValues(alpha: 0.1),
-              colorScheme.primary.withValues(alpha: 0.3),
-            ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 14.sp, color: theme.colorScheme.onSurfaceVariant),
+        SizedBox(width: 4.w),
+        Expanded(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        child: Center(
-          child: Icon(
-            Icons.event,
-            size: 60.sp,
-            color: colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
-          ),
+      ],
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.status});
+
+  final TicketStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final (bg, fg) = switch (status) {
+      TicketStatus.confirmed => (AppColors.mint, AppColors.success),
+      TicketStatus.pending => (AppColors.peach, AppColors.accentDark),
+      TicketStatus.used => (AppColors.sky, AppColors.primary),
+      TicketStatus.cancelled ||
+      TicketStatus.refunded =>
+        (const Color(0xFFFCE4E4), AppColors.error),
+    };
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Text(
+        status.displayName,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: fg,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );

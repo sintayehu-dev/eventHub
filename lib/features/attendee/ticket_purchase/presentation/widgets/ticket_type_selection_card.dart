@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 
 class TicketTypeSelectionCard extends StatelessWidget {
@@ -17,123 +18,130 @@ class TicketTypeSelectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
     final isAvailable = ticketType.isAvailable;
-    
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      color: colorScheme.primaryContainer,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
+    final selected = quantity > 0;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      margin: EdgeInsets.only(bottom: 14.h),
+      padding: EdgeInsets.all(18.w),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
+        border: Border.all(
+          color: selected ? scheme.secondary : Colors.transparent,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        ticketType.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (ticketType.description.isNotEmpty) ...[
-                        SizedBox(height: 4.h),
-                        Text(
-                          ticketType.description,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(ticketType.name, style: theme.textTheme.titleMedium),
+                    if (ticketType.description.isNotEmpty) ...[
+                      SizedBox(height: 4.h),
+                      Text(ticketType.description,
+                          style: theme.textTheme.bodySmall),
                     ],
-                  ),
+                  ],
                 ),
-                Text(
-                  ticketType.price == 0
-                      ? 'Free'
-                      : '${ticketType.price.toStringAsFixed(0)} Birr',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              SizedBox(width: 12.w),
+              Text(
+                ticketType.price == 0
+                    ? 'Free'
+                    : '${ticketType.price.toStringAsFixed(0)} Birr',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(color: scheme.primary),
+              ),
+            ],
+          ),
+          SizedBox(height: 14.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: isAvailable
+                      ? AppColors.mint
+                      : const Color(0xFFFCE4E4),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
+                child: Text(
                   isAvailable
                       ? '${ticketType.availableQuantity} available'
                       : 'Sold out',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isAvailable ? Colors.green : colorScheme.error,
-                    fontWeight: FontWeight.w500,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: isAvailable ? AppColors.success : scheme.error,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                if (isAvailable)
-                  _buildQuantitySelector(colorScheme, theme),
-              ],
-            ),
-          ],
-        ),
+              ),
+              if (isAvailable) _buildQuantitySelector(scheme, theme),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildQuantitySelector(ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildQuantitySelector(ColorScheme scheme, ThemeData theme) {
+    final canAdd = quantity < ticketType.availableQuantity;
+    final canRemove = quantity > 0;
+
+    Widget stepper(IconData icon, bool enabled, VoidCallback onTap,
+        {required bool filled}) {
+      return GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: Container(
+          width: 36.w,
+          height: 36.w,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: filled && enabled ? scheme.secondary : scheme.surfaceContainerHighest,
+          ),
+          child: Icon(
+            icon,
+            size: 18.sp,
+            color: enabled
+                ? (filled ? scheme.onSecondary : scheme.onSurface)
+                : scheme.onSurface.withValues(alpha: 0.3),
+          ),
+        ),
+      );
+    }
+
     return Row(
       children: [
-        IconButton(
-          onPressed: quantity > 0
-              ? () => onQuantityChanged(quantity - 1)
-              : null,
-          icon: Icon(
-            Icons.remove_circle,
-            color: quantity > 0
-                ? colorScheme.primary
-                : colorScheme.onSurface.withValues(alpha: 0.3),
-            size: 28.sp,
-          ),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-        ),
-        Container(
+        stepper(Icons.remove_rounded, canRemove,
+            () => onQuantityChanged(quantity - 1),
+            filled: false),
+        SizedBox(
           width: 40.w,
-          alignment: Alignment.center,
           child: Text(
             quantity.toString(),
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium,
           ),
         ),
-        IconButton(
-          onPressed: quantity < ticketType.availableQuantity
-              ? () => onQuantityChanged(quantity + 1)
-              : null,
-          icon: Icon(
-            Icons.add_circle,
-            color: quantity < ticketType.availableQuantity
-                ? colorScheme.primary
-                : colorScheme.onSurface.withValues(alpha: 0.3),
-            size: 28.sp,
-          ),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-        ),
+        stepper(Icons.add_rounded, canAdd,
+            () => onQuantityChanged(quantity + 1),
+            filled: true),
       ],
     );
   }

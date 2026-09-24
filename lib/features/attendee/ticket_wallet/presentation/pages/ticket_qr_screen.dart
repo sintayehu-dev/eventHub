@@ -19,7 +19,6 @@ class TicketQRScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Ticket QR Code',
@@ -27,9 +26,6 @@ class TicketQRScreen extends StatelessWidget {
             color: colorScheme.onSurface,
           ),
         ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -41,7 +37,7 @@ class TicketQRScreen extends StatelessWidget {
                 color: colorScheme.primaryContainer,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
+                  borderRadius: BorderRadius.circular(24.r),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(16.w),

@@ -17,8 +17,8 @@ class DiscoverCategoryChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = theme.colorScheme;
+
     final categories = [
       {'name': 'All', 'category': null},
       {'name': 'Music', 'category': EventCategory.music},
@@ -27,76 +27,62 @@ class DiscoverCategoryChips extends StatelessWidget {
       {'name': 'Sports', 'category': EventCategory.sports},
     ];
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: categories.map((category) {
-            final name = category['name'] as String;
-            final isSelected = name == selectedCategory;
-            
-            return Padding(
-              padding: EdgeInsets.only(right: 8.w),
-              child: GestureDetector(
-                onTap: () {
-                  onCategorySelected(name);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      child: Row(
+        children: categories.map((category) {
+          final name = category['name'] as String;
+          final isSelected = name == selectedCategory;
 
-                  if (category['category'] == null) {
-                    context.read<EventDiscoveryBloc>().add(
-                          const EventDiscoveryEvent.loadUpcomingEvents(limit: 20),
-                        );
-                  } else {
-                    context.read<EventDiscoveryBloc>().add(
-                          EventDiscoveryEvent.loadEventsByCategory(
-                            category: category['category'] as EventCategory,
-                            limit: 20,
-                          ),
-                        );
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: isSelected ? colorScheme.primary : colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: isSelected 
-                          ? colorScheme.primary 
-                          : colorScheme.primary.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ] : null,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _getCategoryIcon(name),
-                        color: isSelected ? colorScheme.onPrimary : colorScheme.primary,
-                        size: 16.sp,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        name,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: isSelected ? colorScheme.onPrimary : colorScheme.primary,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          return Padding(
+            padding: EdgeInsets.only(right: 10.w),
+            child: GestureDetector(
+              onTap: () {
+                onCategorySelected(name);
+
+                if (category['category'] == null) {
+                  context.read<EventDiscoveryBloc>().add(
+                        const EventDiscoveryEvent.loadUpcomingEvents(limit: 20),
+                      );
+                } else {
+                  context.read<EventDiscoveryBloc>().add(
+                        EventDiscoveryEvent.loadEventsByCategory(
+                          category: category['category'] as EventCategory,
+                          limit: 20,
                         ),
+                      );
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: isSelected ? scheme.primary : scheme.surface,
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _getCategoryIcon(name),
+                      color: isSelected ? scheme.onPrimary : scheme.primary,
+                      size: 16.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      name,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color:
+                            isSelected ? scheme.onPrimary : scheme.onSurface,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

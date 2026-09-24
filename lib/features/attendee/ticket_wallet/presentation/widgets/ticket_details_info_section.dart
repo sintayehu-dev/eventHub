@@ -22,28 +22,21 @@ class TicketDetailsInfoSection extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(28.r),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: colorScheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.05),
-          width: 1,
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
+            style: theme.textTheme.titleMedium,
           ),
           if (topWidget != null) ...[
             SizedBox(height: 16.h),
@@ -69,17 +62,13 @@ class TicketDetailsInfoSection extends StatelessWidget {
             width: 100.w,
             child: Text(
               detail.label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: FontWeight.w500,
-              ),
+              style: theme.textTheme.bodySmall,
             ),
           ),
           Expanded(
             child: Text(
               detail.value,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurface,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),

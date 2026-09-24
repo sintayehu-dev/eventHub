@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
-import 'package:eventhub/core/theme/app_theme.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_bloc.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_event.dart';
 import 'package:eventhub/features/auth/application/splash/bloc/splash_state.dart';
@@ -17,70 +17,57 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
-  late AnimationController _logoController;
-  late AnimationController _textController;
-  late AnimationController _progressController;
-  late Animation<double> _logoAnimation;
-  late Animation<double> _textAnimation;
-  late Animation<double> _progressAnimation;
+  late final AnimationController _logoController;
+  late final AnimationController _textController;
+  late final AnimationController _progressController;
+  late final Animation<double> _logoAnimation;
+  late final Animation<double> _textAnimation;
+  late final Animation<double> _progressAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controllers
     _logoController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-
     _textController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-
     _progressController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
 
-    // Initialize animations
-    _logoAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
+    _logoAnimation = CurvedAnimation(
       parent: _logoController,
       curve: Curves.elasticOut,
-    ));
-
-    _textAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
+    );
+    _textAnimation = CurvedAnimation(
       parent: _textController,
       curve: Curves.easeOut,
-    ));
-
-    _progressAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
+    );
+    _progressAnimation = CurvedAnimation(
       parent: _progressController,
       curve: Curves.easeInOut,
-    ));
+    );
 
-    // Start animations
     _startAnimations();
   }
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     _logoController.forward();
 
     await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
     _textController.forward();
 
     await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
     _progressController.forward();
   }
 
@@ -94,13 +81,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // Force dark theme for splash screen
-    final darkTheme = AppTheme.darkTheme();
-    final colorScheme = darkTheme.colorScheme;
-    
-    return Theme(
-      data: darkTheme,
-      child: BlocProvider(
+    final theme = Theme.of(context);
+
+    return BlocProvider(
       create: (context) {
         final splashBloc = SplashBloc();
         Future.delayed(
@@ -114,265 +97,137 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           if (!state.isLoading && !state.isError && state.routeName != null) {
             context.goNamed(state.routeName!);
           }
-          
+
           if (state.isError) {
             AppHelpers.showErrorSnackBar(
                 context, 'Something went wrong. Please restart the app.');
           }
         },
         child: Scaffold(
-          backgroundColor: colorScheme.surface,
+          backgroundColor: AppColors.primaryDark,
           body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  colorScheme.surface,
-                  colorScheme.primaryContainer,
-                  colorScheme.primary.withValues(alpha: 0.8),
-                  colorScheme.primary,
-                ],
-                stops: const [0.0, 0.3, 0.7, 1.0],
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Animated Logo
-                          AnimatedBuilder(
-                            animation: _logoAnimation,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: _logoAnimation.value,
+            decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -70.w,
+                  top: -40.h,
+                  child: _Dot(size: 240.w, alpha: 0.06),
+                ),
+                Positioned(
+                  left: -60.w,
+                  bottom: 120.h,
+                  child: _Dot(size: 180.w, alpha: 0.05),
+                ),
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.w),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ScaleTransition(
+                                scale: _logoAnimation,
                                 child: Container(
-                                  width: 100.w,
-                                  height: 100.w,
+                                  width: 96.w,
+                                  height: 96.w,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        colorScheme.primary,
-                                        colorScheme.secondary,
-                                      ],
-                                    ),
-                                    shape: BoxShape.circle,
+                                    color: AppColors.accent,
+                                    borderRadius: BorderRadius.circular(30.r),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: colorScheme.primary
-                                            .withValues(alpha: 0.3),
-                                        blurRadius: 20,
-                                        spreadRadius: 5,
+                                        color: AppColors.accent
+                                            .withValues(alpha: 0.35),
+                                        blurRadius: 32,
+                                        offset: const Offset(0, 12),
                                       ),
                                     ],
                                   ),
                                   child: Icon(
-                                    Icons.event,
-                                    size: 50.sp,
-                                    color: colorScheme.onPrimary,
+                                    Icons.confirmation_number_rounded,
+                                    size: 46.sp,
+                                    color: AppColors.white,
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 40.h),
-
-                          // Animated App Name
-                          AnimatedBuilder(
-                            animation: _textAnimation,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _textAnimation.value,
-                                child: Transform.translate(
-                                  offset: Offset(
-                                      0, 20 * (1 - _textAnimation.value)),
-                                  child: Column(
-                                    children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                                text: 'Ethio ',
-                                                style: darkTheme
-                                                  .textTheme.displayMedium
-                                                  ?.copyWith(
-                                                color: colorScheme.onSurface,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                                text: 'Events',
-                                                style: darkTheme
-                                                  .textTheme.displayMedium
-                                                  ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                foreground: Paint()
-                                                  ..shader = LinearGradient(
-                                                    colors: [
-                                                      colorScheme.primary,
-                                                      colorScheme.secondary,
-                                                    ],
-                                                  ).createShader(
-                                                    const Rect.fromLTWH(
-                                                        0.0, 0.0, 200.0, 70.0),
-                                                  ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 12.h),
-                                      Text(
-                                        'WHERE EXPERIENCES CONNECT',
-                                          style: darkTheme.textTheme.labelMedium
-                                            ?.copyWith(
-                                          color: colorScheme.onSurface
-                                              .withValues(alpha: 0.7),
-                                          letterSpacing: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Bottom Section with Loading
-                    AnimatedBuilder(
-                      animation: _progressAnimation,
-                      builder: (context, child) {
-                        return Opacity(
-                          opacity: _progressAnimation.value,
-                          child: Column(
-                            children: [
-                              // Loading Text
-                              Text(
-                                'Syncing your universe',
-                                  style:
-                                      darkTheme.textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurface
-                                      .withValues(alpha: 0.8),
                                 ),
                               ),
-
-                              SizedBox(height: 16.h),
-
-                              // Progress Bar
-                              Container(
-                                width: double.infinity,
-                                height: 4.h,
-                                decoration: BoxDecoration(
-                                  color: colorScheme.onSurface
-                                      .withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                                child: Stack(
+                              SizedBox(height: 32.h),
+                              FadeTransition(
+                                opacity: _textAnimation,
+                                child: Column(
                                   children: [
-                                    FractionallySizedBox(
-                                      widthFactor: _progressAnimation.value,
-                                      child: Container(
-                                        height: 4.h,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              colorScheme.primary,
-                                              colorScheme.secondary,
-                                            ],
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(2),
-                                        ),
+                                    Text(
+                                      'Ethio Events',
+                                      style: theme.textTheme.displaySmall
+                                          ?.copyWith(color: AppColors.white),
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Text(
+                                      'Where experiences connect',
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color: AppColors.white
+                                            .withValues(alpha: 0.7),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-
-                              SizedBox(height: 16.h),
-
-                              // Feature Icons
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildFeatureIcon(
-                                      Icons.event_available, 'EVENTS'),
-                                  SizedBox(width: 32.w),
-                                  _buildFeatureIcon(
-                                      Icons.confirmation_number, 'TICKETS'),
-                                  SizedBox(width: 32.w),
-                                  _buildFeatureIcon(Icons.favorite, 'SAVED'),
-                                ],
-                              ),
-                              
-                              SizedBox(height: 40.h),
-                              
-                              // Premium Access
-                              Text(
-                                'PREMIUM ACCESS',
-                                  style:
-                                      darkTheme.textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurface
-                                      .withValues(alpha: 0.5),
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              
-                              SizedBox(height: 20.h),
                             ],
                           ),
-                        );
-                      },
+                        ),
+                        FadeTransition(
+                          opacity: _progressAnimation,
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 32.h),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4.r),
+                              child: SizedBox(
+                                width: 120.w,
+                                height: 4.h,
+                                child: AnimatedBuilder(
+                                  animation: _progressAnimation,
+                                  builder: (context, _) =>
+                                      LinearProgressIndicator(
+                                    value: _progressAnimation.value,
+                                    backgroundColor: AppColors.white
+                                        .withValues(alpha: 0.15),
+                                    color: AppColors.accent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
       ),
-      ),
     );
   }
+}
 
-  Widget _buildFeatureIcon(IconData icon, String label) {
-    final darkTheme = AppTheme.darkTheme();
-    final colorScheme = darkTheme.colorScheme;
-    
-    return Column(
-      children: [
-        Container(
-          width: 32.w,
-          height: 32.w,
-          decoration: BoxDecoration(
-            color: colorScheme.onSurface.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            size: 16.sp,
-            color: colorScheme.primary,
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          label,
-          style: darkTheme.textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.6),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+class _Dot extends StatelessWidget {
+  const _Dot({required this.size, required this.alpha});
+
+  final double size;
+  final double alpha;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.white.withValues(alpha: alpha),
+      ),
     );
   }
 }

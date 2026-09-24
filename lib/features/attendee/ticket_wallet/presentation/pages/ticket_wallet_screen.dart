@@ -46,12 +46,10 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: Padding(
-        padding: EdgeInsets.fromLTRB(
-            0, MediaQuery.of(context).padding.top + 20.h, 0, 90.h),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 16.h),
         child: Column(
           children: [
             Padding(
@@ -61,23 +59,24 @@ class _TicketWalletScreenContentState extends State<_TicketWalletScreenContent>
                 action: GestureDetector(
                   onTap: _refreshTickets,
                   child: Container(
-                    padding: EdgeInsets.all(8.w),
+                    width: 44.w,
+                    height: 44.w,
                     decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12.r),
+                      color: colorScheme.surface,
+                      shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.refresh_rounded,
                       color: colorScheme.primary,
-                      size: 20.sp,
+                      size: 22.sp,
                     ),
                   ),
                 ),
               ),
             ),
 
-            SizedBox(height: 20.h),
-            
+            SizedBox(height: 16.h),
+
             // Ticket Wallet Body with expanded height
             Expanded(
               child: TicketWalletBody(tabController: _tabController),

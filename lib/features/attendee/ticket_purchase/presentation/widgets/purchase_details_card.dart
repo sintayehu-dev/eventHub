@@ -16,13 +16,13 @@ class PurchaseDetailsCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Card(
-      color: colorScheme.primaryContainer,
+      color: colorScheme.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

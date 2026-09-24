@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/ticket_purchase/domain/entities/ticket_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/app_button.dart';
 import '../widgets/purchase_success_header.dart';
 import '../widgets/purchase_details_card.dart';
 import '../widgets/purchased_tickets_list.dart';
@@ -21,19 +22,8 @@ class PurchaseSuccessScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: Text(
-          'Purchase Successful',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-        centerTitle: true,
+        title: const Text('Purchase complete'),
         automaticallyImplyLeading: false,
       ),
       body: Column(
@@ -68,61 +58,24 @@ class PurchaseSuccessScreen extends StatelessWidget {
 
   Widget _buildActionButtons(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     return Container(
-      padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, MediaQuery.of(context).padding.bottom + 20.h),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            offset: const Offset(0, -4),
-            blurRadius: 10,
-          ),
-        ],
-      ),
+      padding: EdgeInsets.fromLTRB(
+          24.w, 16.h, 24.w, MediaQuery.of(context).padding.bottom + 20.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => context.goNamed(RouteName.ticketWallet),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'View My Tickets',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+          AppButton(
+            label: 'View my tickets',
+            icon: Icons.arrow_forward_rounded,
+            variant: AppButtonVariant.accent,
+            onPressed: () => context.goNamed(RouteName.ticketWallet),
           ),
-          SizedBox(height: 12.h),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () => context.goNamed(RouteName.attendeeHome),
-              style: TextButton.styleFrom(
-                foregroundColor: colorScheme.onSurface,
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-              ),
-              child: Text(
-                'Back to Home',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          SizedBox(height: 8.h),
+          TextButton(
+            onPressed: () => context.goNamed(RouteName.attendeeHome),
+            child: Text(
+              'Back to home',
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],

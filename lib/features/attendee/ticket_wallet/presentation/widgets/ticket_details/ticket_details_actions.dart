@@ -26,12 +26,10 @@ class TicketDetailsActions extends StatelessWidget {
             icon: const Icon(Icons.qr_code_rounded),
             label: const Text('Show QR Code'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+              backgroundColor: colorScheme.secondary,
+              foregroundColor: colorScheme.onSecondary,
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
-              ),
+              shape: const StadiumBorder(),
               elevation: 0,
             ),
           ),
@@ -45,11 +43,9 @@ class TicketDetailsActions extends StatelessWidget {
             label: const Text('Share Ticket'),
             style: OutlinedButton.styleFrom(
               foregroundColor: colorScheme.primary,
-              side: BorderSide(color: colorScheme.primary, width: 1.5),
+              side: BorderSide(color: colorScheme.outlineVariant, width: 1.5),
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
-              ),
+              shape: const StadiumBorder(),
             ),
           ),
         ),

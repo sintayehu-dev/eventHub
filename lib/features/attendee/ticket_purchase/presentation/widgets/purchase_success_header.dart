@@ -12,39 +12,45 @@ class PurchaseSuccessHeader extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 100.w,
-          height: 100.w,
+          width: 132.w,
+          height: 132.w,
           decoration: BoxDecoration(
-            color: colorScheme.primary,
+            color: colorScheme.secondaryContainer,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                spreadRadius: 5,
-              ),
-            ],
           ),
-          child: Icon(
-            Icons.check_rounded,
-            color: colorScheme.onPrimary,
-            size: 60.sp,
+          alignment: Alignment.center,
+          child: Container(
+            width: 88.w,
+            height: 88.w,
+            decoration: BoxDecoration(
+              color: colorScheme.secondary,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.secondary.withValues(alpha: 0.4),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.check_rounded,
+              color: colorScheme.onSecondary,
+              size: 50.sp,
+            ),
           ),
         ),
         SizedBox(height: 24.h),
         Text(
-          'Purchase Successful!',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
+          'Purchase successful!',
+          style: theme.textTheme.headlineMedium,
         ),
         SizedBox(height: 12.h),
         Text(
           'Your tickets have been purchased successfully and are now available in your wallet.',
           textAlign: TextAlign.center,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.7),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
       ],

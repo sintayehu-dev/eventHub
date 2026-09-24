@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 
+/// Compact list card: square image on the left, details on the right.
 class DiscoverEventCard extends StatelessWidget {
   final EventDiscoveryEntity event;
 
@@ -12,114 +13,99 @@ class DiscoverEventCard extends StatelessWidget {
     required this.event,
   });
 
+  static const _months = [
+    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
     return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouteName.eventDetail,
-          pathParameters: {'eventId': event.id},
-        );
-      },
+      onTap: () => context.pushNamed(
+        RouteName.eventDetail,
+        pathParameters: {'eventId': event.id},
+      ),
       child: Container(
-        margin: EdgeInsets.only(bottom: 20.h),
+        padding: EdgeInsets.all(10.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          color: colorScheme.surface,
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(28.r),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: scheme.shadow.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            // Event Image
-            _buildEventImage(colorScheme, theme),
-
-            // Event Details
-            Padding(
-              padding: EdgeInsets.all(16.w),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.r),
+              child: SizedBox(
+                width: 104.w,
+                height: 112.h,
+                child: event.bannerUrl != null
+                    ? Image.network(
+                        event.bannerUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholder(scheme),
+                      )
+                    : _placeholder(scheme),
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    '${_months[event.dateTime.month - 1]} ${event.dateTime.day}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: scheme.secondary,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    event.title,
+                    style: theme.textTheme.titleMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 6.h),
                   Row(
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Text(
-                          _formatDate(event.dateTime),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Icon(Icons.location_on_rounded, color: colorScheme.primary, size: 14.sp),
+                      Icon(Icons.location_on_rounded,
+                          size: 14.sp, color: scheme.onSurfaceVariant),
                       SizedBox(width: 4.w),
                       Expanded(
                         child: Text(
                           event.location,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
+                          style: theme.textTheme.bodySmall,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Icon(
-                        event.isFavorite == true ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                        color: colorScheme.primary,
-                        size: 20.sp,
-                      ),
                     ],
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    event.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
-                  Text(
-                    event.description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                      height: 1.4,
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: scheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 16.h),
-                  Row(
-                    children: [
-                      _buildAttendeesStack(colorScheme),
-                      SizedBox(width: 12.w),
-                      Text(
-                        event.attendeeCount != null 
-                            ? '+${event.attendeeCount} attending' 
-                            : 'by ${event.organizerName}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                    child: Text(
+                      event.priceRange,
+                      style: theme.textTheme.labelMedium
+                          ?.copyWith(color: scheme.onSurface),
+                    ),
                   ),
                 ],
               ),
@@ -130,82 +116,17 @@ class DiscoverEventCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEventImage(ColorScheme colorScheme, ThemeData theme) {
-    return Container(
-      height: 180.h,
+  Widget _placeholder(ColorScheme scheme) {
+    return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.primaryContainer, scheme.secondaryContainer],
+        ),
       ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            child: event.bannerUrl != null
-                ? Image.network(
-                    event.bannerUrl!,
-                    height: 180.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _buildPlaceholder(colorScheme),
-                  )
-                : _buildPlaceholder(colorScheme),
-          ),
-          Positioned(
-            top: 12.h,
-            right: 12.w,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Text(
-                event.priceRange,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Icon(Icons.celebration_rounded,
+          size: 32.sp, color: scheme.primary.withValues(alpha: 0.4)),
     );
-  }
-
-  Widget _buildPlaceholder(ColorScheme colorScheme) {
-    return Container(
-      width: double.infinity,
-      color: colorScheme.primaryContainer,
-      child: Icon(Icons.image_rounded, color: colorScheme.primary.withValues(alpha: 0.5), size: 40.sp),
-    );
-  }
-
-  Widget _buildAttendeesStack(ColorScheme colorScheme) {
-    return SizedBox(
-      width: 60.w,
-      height: 24.h,
-      child: Stack(
-        children: List.generate(3, (index) {
-          return Positioned(
-            left: index * 16.w,
-            child: Container(
-              width: 24.w,
-              height: 24.h,
-              decoration: BoxDecoration(
-                color: [colorScheme.primary, colorScheme.secondary, colorScheme.tertiary][index].withValues(alpha: 0.3),
-                shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.surface, width: 2),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime dateTime) {
-    final months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return '${months[dateTime.month - 1]} ${dateTime.day}';
   }
 }

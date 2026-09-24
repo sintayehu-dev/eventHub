@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import '../widgets/discover/discover_header.dart';
@@ -44,16 +45,17 @@ class _DiscoverViewState extends State<DiscoverView> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-              0, MediaQuery.of(context).padding.top + 20.h, 0, 90.h),
+              0,
+              MediaQuery.of(context).padding.top + 16.h,
+              0,
+              FloatingPillNavigationBar.clearance(context)),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Header
               const DiscoverHeader(),
@@ -109,7 +111,7 @@ class _DiscoverEventsList extends StatelessWidget {
       children: List.generate(
         5,
         (index) => Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
+          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
           child: const DiscoverShimmerCard(),
         ),
       ),
@@ -165,7 +167,7 @@ class _DiscoverEventsList extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 0),
       child: Column(
         children: events
             .map(

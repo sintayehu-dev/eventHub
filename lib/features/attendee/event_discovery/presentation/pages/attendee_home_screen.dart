@@ -4,10 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/router/route_name.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
+import 'package:eventhub/core/widgets/shimmer_widget.dart';
 import 'package:eventhub/features/attendee/event_discovery/application/event_discovery/bloc/event_discovery_bloc.dart';
 
 import '../widgets/home/attendee_home_header.dart';
+import '../widgets/home/attendee_search_bar.dart';
 import '../widgets/home/attendee_categories_section.dart';
+import '../widgets/home/featured_event_card.dart';
 import '../widgets/home/upcoming_events_section.dart';
 
 class AttendeeHomeScreen extends StatelessWidget {
@@ -26,51 +30,77 @@ class AttendeeHomeScreen extends StatelessWidget {
 class AttendeeHomeView extends StatelessWidget {
   const AttendeeHomeView({super.key});
 
+  void _openEvent(BuildContext context, String eventId) {
+    context.pushNamed(
+      RouteName.eventDetail,
+      pathParameters: {'eventId': eventId},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () async {
           context.read<EventDiscoveryBloc>().add(
                 const EventDiscoveryEvent.refreshEvents(),
               );
         },
-        color: colorScheme.primary,
+        color: scheme.primary,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                20.w, MediaQuery.of(context).padding.top + 20.h, 20.w, 90.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AttendeeHomeHeader(),
-                SizedBox(height: 24.h),
-                AttendeeCategoriesSection(
-                  onCategoryTap: (category) {
-                    context.read<EventDiscoveryBloc>().add(
-                          EventDiscoveryEvent.loadEventsByCategory(
-                            category: category,
-                          ),
-                        );
-                    context.pushNamed(RouteName.attendeeDiscover);
-                  },
-                ),
-                SizedBox(height: 32.h),
-                UpcomingEventsSection(
-                  onEventTap: (eventId) {
-                    context.pushNamed(
-                      RouteName.eventDetail,
-                      pathParameters: {'eventId': eventId},
+          padding: EdgeInsets.fromLTRB(
+            20.w,
+            MediaQuery.of(context).padding.top + 16.h,
+            20.w,
+            FloatingPillNavigationBar.clearance(context),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AttendeeHomeHeader(),
+              SizedBox(height: 20.h),
+              AttendeeSearchBar(
+                onTap: () => context.goNamed(RouteName.attendeeDiscover),
+              ),
+              SizedBox(height: 20.h),
+              BlocBuilder<EventDiscoveryBloc, EventDiscoveryState>(
+                builder: (context, state) {
+                  if (state.isLoading || state.isLoadingDetails) {
+                    return ShimmerBox(
+                      width: double.infinity,
+                      height: 210.h,
+                      borderRadius: BorderRadius.circular(32.r),
                     );
-                  },
-                ),
-              ],
-            ),
+                  }
+                  if (state.hasError || state.events.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  final event = state.events.first;
+                  return FeaturedEventCard(
+                    event: event,
+                    onTap: () => _openEvent(context, event.id),
+                  );
+                },
+              ),
+              SizedBox(height: 28.h),
+              AttendeeCategoriesSection(
+                onCategoryTap: (category) {
+                  context.read<EventDiscoveryBloc>().add(
+                        EventDiscoveryEvent.loadEventsByCategory(
+                          category: category,
+                        ),
+                      );
+                  context.pushNamed(RouteName.attendeeDiscover);
+                },
+              ),
+              SizedBox(height: 28.h),
+              UpcomingEventsSection(
+                onEventTap: (eventId) => _openEvent(context, eventId),
+              ),
+            ],
           ),
         ),
       ),

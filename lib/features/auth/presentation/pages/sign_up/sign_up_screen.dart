@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
+import 'package:eventhub/core/presentation/widgets/app_button.dart';
+import 'package:eventhub/core/presentation/widgets/app_text_field.dart';
+import 'package:eventhub/core/presentation/widgets/auth_scaffold.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
 import 'package:eventhub/core/widgets/app_validation_error_widget.dart';
-import 'package:eventhub/core/widgets/spinkit_loading_widget.dart';
-import 'package:eventhub/core/theme/app_theme.dart';
-import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_bloc.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_event.dart';
 import 'package:eventhub/features/auth/application/registration/bloc/registration_state.dart';
@@ -23,7 +24,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   String? _selectedRole;
 
   @override
@@ -34,578 +34,286 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  String? _errorFor(RegistrationState state, String key) {
+    if (state.showErrorMessages && state.firstInvalidField['key'] == key) {
+      return state.firstInvalidField['error'];
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Force dark theme for sign up screen
-    final darkTheme = AppTheme.darkTheme();
-    final colorScheme = darkTheme.colorScheme;
-    
-    return Theme(
-      data: darkTheme,
-      child: Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-              colors: [
-                colorScheme.primary.withValues(alpha: 0.95),
-                colorScheme.primaryContainer.withValues(alpha: 0.8),
-                colorScheme.surface.withValues(alpha: 0.9),
-                colorScheme.surface.withValues(alpha: 0.95),
-            ],
-            
-            stops: const [0.0, 0.3, 0.7, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: BlocConsumer<RegistrationBloc, RegistrationState>(
-            listener: (context, state) {
-              if (state.isRegistrationSuccessful) {
-                AppHelpers.showRegistrationSuccessSnackBar(context);
-                // Use role-based routing
-                if (state.routeName != null) {
-                  context.goNamed(state.routeName!);
-                } else {
-                  // Fallback to attendee home if no route specified
-                  context.goNamed(RouteName.attendeeHome);
-                }
-              }
-              
-              if (state.isRegistrationError) {
-                AppHelpers.showErrorSnackBar(context, state.errorMessage);
-              }
-            },
-            builder: (context, state) {
-                return SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Back button
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                          child: AppBackButton(
-                            iconColor: colorScheme.onSurface,
-                          ),
-                        ),
-                      
-                        Text(
-                              'Join the Scene',
-                                style:
-                                    darkTheme.textTheme.displaySmall?.copyWith(
-                                color: colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              'Create your account & start exploring.',
-                                style: darkTheme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.7),
-                              ),
-                            ),
-                            
-                            SizedBox(height: 32.h),
-                            
-                            // Full Name Field
-                            Text(
-                              'Full Name',
-                                style: darkTheme.textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.onSurface
-                                      .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: colorScheme.outline
-                                        .withValues(alpha: 0.4),
-                                  width: 1,
-                                ),
-                              ),
-                              child: TextFormField(
-                                controller: _fullNameController,
-                                  style:
-                                      darkTheme.textTheme.bodyLarge?.copyWith(
-                                  color: colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Enter your full name',
-                                  hintStyle:
-                                  darkTheme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurface
-                                        .withValues(alpha: 0.5),
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.person_outline,
-                                    color: colorScheme.primary,
-                                size: darkTheme.textTheme.titleLarge?.fontSize,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 16.h,
-                                  ),
-                                ),
-                                  onChanged: (value) {
-                                    context.read<RegistrationBloc>().add(
-                                          RegistrationEvent.fullNameChanged(
-                                              value),
-                                        );
-                                  },
-                                ),
-                              ),
-                              // Full Name validation error
-                              if (state.showErrorMessages &&
-                            state.firstInvalidField['key'] == 'fullName')
-                                AppValidationErrorWidget(
-                            errorMessage: state.firstInvalidField['error'],
-                                ),
-                            
-                            SizedBox(height: 24.h),
-                            
-                            // Email Field
-                            Text(
-                              'Email Address',
-                                style: darkTheme.textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.onSurface
-                                      .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: colorScheme.outline
-                                        .withValues(alpha: 0.4),
-                                  width: 1,
-                                ),
-                              ),
-                              child: TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                  style:
-                                      darkTheme.textTheme.bodyLarge?.copyWith(
-                                  color: colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                              hintText: 'Enter your email',
-                                  hintStyle:
-                                  darkTheme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurface
-                                        .withValues(alpha: 0.5),
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.email_outlined,
-                                    color: colorScheme.primary,
-                                size: darkTheme.textTheme.titleLarge?.fontSize,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 16.h,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  context.read<RegistrationBloc>().add(
-                                    RegistrationEvent.emailChanged(value),
-                                  );
-                                },
-                              ),
-                            ),
-                            // Email validation error
-                            if (state.showErrorMessages &&
-                            state.firstInvalidField['key'] == 'email')
-                              AppValidationErrorWidget(
-                            errorMessage: state.firstInvalidField['error'],
-                              ),
-                            
-                            SizedBox(height: 24.h),
-                            
-                            // Password Field
-                            Text(
-                              'Password',
-                                style: darkTheme.textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.onSurface
-                                      .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: colorScheme.outline
-                                        .withValues(alpha: 0.4),
-                                  width: 1,
-                                ),
-                              ),
-                              child: TextFormField(
-                                controller: _passwordController,
-                                obscureText: !state.showPassword,
-                                  style:
-                                      darkTheme.textTheme.bodyLarge?.copyWith(
-                                  color: colorScheme.onSurface,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: '••••••••',
-                                  hintStyle:
-                                        darkTheme.textTheme.bodyLarge?.copyWith(
-                                    color: colorScheme.onSurface
-                                        .withValues(alpha: 0.5),
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: colorScheme.primary,
-                                size: darkTheme.textTheme.titleLarge?.fontSize,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      state.showPassword
-                                          ? Icons.visibility_off_outlined
-                                          : Icons.visibility_outlined,
-                                      color: colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                  size:
-                                      darkTheme.textTheme.titleLarge?.fontSize,
-                                    ),
-                                    onPressed: () {
-                                      context.read<RegistrationBloc>().add(
-                                        const RegistrationEvent.toggleShowPassword(),
-                                      );
-                                    },
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 16.h,
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  context.read<RegistrationBloc>().add(
-                                    RegistrationEvent.passwordChanged(value),
-                                  );
-                                },
-                              ),
-                            ),
-                            // Password validation error
-                            if (state.showErrorMessages &&
-                            state.firstInvalidField['key'] == 'password')
-                              AppValidationErrorWidget(
-                            errorMessage: state.firstInvalidField['error'],
-                              ),
-                            
-                            SizedBox(height: 32.h),
-                            
-                            // Role Selection
-                            Text(
-                              'Select Your Role',
-                                style: darkTheme.textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSurface
-                                    .withValues(alpha: 0.8),
-                              ),
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildRoleCard(
-                                    icon: Icons.event_available,
-                                    title: 'Attendee',
-                                    value: 'attendee',
-                                    isSelected: _selectedRole == 'attendee',
-                                  ),
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: _buildRoleCard(
-                                    icon: Icons.event_note,
-                                    title: 'Organizer',
-                                    value: 'organizer',
-                                    isSelected: _selectedRole == 'organizer',
-                                  ),
-                            ),
-                              ],
-                            ),
-                            // Role validation error
-                            if (state.showErrorMessages &&
-                            state.firstInvalidField['key'] == 'userRole')
-                              AppValidationErrorWidget(
-                            errorMessage: state.firstInvalidField['error'],
-                              ),
-                            
-                        SizedBox(height: 32.h),
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
-                        // Privacy Policy Checkbox
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocConsumer<RegistrationBloc, RegistrationState>(
+      listener: (context, state) {
+        if (state.isRegistrationSuccessful) {
+          AppHelpers.showRegistrationSuccessSnackBar(context);
+          // Use role-based routing
+          if (state.routeName != null) {
+            context.goNamed(state.routeName!);
+          } else {
+            // Fallback to attendee home if no route specified
+            context.goNamed(RouteName.attendeeHome);
+          }
+        }
+
+        if (state.isRegistrationError) {
+          AppHelpers.showErrorSnackBar(context, state.errorMessage);
+        }
+      },
+      builder: (context, state) {
+        final termsAccepted = state.termsAcceptance?.value
+                .fold((_) => false, (r) => r) ??
+            false;
+
+        return AuthScaffold(
+          title: 'Create account',
+          subtitle: 'Join the scene and start exploring.',
+          headerHeight: 200.h,
+          leading: const AppBackButton(),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(24.w, 28.h, 24.w, 24.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppTextField(
+                  label: 'Full name',
+                  hintText: 'Your full name',
+                  controller: _fullNameController,
+                  prefixIcon: Icons.person_outline_rounded,
+                  errorText: _errorFor(state, 'fullName'),
+                  onChanged: (v) => context
+                      .read<RegistrationBloc>()
+                      .add(RegistrationEvent.fullNameChanged(v)),
+                ),
+                SizedBox(height: 18.h),
+                AppTextField(
+                  label: 'Email address',
+                  hintText: 'you@example.com',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: Icons.mail_outline_rounded,
+                  errorText: _errorFor(state, 'email'),
+                  onChanged: (v) => context
+                      .read<RegistrationBloc>()
+                      .add(RegistrationEvent.emailChanged(v)),
+                ),
+                SizedBox(height: 18.h),
+                AppTextField(
+                  label: 'Password',
+                  hintText: 'Create a password',
+                  controller: _passwordController,
+                  obscureText: !state.showPassword,
+                  prefixIcon: Icons.lock_outline_rounded,
+                  errorText: _errorFor(state, 'password'),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      state.showPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 20.sp,
+                    ),
+                    onPressed: () => context
+                        .read<RegistrationBloc>()
+                        .add(const RegistrationEvent.toggleShowPassword()),
+                  ),
+                  onChanged: (v) => context
+                      .read<RegistrationBloc>()
+                      .add(RegistrationEvent.passwordChanged(v)),
+                ),
+                SizedBox(height: 24.h),
+                Text('I want to', style: theme.textTheme.titleSmall),
+                SizedBox(height: 10.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _RoleCard(
+                        icon: Icons.confirmation_number_outlined,
+                        title: 'Attend events',
+                        selected: _selectedRole == 'attendee',
+                        onTap: () => _selectRole('attendee'),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: _RoleCard(
+                        icon: Icons.event_note_outlined,
+                        title: 'Organize events',
+                        selected: _selectedRole == 'organizer',
+                        onTap: () => _selectRole('organizer'),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_errorFor(state, 'userRole') != null)
+                  AppValidationErrorWidget(
+                    errorMessage: _errorFor(state, 'userRole'),
+                  ),
+                SizedBox(height: 24.h),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 24.w,
+                      height: 24.w,
+                      child: Checkbox(
+                        value: termsAccepted,
+                        onChanged: (v) => context.read<RegistrationBloc>().add(
+                              RegistrationEvent.termsAcceptedChanged(v ?? false),
+                            ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                            height: 1.5,
+                          ),
                           children: [
-                            SizedBox(
-                              width: 24.w,
-                              height: 24.h,
-                              child: Checkbox(
-                                value: state.termsAcceptance?.value.fold(
-                                      (_) =>
-                                          false, // If invalid, show unchecked
-                                      (r) =>
-                                          r, // If valid, show the actual value
-                                    ) ??
-                                    false,
-                                onChanged: (value) {
-                                  context.read<RegistrationBloc>().add(
-                                        RegistrationEvent.termsAcceptedChanged(
-                                            value ?? false),
-                                      );
-                                },
-                                activeColor: colorScheme.primary,
-                                checkColor: colorScheme.onPrimary,
-                                side: BorderSide(
-                                  color: colorScheme.outline
-                                      .withValues(alpha: 0.4),
-                                  width: 1.5,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  final currentValue =
-                                      state.termsAcceptance?.value.fold(
-                                            (_) =>
-                                                false, // If invalid, treat as unchecked
-                                            (r) =>
-                                                r, // If valid, use the actual value
-                                          ) ??
-                                          false;
-                                  context.read<RegistrationBloc>().add(
-                                        RegistrationEvent.termsAcceptedChanged(
-                                            !currentValue),
-                                      );
-                                },
-                                child: RichText(
-                                  text: TextSpan(
-                                    style:
-                                        darkTheme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface
-                                          .withValues(alpha: 0.8),
-                                      height: 1.4,
-                                    ),
-                                    children: [
-                                      const TextSpan(text: 'I agree to the '),
-                                      WidgetSpan(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            context.pushNamed(RouteName.terms);
-                                          },
-                                          child: Text(
-                                            'Terms of Service',
-                                            style: darkTheme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color: colorScheme.primary,
-                                              fontWeight: FontWeight.w600,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              decorationColor:
-                                                  colorScheme.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const TextSpan(text: ' and '),
-                                      WidgetSpan(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            context.pushNamed(
-                                                RouteName.privacyPolicy);
-                                          },
-                                          child: Text(
-                                            'Privacy Policy',
-                                            style: darkTheme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color: colorScheme.primary,
-                                              fontWeight: FontWeight.w600,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              decorationColor:
-                                                  colorScheme.primary,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                            const TextSpan(text: 'I agree to the '),
+                            _link(context, 'Terms of Service', RouteName.terms),
+                            const TextSpan(text: ' and '),
+                            _link(context, 'Privacy Policy',
+                                RouteName.privacyPolicy),
                           ],
                         ),
-                        // Terms acceptance validation error
-                        if (state.showErrorMessages &&
-                            state.firstInvalidField['key'] == 'termsAcceptance')
-                          Padding(
-                            padding: EdgeInsets.only(left: 36.w, top: 8.h),
-                            child: AppValidationErrorWidget(
-                              errorMessage: state.firstInvalidField['error'],
+                      ),
+                    ),
+                  ],
+                ),
+                if (_errorFor(state, 'termsAcceptance') != null)
+                  Padding(
+                    padding: EdgeInsets.only(left: 36.w),
+                    child: AppValidationErrorWidget(
+                      errorMessage: _errorFor(state, 'termsAcceptance'),
+                    ),
+                  ),
+                SizedBox(height: 28.h),
+                AppButton(
+                  label: 'Create account',
+                  icon: Icons.arrow_forward_rounded,
+                  isLoading: state.isLoading,
+                  onPressed: () => context
+                      .read<RegistrationBloc>()
+                      .add(const RegistrationEvent.registrationSubmitted()),
+                ),
+                SizedBox(height: 24.h),
+                Center(
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    behavior: HitTestBehavior.opaque,
+                    child: Text.rich(
+                      TextSpan(
+                        text: 'Already have an account? ',
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: scheme.onSurfaceVariant),
+                        children: [
+                          TextSpan(
+                            text: 'Sign in',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                            
-                            SizedBox(height: 40.h),
-                            
-                            // Sign Up Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56.h,
-                              child: ElevatedButton(
-                                onPressed: state.isLoading ? null : () {
-                                  context.read<RegistrationBloc>().add(
-                                    const RegistrationEvent.registrationSubmitted(),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: colorScheme.onPrimary,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16.r),
-                                  ),
-                                ),
-                                child: state.isLoading
-                                      ? SpinKitLoadingWidget(
-                                          color: colorScheme.onPrimary,
-                                          size: 24.w,
-                                      )
-                                    : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Sign Up',
-                                              style: darkTheme
-                                                  .textTheme.titleMedium
-                                                ?.copyWith(
-                                              color: colorScheme.onPrimary,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          SizedBox(width: 8.w),
-                                          Icon(
-                                            Icons.arrow_forward,
-                                        size: darkTheme
-                                            .textTheme.titleMedium?.fontSize,
-                                          ),
-                                        ],
-                                      ),
-                              ),
-                            ),
-                            
-                            SizedBox(height: 24.h),
-                            
-                            // Sign In Link
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Already have an account? ',
-                                    style: darkTheme.textTheme.bodyMedium
-                                        ?.copyWith(
-                                    color: colorScheme.onSurface
-                                        .withValues(alpha: 0.7),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => context.pop(),
-                                  child: Text(
-                                    'Log In',
-                                      style: darkTheme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                      color: colorScheme.onSurface,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            
-                            SizedBox(height: 32.h),
-                          ],
-                        ),
+                        ],
+                      ),
+                    ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _selectRole(String value) {
+    setState(() => _selectedRole = value);
+    context.read<RegistrationBloc>().add(
+          RegistrationEvent.userRoleChanged(value),
+        );
+  }
+
+  InlineSpan _link(BuildContext context, String text, String routeName) {
+    final theme = Theme.of(context);
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.baseline,
+      baseline: TextBaseline.alphabetic,
+      child: GestureDetector(
+        onTap: () => context.pushNamed(routeName),
+        child: Text(
+          text,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+            decoration: TextDecoration.underline,
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildRoleCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required bool isSelected,
-  }) {
-    final darkTheme = AppTheme.darkTheme();
-    final colorScheme = darkTheme.colorScheme;
+class _RoleCard extends StatelessWidget {
+  const _RoleCard({
+    required this.icon,
+    required this.title,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedRole = value;
-        });
-        context.read<RegistrationBloc>().add(
-              RegistrationEvent.userRoleChanged(value),
-            );
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? colorScheme.primary.withValues(alpha: 0.25)
-              : colorScheme.onSurface.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16.r),
+          color: selected ? scheme.primary : scheme.surface,
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: isSelected
-                ? colorScheme.primary
-                : colorScheme.outline.withValues(alpha: 0.4),
-            width: 1,
+            color: selected ? scheme.primary : scheme.outlineVariant,
+            width: 1.5,
           ),
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? colorScheme.primary
-                  : colorScheme.onSurface.withValues(alpha: 0.6),
-              size: darkTheme.textTheme.headlineSmall?.fontSize,
+            Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: selected
+                    ? scheme.onPrimary.withValues(alpha: 0.16)
+                    : scheme.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 20.sp,
+                color: selected ? scheme.onPrimary : scheme.secondary,
+              ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 10.h),
             Text(
               title,
-              style: darkTheme.textTheme.labelMedium?.copyWith(
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.onSurface.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500,
-              ),
               textAlign: TextAlign.center,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: selected ? scheme.onPrimary : scheme.onSurface,
+              ),
             ),
           ],
         ),

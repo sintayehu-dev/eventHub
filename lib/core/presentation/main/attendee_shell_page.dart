@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:eventhub/core/widgets/compact_bottom_navigation_bar.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 
 class AttendeeShellPage extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -15,30 +15,27 @@ class AttendeeShellPage extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       body: navigationShell,
-      bottomNavigationBar: CompactBottomNavigationBar(
+      bottomNavigationBar: FloatingPillNavigationBar(
         navigationShell: navigationShell,
-        items: [
-          const CompactBottomNavigationItem(
+        items: const [
+          PillNavItem(
             icon: Icons.home_outlined,
-            activeIcon: Icons.home,
+            activeIcon: Icons.home_rounded,
             label: 'Home',
           ),
-          const CompactBottomNavigationItem(
-            icon: Icons.search_outlined,
-            activeIcon: Icons.search,
-            label: 'Search',
+          PillNavItem(
+            icon: Icons.search_rounded,
+            activeIcon: Icons.search_rounded,
+            label: 'Explore',
           ),
-          CompactBottomNavigationItem(
+          PillNavItem(
             icon: Icons.confirmation_number_outlined,
-            activeIcon: Icons.confirmation_number,
+            activeIcon: Icons.confirmation_number_rounded,
             label: 'Tickets',
-            badge: CompactBadge(
-              text: '2',
-            ),
           ),
-          const CompactBottomNavigationItem(
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
+          PillNavItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
             label: 'Profile',
           ),
         ],

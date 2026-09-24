@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eventhub/core/router/route_name.dart';
 import 'package:eventhub/features/attendee/event_discovery/domain/entities/event_discovery_entity.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/presentation/widgets/app_back_button.dart';
 import '../widgets/ticket_purchase_event_header.dart';
 import '../widgets/ticket_type_selection_card.dart';
 import '../widgets/ticket_purchase_summary.dart';
@@ -25,26 +26,18 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final totalTickets =
         _selectedQuantities.values.fold(0, (sum, qty) => sum + qty);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Select Tickets',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Text('Select tickets'),
+        leading: Padding(
+          padding: EdgeInsets.only(left: 16.w),
+          child: const AppBackButton(),
         ),
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        elevation: 0,
-        centerTitle: true,
+        leadingWidth: 60.w,
       ),
-      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           Column(
@@ -55,7 +48,7 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
               // Ticket Types
               Expanded(
                 child: ListView.builder(
-                  padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 120.h),
+                  padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 200.h),
                   itemCount: widget.event.ticketTypes.length,
                   itemBuilder: (context, index) {
                     final ticketType = widget.event.ticketTypes[index];

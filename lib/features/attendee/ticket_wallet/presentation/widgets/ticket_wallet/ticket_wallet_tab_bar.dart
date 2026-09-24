@@ -12,34 +12,32 @@ class TicketWalletTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final scheme = theme.colorScheme;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16.r),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(26.r),
       ),
       child: TabBar(
         controller: controller,
         dividerColor: Colors.transparent,
+        splashBorderRadius: BorderRadius.circular(22.r),
         indicator: BoxDecoration(
-          color: colorScheme.primary,
-          borderRadius: BorderRadius.circular(12.r),
+          color: scheme.primary,
+          borderRadius: BorderRadius.circular(22.r),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        labelColor: colorScheme.onPrimary,
-        unselectedLabelColor: colorScheme.primary,
-        labelStyle: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
-        unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
+        labelColor: scheme.onPrimary,
+        unselectedLabelColor: scheme.onSurfaceVariant,
+        labelStyle: theme.textTheme.labelLarge,
+        unselectedLabelStyle: theme.textTheme.labelLarge,
         tabs: const [
-          Tab(text: 'Upcoming'),
-          Tab(text: 'Past'),
-          Tab(text: 'All'),
+          Tab(text: 'Upcoming', height: 40),
+          Tab(text: 'Past', height: 40),
+          Tab(text: 'All', height: 40),
         ],
       ),
     );

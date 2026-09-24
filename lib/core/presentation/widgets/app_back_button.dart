@@ -19,9 +19,9 @@ class AppBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    return IconButton(
-      onPressed: onPressed ??
+
+    return GestureDetector(
+      onTap: onPressed ??
           () {
             if (context.canPop()) {
               context.pop();
@@ -30,20 +30,25 @@ class AppBackButton extends StatelessWidget {
               context.go('/staff/scanner');
             }
           },
-      icon: Container(
-        padding: EdgeInsets.all(8.w),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 44.w,
+        height: 44.w,
         decoration: BoxDecoration(
           color: backgroundColor ?? theme.colorScheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.8),
-            width: 1,
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Icon(
-          Icons.chevron_left,
+          Icons.arrow_back_ios_new_rounded,
           color: iconColor ?? theme.colorScheme.onSurface,
-          size: size ?? 24.sp,
+          size: size ?? 18.sp,
         ),
       ),
     );

@@ -8,7 +8,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkTheme = AppTheme.darkTheme();
+    final darkTheme = Theme.of(context);
     final colorScheme = darkTheme.colorScheme;
 
     return Theme(
@@ -18,19 +18,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                colorScheme.primary.withValues(alpha: 0.95),
-                colorScheme.primaryContainer.withValues(alpha: 0.8),
-                colorScheme.surface.withValues(alpha: 0.9),
-                colorScheme.surface.withValues(alpha: 0.95),
-              ],
-              stops: const [0.0, 0.3, 0.7, 1.0],
-            ),
-          ),
+          color: darkTheme.scaffoldBackgroundColor,
           child: SafeArea(
             child: Column(
               children: [
