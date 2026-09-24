@@ -113,7 +113,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             Text(
               'Staff Assignments',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -121,7 +121,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             Text(
               '${_selectedStaffIds.length} selected',
               style: TextStyle(
-                color: const Color(0xFF8B5CF6),
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -131,7 +131,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         SizedBox(height: 16.h),
 
         // Staff Selection Dropdown
-        _buildStaffSelectionDropdown(),
+        _buildStaffSelectionDropdown(context),
         SizedBox(height: 16.h),
 
         // Selected Staff List
@@ -139,7 +139,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
           Text(
             'Selected Staff Members',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -149,7 +149,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             final staff = _availableStaff.firstWhere((s) => s.id == staffId);
             return Padding(
               padding: EdgeInsets.only(bottom: 12.h),
-              child: _buildSelectedStaffCard(staff),
+              child: _buildSelectedStaffCard(context, staff),
             );
           }),
         ],
@@ -157,15 +157,15 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
     );
   }
 
-  Widget _buildStaffSelectionDropdown() {
+  Widget _buildStaffSelectionDropdown(BuildContext context) {
     if (_isLoadingStaff) {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: Row(
           children: [
@@ -173,7 +173,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
               width: 20.w,
               height: 20.h,
               child: CircularProgressIndicator(
-                color: const Color(0xFF8B5CF6),
+                color: Theme.of(context).colorScheme.primary,
                 strokeWidth: 2,
               ),
             ),
@@ -181,7 +181,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             Text(
               'Loading staff members...',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
               ),
             ),
@@ -195,22 +195,22 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
         width: double.infinity,
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: Column(
           children: [
             Icon(
               Icons.people_outline,
               size: 32.sp,
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             SizedBox(height: 8.h),
             Text(
               'No staff members found',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -219,7 +219,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             Text(
               'Staff members need to register with "Staff" role',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12.sp,
               ),
               textAlign: TextAlign.center,
@@ -231,9 +231,9 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Column(
         children: [
@@ -251,7 +251,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                 children: [
                   Icon(
                     Icons.people,
-                    color: const Color(0xFF8B5CF6),
+                    color: Theme.of(context).colorScheme.primary,
                     size: 20.sp,
                   ),
                   SizedBox(width: 12.w),
@@ -262,8 +262,8 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                           : '${_selectedStaffIds.length} staff member${_selectedStaffIds.length == 1 ? '' : 's'} selected',
                       style: TextStyle(
                         color: _selectedStaffIds.isEmpty
-                            ? Colors.grey[400]
-                            : Colors.white,
+                            ? Theme.of(context).colorScheme.onSurfaceVariant
+                            : Theme.of(context).colorScheme.onSurface,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -273,7 +273,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                     _isDropdownOpen
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     size: 20.sp,
                   ),
                 ],
@@ -284,7 +284,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
           // Dropdown Content
           if (_isDropdownOpen) ...[
             Divider(
-              color: Colors.grey[700],
+              color: Theme.of(context).colorScheme.outlineVariant,
               height: 1,
               thickness: 1,
             ),
@@ -299,7 +299,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   final staff = _availableStaff[index];
                   final isSelected = _selectedStaffIds.contains(staff.id);
 
-                  return _buildStaffCheckboxItem(staff, isSelected);
+                  return _buildStaffCheckboxItem(context, staff, isSelected);
                 },
               ),
             ),
@@ -309,14 +309,14 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
     );
   }
 
-  Widget _buildStaffCheckboxItem(StaffEntity staff, bool isSelected) {
+  Widget _buildStaffCheckboxItem(BuildContext context, StaffEntity staff, bool isSelected) {
     return GestureDetector(
       onTap: () => _toggleStaffSelection(staff.id),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
               : Colors.transparent,
         ),
         child: Row(
@@ -327,10 +327,10 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
               height: 20.h,
               decoration: BoxDecoration(
                 color:
-                    isSelected ? const Color(0xFF8B5CF6) : Colors.transparent,
+                    isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
                 border: Border.all(
                   color:
-                      isSelected ? const Color(0xFF8B5CF6) : Colors.grey[600]!,
+                      isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(4.r),
@@ -338,7 +338,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
               child: isSelected
                   ? Icon(
                       Icons.check,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       size: 14.sp,
                     )
                   : null,
@@ -348,7 +348,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             // Staff Avatar
             CircleAvatar(
               radius: 16.r,
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               backgroundImage: staff.profileImageUrl != null
                   ? NetworkImage(staff.profileImageUrl!)
                   : null,
@@ -356,7 +356,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   ? Text(
                       staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -373,7 +373,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   Text(
                     staff.name,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -381,7 +381,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                   Text(
                     staff.email,
                     style: TextStyle(
-                      color: Colors.grey[400],
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12.sp,
                     ),
                   ),
@@ -394,22 +394,22 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
     );
   }
 
-  Widget _buildSelectedStaffCard(StaffEntity staff) {
+  Widget _buildSelectedStaffCard(BuildContext context, StaffEntity staff) {
     final role = _staffRoles[staff.id] ?? StaffRole.staff;
     
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         children: [
           // Staff Avatar
           CircleAvatar(
             radius: 20.r,
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             backgroundImage: staff.profileImageUrl != null
                 ? NetworkImage(staff.profileImageUrl!)
                 : null,
@@ -417,7 +417,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                 ? Text(
                     staff.name.isNotEmpty ? staff.name[0].toUpperCase() : 'S',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -434,7 +434,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                 Text(
                   staff.name,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -442,7 +442,7 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
                 Text(
                   staff.email,
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12.sp,
                   ),
                 ),
@@ -454,23 +454,23 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A0B2E),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: Colors.grey[600]!, width: 1),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<StaffRole>(
                 value: role,
                 isDense: true,
-                dropdownColor: const Color(0xFF1A0B2E),
+                dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 icon: Icon(Icons.keyboard_arrow_down,
-                    color: Colors.grey[400], size: 16.sp),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
                 items: StaffRole.values.map((r) {
                   return DropdownMenuItem(
                     value: r,
                     child: Text(
                       r.displayName,
-                      style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp),
                     ),
                   );
                 }).toList(),
@@ -490,12 +490,12 @@ class _StaffAssignmentWidgetState extends State<StaffAssignmentWidget> {
             child: Container(
               padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.2),
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Icon(
                 Icons.close,
-                color: Colors.red[400],
+                color: Theme.of(context).colorScheme.error,
                 size: 16.sp,
               ),
             ),

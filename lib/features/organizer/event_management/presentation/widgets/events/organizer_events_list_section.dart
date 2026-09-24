@@ -16,7 +16,7 @@ class OrganizerEventsListSection extends StatelessWidget {
     return BlocBuilder<EventManagementBloc, EventManagementState>(
       builder: (context, state) {
         if (state.isLoading) {
-          return _buildLoadingList();
+          return _buildLoadingList(context);
         }
 
         if (state.hasError && state.errorMessage.isNotEmpty) {
@@ -44,7 +44,7 @@ class OrganizerEventsListSection extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingList() {
+  Widget _buildLoadingList(BuildContext context) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       sliver: SliverList(

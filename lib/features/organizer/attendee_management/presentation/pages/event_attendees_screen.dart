@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -112,15 +113,15 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
       ),
       body: Column(
         children: [
-          _buildHeader(),
-          _buildSearchAndFilter(),
-          Expanded(child: _buildAttendeesList()),
+          _buildHeader(context),
+          _buildSearchAndFilter(context),
+          Expanded(child: _buildAttendeesList(context)),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final confirmedCount = _attendees.where((a) => a['status'] == 'Confirmed').length;
@@ -149,7 +150,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               Text(
                 'Neon Pulse Electronic Night',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -157,13 +158,13 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4ADE80),
+                  color: AppColors.success,
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   'Active',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -175,7 +176,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildStatCard(
+                child: _buildStatCard(context, 
                   title: 'Total Tickets',
                   value: '${_attendees.length}',
                   color: colorScheme.primary,
@@ -183,7 +184,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: _buildStatCard(
+                child: _buildStatCard(context, 
                   title: 'Confirmed',
                   value: '$confirmedCount',
                   color: colorScheme.tertiary,
@@ -191,7 +192,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: _buildStatCard(
+                child: _buildStatCard(context, 
                   title: 'Pending',
                   value: '$pendingCount',
                   color: colorScheme.secondary,
@@ -204,7 +205,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildStatCard({
+  Widget _buildStatCard(BuildContext context, {
     required String title,
     required String value,
     required Color color,
@@ -243,7 +244,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildSearchAndFilter() {
+  Widget _buildSearchAndFilter(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
@@ -293,15 +294,15 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('All'),
+                _buildFilterChip(context, 'All'),
                 SizedBox(width: 8.w),
-                _buildFilterChip('Confirmed'),
+                _buildFilterChip(context, 'Confirmed'),
                 SizedBox(width: 8.w),
-                _buildFilterChip('Pending'),
+                _buildFilterChip(context, 'Pending'),
                 SizedBox(width: 8.w),
-                _buildFilterChip('VIP'),
+                _buildFilterChip(context, 'VIP'),
                 SizedBox(width: 8.w),
-                _buildFilterChip('General'),
+                _buildFilterChip(context, 'General'),
               ],
             ),
           ),
@@ -311,7 +312,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label) {
+  Widget _buildFilterChip(BuildContext context, String label) {
     final isSelected = _selectedFilter == label;
     return GestureDetector(
       onTap: () => setState(() => _selectedFilter = label),
@@ -319,19 +320,19 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
-              : const Color(0xFF2A1B3D),
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF8B5CF6)
-                : const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? const Color(0xFF8B5CF6) : Colors.grey[400],
+            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -340,7 +341,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildAttendeesList() {
+  Widget _buildAttendeesList(BuildContext context) {
     List<Map<String, dynamic>> filteredAttendees = _attendees.where((attendee) {
       // Search filter
       if (_searchController.text.isNotEmpty) {
@@ -369,30 +370,30 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
       itemCount: filteredAttendees.length,
       itemBuilder: (context, index) {
         final attendee = filteredAttendees[index];
-        return _buildAttendeeCard(attendee);
+        return _buildAttendeeCard(context, attendee);
       },
     );
   }
 
-  Widget _buildAttendeeCard(Map<String, dynamic> attendee) {
+  Widget _buildAttendeeCard(BuildContext context, Map<String, dynamic> attendee) {
     final statusColor = attendee['status'] == 'Confirmed'
-        ? const Color(0xFF4ADE80)
-        : const Color(0xFFF59E0B);
+        ? AppColors.success
+        : AppColors.accentDark;
     
     final ticketTypeColor = attendee['ticketType'] == 'VIP'
-        ? const Color(0xFF8B5CF6)
+        ? Theme.of(context).colorScheme.primary
         : attendee['ticketType'] == 'Early Bird'
-            ? const Color(0xFF06B6D4)
-            : const Color(0xFF64748B);
+            ? AppColors.primaryLight
+            : AppColors.inkSoft;
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -406,8 +407,8 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF8B5CF6),
-                      const Color(0xFF06B6D4),
+                      Theme.of(context).colorScheme.primary,
+                      AppColors.primaryLight,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12.r),
@@ -416,7 +417,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                   child: Text(
                     attendee['avatar'],
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -436,7 +437,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                           child: Text(
                             attendee['name'],
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
                             ),
@@ -464,7 +465,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                     Text(
                       attendee['email'],
                       style: TextStyle(
-                        color: Colors.grey[400],
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 12.sp,
                       ),
                     ),
@@ -490,7 +491,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                         Text(
                           'Purchased: ${attendee['purchaseDate']}',
                           style: TextStyle(
-                            color: Colors.grey[500],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 10.sp,
                           ),
                         ),
@@ -504,14 +505,14 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
-                  color: Colors.grey[400],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   size: 20.sp,
                 ),
-                color: const Color(0xFF2A1B3D),
+                color: Theme.of(context).colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.r),
                   side: BorderSide(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 itemBuilder: (context) => [
@@ -519,9 +520,9 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                     value: 'view',
                     child: Row(
                       children: [
-                        Icon(Icons.visibility_outlined, color: Colors.grey[400], size: 16.sp),
+                        Icon(Icons.visibility_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
                         SizedBox(width: 8.w),
-                        Text('View Details', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                        Text('View Details', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp)),
                       ],
                     ),
                   ),
@@ -529,9 +530,9 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                     value: 'contact',
                     child: Row(
                       children: [
-                        Icon(Icons.email_outlined, color: Colors.grey[400], size: 16.sp),
+                        Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
                         SizedBox(width: 8.w),
-                        Text('Contact', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                        Text('Contact', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp)),
                       ],
                     ),
                   ),
@@ -539,9 +540,9 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
                     value: 'refund',
                     child: Row(
                       children: [
-                        Icon(Icons.money_off_outlined, color: Colors.red[400], size: 16.sp),
+                        Icon(Icons.money_off_outlined, color: Theme.of(context).colorScheme.error, size: 16.sp),
                         SizedBox(width: 8.w),
-                        Text('Issue Refund', style: TextStyle(color: Colors.red[400], fontSize: 12.sp)),
+                        Text('Issue Refund', style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12.sp)),
                       ],
                     ),
                   ),
@@ -559,20 +560,20 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Export Attendee List',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildExportOption('CSV Format', Icons.table_chart_outlined),
+            _buildExportOption(context, 'CSV Format', Icons.table_chart_outlined),
             SizedBox(height: 12.h),
-            _buildExportOption('PDF Report', Icons.picture_as_pdf_outlined),
+            _buildExportOption(context, 'PDF Report', Icons.picture_as_pdf_outlined),
             SizedBox(height: 12.h),
-            _buildExportOption('Excel Format', Icons.grid_on_outlined),
+            _buildExportOption(context, 'Excel Format', Icons.grid_on_outlined),
           ],
         ),
         actions: [
@@ -580,7 +581,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             onPressed: () => context.pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
             ),
           ),
         ],
@@ -588,14 +589,14 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildExportOption(String title, IconData icon) {
+  Widget _buildExportOption(BuildContext context, String title, IconData icon) {
     return GestureDetector(
       onTap: () {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Exporting attendee list as $title...'),
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
           ),
@@ -604,19 +605,19 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A0B2E),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B5CF6), size: 20.sp),
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20.sp),
             SizedBox(width: 12.w),
             Text(
               title,
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp),
             ),
           ],
         ),
@@ -627,7 +628,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
   void _showMoreOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2A1B3D),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -640,22 +641,22 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               width: 40.w,
               height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
             SizedBox(height: 20.h),
-            _buildBottomSheetOption(
+            _buildBottomSheetOption(context, 
               'Send Bulk Email',
               Icons.email_outlined,
               () => _sendBulkEmail(),
             ),
-            _buildBottomSheetOption(
+            _buildBottomSheetOption(context, 
               'Check-in All',
               Icons.check_circle_outlined,
               () => _checkInAll(),
             ),
-            _buildBottomSheetOption(
+            _buildBottomSheetOption(context, 
               'Event Statistics',
               Icons.analytics_outlined,
               () => _showEventStats(),
@@ -667,7 +668,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildBottomSheetOption(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildBottomSheetOption(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: () {
         context.pop();
@@ -678,17 +679,17 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
         margin: EdgeInsets.only(bottom: 8.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A0B2E),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B5CF6), size: 20.sp),
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20.sp),
             SizedBox(width: 16.w),
             Text(
               title,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -717,22 +718,22 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Attendee Details',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow('Name', attendee['name']),
-            _buildDetailRow('Email', attendee['email']),
-            _buildDetailRow('Phone', attendee['phone']),
-            _buildDetailRow('Ticket Type', attendee['ticketType']),
-            _buildDetailRow('Purchase Date', attendee['purchaseDate']),
-            _buildDetailRow('Status', attendee['status']),
+            _buildDetailRow(context, 'Name', attendee['name']),
+            _buildDetailRow(context, 'Email', attendee['email']),
+            _buildDetailRow(context, 'Phone', attendee['phone']),
+            _buildDetailRow(context, 'Ticket Type', attendee['ticketType']),
+            _buildDetailRow(context, 'Purchase Date', attendee['purchaseDate']),
+            _buildDetailRow(context, 'Status', attendee['status']),
           ],
         ),
         actions: [
@@ -740,7 +741,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             onPressed: () => context.pop(),
             child: Text(
               'Close',
-              style: TextStyle(color: const Color(0xFF8B5CF6), fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 14.sp),
             ),
           ),
         ],
@@ -748,7 +749,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
@@ -759,7 +760,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             child: Text(
               '$label:',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -769,7 +770,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             child: Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12.sp,
               ),
             ),
@@ -783,7 +784,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Opening email to ${attendee['name']}...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -794,22 +795,22 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Issue Refund',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Text(
           'Are you sure you want to issue a refund to ${attendee['name']}? This action cannot be undone.',
-          style: TextStyle(color: Colors.grey[300], fontSize: 14.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
             ),
           ),
           TextButton(
@@ -818,7 +819,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Refund issued to ${attendee['name']}'),
-                  backgroundColor: const Color(0xFF4ADE80),
+                  backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                 ),
@@ -826,7 +827,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
             },
             child: Text(
               'Issue Refund',
-              style: TextStyle(color: Colors.red[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14.sp),
             ),
           ),
         ],
@@ -838,7 +839,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening bulk email composer...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -849,7 +850,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Checking in all confirmed attendees...'),
-        backgroundColor: const Color(0xFF4ADE80),
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -860,7 +861,7 @@ class _EventAttendeesScreenState extends State<EventAttendeesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Opening event statistics...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),

@@ -103,7 +103,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             Text(
               'Staff Members',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -111,7 +111,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             Text(
               '${_staffMembers.length} member${_staffMembers.length == 1 ? '' : 's'}',
               style: TextStyle(
-                color: const Color(0xFF8B5CF6),
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -123,7 +123,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
         Text(
           'Create staff members with login credentials for your event',
           style: TextStyle(
-            color: Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 12.sp,
           ),
         ),
@@ -136,10 +136,10 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             width: double.infinity,
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A1B3D),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                 width: 2,
                 style: BorderStyle.solid,
               ),
@@ -149,14 +149,14 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               children: [
                 Icon(
                   Icons.add_circle_outline,
-                  color: const Color(0xFF8B5CF6),
+                  color: Theme.of(context).colorScheme.primary,
                   size: 20.sp,
                 ),
                 SizedBox(width: 8.w),
                 Text(
                   'Add Staff Member',
                   style: TextStyle(
-                    color: const Color(0xFF8B5CF6),
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -174,7 +174,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             final staffMember = entry.value;
             return Padding(
               padding: EdgeInsets.only(bottom: 16.h),
-              child: _buildStaffMemberCard(index, staffMember),
+              child: _buildStaffMemberCard(context, index, staffMember),
             );
           }),
         ],
@@ -182,13 +182,13 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildStaffMemberCard(int index, StaffCreationData staffMember) {
+  Widget _buildStaffMemberCard(BuildContext context, int index, StaffCreationData staffMember) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +200,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               Text(
                 'Staff Member ${index + 1}',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -210,12 +210,12 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
                 child: Container(
                   padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.2),
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                   child: Icon(
                     Icons.close,
-                    color: Colors.red[400],
+                    color: Theme.of(context).colorScheme.error,
                     size: 16.sp,
                   ),
                 ),
@@ -225,7 +225,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 16.h),
 
           // Name Field
-          _buildTextField(
+          _buildTextField(context, 
             label: 'Full Name',
             value: staffMember.name,
             onChanged: (value) {
@@ -239,7 +239,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 12.h),
 
           // Email Field
-          _buildTextField(
+          _buildTextField(context, 
             label: 'Email Address',
             value: staffMember.email,
             onChanged: (value) {
@@ -254,7 +254,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           SizedBox(height: 12.h),
 
           // Password Field (Manual entry with auto-generate option)
-          _buildPasswordField(
+          _buildPasswordField(context, 
             index: index,
             label: 'Password',
             value: staffMember.password,
@@ -277,10 +277,10 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6.r),
               border: Border.all(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -288,14 +288,14 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: const Color(0xFF8B5CF6),
+                  color: Theme.of(context).colorScheme.primary,
                   size: 16.sp,
                 ),
                 SizedBox(width: 8.w),
                 Text(
                   'Role: Staff (Default)',
                   style: TextStyle(
-                    color: const Color(0xFF8B5CF6),
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -308,7 +308,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildPasswordField({
+  Widget _buildPasswordField(BuildContext context, {
     required int index,
     required String label,
     required String value,
@@ -325,7 +325,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
             Text(
               label,
               style: TextStyle(
-                color: Colors.grey[300],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -335,13 +335,13 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
                   'Regenerate',
                   style: TextStyle(
-                    color: const Color(0xFF8B5CF6),
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 10.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -356,34 +356,34 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           onChanged: onChanged,
           obscureText: !isVisible,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14.sp,
             fontFamily: 'monospace',
           ),
           decoration: InputDecoration(
             hintText: 'Enter password or generate one',
             hintStyle: TextStyle(
-              color: Colors.grey[500],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
             ),
             filled: true,
-            fillColor: const Color(0xFF1A0B2E),
+            fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Colors.red : Colors.grey[600]!,
+                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant,
                   width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Colors.red : Colors.grey[600]!,
+                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant,
                   width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: value.isEmpty ? Colors.red : const Color(0xFF8B5CF6),
+                  color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
                   width: 2),
             ),
             contentPadding:
@@ -396,7 +396,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
               },
               child: Icon(
                 isVisible ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 20.sp,
               ),
             ),
@@ -409,7 +409,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
                 ? 'Password is required for staff login'
                 : 'Staff member will use this password to login',
             style: TextStyle(
-              color: value.isEmpty ? Colors.red[300] : Colors.grey[400],
+              color: value.isEmpty ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 10.sp,
               fontStyle: FontStyle.italic,
             ),
@@ -419,7 +419,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(BuildContext context, {
     required String label,
     required String value,
     required Function(String) onChanged,
@@ -442,7 +442,7 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[300],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -453,37 +453,37 @@ class _StaffCreationWidgetState extends State<StaffCreationWidget> {
           onChanged: onChanged,
           keyboardType: keyboardType,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14.sp,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.grey[500],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 14.sp,
             ),
             filled: true,
-            fillColor: const Color(0xFF1A0B2E),
+            fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Colors.red : Colors.grey[600]!, width: 1),
+                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Colors.red : Colors.grey[600]!, width: 1),
+                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.outlineVariant, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
               borderSide: BorderSide(
-                  color: !isValid ? Colors.red : const Color(0xFF8B5CF6),
+                  color: !isValid ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
                   width: 2),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             errorText: errorText,
             errorStyle: TextStyle(
-              color: Colors.red[300],
+              color: Theme.of(context).colorScheme.error,
               fontSize: 10.sp,
             ),
           ),

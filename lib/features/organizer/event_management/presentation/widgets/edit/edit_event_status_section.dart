@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/features/organizer/event_management/domain/entities/event_entity.dart';
 
@@ -17,7 +18,7 @@ class EditEventStatusSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A1B3D),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: statusColor.withValues(alpha: 0.3),
@@ -47,7 +48,7 @@ class EditEventStatusSection extends StatelessWidget {
                   ? 'This event can be edited'
                   : 'Limited editing available for this status',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12.sp,
               ),
             ),
@@ -60,13 +61,13 @@ class EditEventStatusSection extends StatelessWidget {
   Color _getStatusColor(EventStatus status) {
     switch (status) {
       case EventStatus.active:
-        return const Color(0xFF4ADE80);
+        return AppColors.success;
       case EventStatus.draft:
-        return const Color(0xFF8B5CF6);
+        return Theme.of(context).colorScheme.primary;
       case EventStatus.completed:
-        return const Color(0xFF60A5FA);
+        return AppColors.primaryLight;
       case EventStatus.cancelled:
-        return const Color(0xFFF87171);
+        return AppColors.error;
     }
   }
 }

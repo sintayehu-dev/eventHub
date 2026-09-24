@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:eventhub/core/di/dependancy_manager.dart';
 import 'package:eventhub/core/utils/app_helpers.dart';
+import 'package:eventhub/core/widgets/floating_pill_navigation_bar.dart';
 import 'package:eventhub/core/utils/app_error_retry_widget.dart';
 import 'package:eventhub/features/auth/domain/user/user_service.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
@@ -46,11 +47,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-
         return Scaffold(
-          backgroundColor: colorScheme.surface,
           body: SafeArea(
             child: _buildContent(context, state),
           ),
@@ -88,28 +85,27 @@ class OrganizerAnalyticsView extends StatelessWidget {
       color: colorScheme.primary,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
+        padding: EdgeInsets.fromLTRB(
+          20.w,
+          16.h,
+          20.w,
+          FloatingPillNavigationBar.clearance(context),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Text(
-              'Analytics',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 24.h),
+            Text('Insights', style: theme.textTheme.headlineMedium),
+            SizedBox(height: 20.h),
 
             const AnalyticsPeriodSelector(),
             SizedBox(height: 24.h),
 
             const AnalyticsKeyMetricsGrid(),
-            SizedBox(height: 32.h),
+            SizedBox(height: 28.h),
             
             const TopPerformingEventsList(),
-            SizedBox(height: 32.h),
+            SizedBox(height: 28.h),
 
             const CategoryRevenueBreakdown(),
           ],
@@ -131,7 +127,12 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
   Widget _buildShimmerContent(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 20.w, 20.w, 90.h),
+      padding: EdgeInsets.fromLTRB(
+        20.w,
+        16.h,
+        20.w,
+        FloatingPillNavigationBar.clearance(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -148,11 +149,11 @@ class OrganizerAnalyticsView extends StatelessWidget {
 
           // Key metrics grid shimmer
           _buildKeyMetricsShimmer(context),
-          SizedBox(height: 32.h),
+          SizedBox(height: 28.h),
 
           // Top performing events shimmer
           _buildTopEventsShimmer(context),
-          SizedBox(height: 32.h),
+          SizedBox(height: 28.h),
 
           // Category breakdown shimmer
           _buildCategoryBreakdownShimmer(context),
@@ -166,8 +167,8 @@ class OrganizerAnalyticsView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(26.r),
       ),
       child: Row(
         children: List.generate(
@@ -201,10 +202,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.1),
-            ),
+            borderRadius: BorderRadius.circular(28.r),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,10 +242,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,10 +268,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,10 +330,7 @@ class OrganizerAnalyticsView extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

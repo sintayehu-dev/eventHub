@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:eventhub/features/organizer/analytics/application/analytics/bloc/analytics_bloc.dart';
 import 'package:eventhub/features/organizer/attendee_management/domain/entities/organizer_analytics_entity.dart';
 
@@ -27,13 +28,10 @@ class TopPerformingEventsList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Top Performing Events',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
+          'Top performing events',
+          style: theme.textTheme.titleLarge,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 14.h),
         if (analytics.topEvents.isEmpty)
           _buildEmptyState(context)
         else
@@ -62,8 +60,8 @@ class TopPerformingEventsList extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(32.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(28.r),
       ),
       child: Center(
         child: Column(
@@ -96,13 +94,13 @@ class TopPerformingEventsList extends StatelessWidget {
   Color _getEventRankColor(int index) {
     switch (index) {
       case 0:
-        return const Color(0xFF06B6D4);
+        return AppColors.accent;
       case 1:
-        return const Color(0xFFF59E0B);
+        return AppColors.primary;
       case 2:
-        return const Color(0xFFEF4444);
+        return AppColors.primaryLight;
       default:
-        return const Color(0xFF8B5CF6);
+        return AppColors.inkSoft;
     }
   }
 }
@@ -128,20 +126,23 @@ class _TopEventItem extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 32.w,
-            height: 32.h,
+            width: 36.w,
+            height: 36.w,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
@@ -150,8 +151,8 @@ class _TopEventItem extends StatelessWidget {
               child: Text(
                 '$rank',
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
+                  color: rank == 1 ? AppColors.ink : AppColors.white,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
@@ -163,10 +164,9 @@ class _TopEventItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.titleSmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4.h),
                 Text(
@@ -180,10 +180,8 @@ class _TopEventItem extends StatelessWidget {
           ),
           Text(
             revenue,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+            style: theme.textTheme.titleMedium
+                ?.copyWith(color: colorScheme.primary),
           ),
         ],
       ),

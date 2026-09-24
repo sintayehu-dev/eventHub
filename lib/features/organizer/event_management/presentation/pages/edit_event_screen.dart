@@ -152,7 +152,7 @@ class _EditEventViewState extends State<EditEventView> {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color(0xFF1A0B2E),
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: EditEventHeader(
@@ -180,9 +180,9 @@ class _EditEventViewState extends State<EditEventView> {
                   if (isLoading)
                     Container(
                       color: Colors.black54,
-                      child: const Center(
+                      child: Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFF8B5CF6),
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
@@ -199,29 +199,29 @@ class _EditEventViewState extends State<EditEventView> {
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Discard Changes?',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Text(
           'You have unsaved changes. Are you sure you want to discard them?',
-          style: TextStyle(color: Colors.grey[300], fontSize: 14.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Keep Editing',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               'Discard',
-              style: TextStyle(color: Colors.red[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14.sp),
             ),
           ),
         ],
@@ -297,8 +297,8 @@ class _EditEventViewState extends State<EditEventView> {
                 onPressed: _hasChanges ? () => _updateEvent(context) : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _hasChanges 
-                      ? const Color(0xFF8B5CF6) 
-                      : Colors.grey[600],
+                      ? Theme.of(context).colorScheme.primary 
+                      : Theme.of(context).colorScheme.outlineVariant,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
@@ -309,7 +309,7 @@ class _EditEventViewState extends State<EditEventView> {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -330,9 +330,9 @@ class _EditEventViewState extends State<EditEventView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF8B5CF6),
-              surface: Color(0xFF2A1B3D),
+            colorScheme: ColorScheme.dark(
+              primary: Theme.of(context).colorScheme.primary,
+              surface: Theme.of(context).colorScheme.surface,
             ),
           ),
           child: child!,
@@ -355,9 +355,9 @@ class _EditEventViewState extends State<EditEventView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF8B5CF6),
-              surface: Color(0xFF2A1B3D),
+            colorScheme: ColorScheme.dark(
+              primary: Theme.of(context).colorScheme.primary,
+              surface: Theme.of(context).colorScheme.surface,
             ),
           ),
           child: child!,

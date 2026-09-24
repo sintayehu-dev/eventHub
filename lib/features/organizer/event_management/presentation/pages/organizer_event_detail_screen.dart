@@ -69,7 +69,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
         if (state.hasError &&
             state.errorMessage.isNotEmpty &&
             !state.isDeleting) {
-          return _buildErrorScaffold(state.errorMessage);
+          return _buildErrorScaffold(context, state.errorMessage);
         }
 
         if (state.selectedEvent != null) {
@@ -82,7 +82,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
               context, state.events.first, state.isDeleting);
         }
 
-        return _buildErrorScaffold('Event not found');
+        return _buildErrorScaffold(context, 'Event not found');
       },
     );
   }
@@ -158,7 +158,7 @@ class _OrganizerEventDetailViewState extends State<OrganizerEventDetailView> {
     );
   }
 
-  Widget _buildErrorScaffold(String message) {
+  Widget _buildErrorScaffold(BuildContext context, String message) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

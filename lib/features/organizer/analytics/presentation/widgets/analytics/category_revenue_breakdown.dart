@@ -30,13 +30,10 @@ class CategoryRevenueBreakdown extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Revenue by Category',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
+          'Revenue by category',
+          style: theme.textTheme.titleLarge,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 14.h),
         ...analytics.revenueByCategory.entries.map((entry) {
           final percentage = analytics.totalRevenue > 0
               ? (entry.value / analytics.totalRevenue) * 100
@@ -47,38 +44,47 @@ class CategoryRevenueBreakdown extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12.r),
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(24.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.06),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.key,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          '${percentage.toStringAsFixed(1)}% of total',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(entry.key, style: theme.textTheme.titleSmall),
+                      ),
+                      Text(
+                        '${entry.value.toStringAsFixed(0)} Birr',
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: colorScheme.primary),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.h),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4.r),
+                    child: LinearProgressIndicator(
+                      value: (percentage / 100).clamp(0.0, 1.0),
+                      minHeight: 8.h,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
+                      color: colorScheme.secondary,
                     ),
                   ),
-                  Text(
-                    '${entry.value.toStringAsFixed(0)} Birr',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(height: 6.h),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${percentage.toStringAsFixed(1)}% of total',
+                      style: theme.textTheme.bodySmall,
                     ),
                   ),
                 ],

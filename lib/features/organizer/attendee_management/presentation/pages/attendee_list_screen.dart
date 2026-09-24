@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:eventhub/core/theme/app_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -134,15 +135,15 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
       ),
       body: Column(
         children: [
-          _buildSearchBar(),
-          _buildStatsHeader(totalTickets, checkedInCount),
-          Expanded(child: _buildAttendeesList()),
+          _buildSearchBar(context),
+          _buildStatsHeader(context, totalTickets, checkedInCount),
+          Expanded(child: _buildAttendeesList(context)),
         ],
       ),
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
@@ -183,7 +184,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     );
   }
 
-  Widget _buildStatsHeader(int totalTickets, int checkedInCount) {
+  Widget _buildStatsHeader(BuildContext context, int totalTickets, int checkedInCount) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
@@ -256,7 +257,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     );
   }
 
-  Widget _buildAttendeesList() {
+  Widget _buildAttendeesList(BuildContext context) {
     List<Map<String, dynamic>> filteredAttendees = _attendees.where((attendee) {
       if (_searchController.text.isNotEmpty) {
         final searchTerm = _searchController.text.toLowerCase();
@@ -271,12 +272,12 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
       itemCount: filteredAttendees.length,
       itemBuilder: (context, index) {
         final attendee = filteredAttendees[index];
-        return _buildAttendeeCard(attendee);
+        return _buildAttendeeCard(context, attendee);
       },
     );
   }
 
-  Widget _buildAttendeeCard(Map<String, dynamic> attendee) {
+  Widget _buildAttendeeCard(BuildContext context, Map<String, dynamic> attendee) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final ticketTypeColor = _getTicketTypeColor(attendee['ticketType']);
@@ -303,8 +304,8 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                   borderRadius: BorderRadius.circular(12.r),
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF8B5CF6),
-                      const Color(0xFF06B6D4),
+                      Theme.of(context).colorScheme.primary,
+                      AppColors.primaryLight,
                     ],
                   ),
                 ),
@@ -312,7 +313,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                   child: Text(
                     attendee['name'].split(' ').map((n) => n[0]).join(''),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -388,14 +389,14 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
           PopupMenuButton<String>(
             icon: Icon(
               Icons.more_vert,
-              color: Colors.grey[400],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: 20.sp,
             ),
-            color: const Color(0xFF2A1B3D),
+            color: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.r),
               side: BorderSide(
-                color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             itemBuilder: (context) => [
@@ -403,9 +404,9 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                 value: 'view',
                 child: Row(
                   children: [
-                    Icon(Icons.visibility_outlined, color: Colors.grey[400], size: 16.sp),
+                    Icon(Icons.visibility_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
                     SizedBox(width: 8.w),
-                    Text('View Profile', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                    Text('View Profile', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp)),
                   ],
                 ),
               ),
@@ -415,13 +416,13 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                   children: [
                     Icon(
                       attendee['isCheckedIn'] ? Icons.check_circle : Icons.check_circle_outline,
-                      color: attendee['isCheckedIn'] ? const Color(0xFF4ADE80) : Colors.grey[400],
+                      color: attendee['isCheckedIn'] ? AppColors.success : Theme.of(context).colorScheme.onSurfaceVariant,
                       size: 16.sp,
                     ),
                     SizedBox(width: 8.w),
                     Text(
                       attendee['isCheckedIn'] ? 'Check Out' : 'Check In',
-                      style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp),
                     ),
                   ],
                 ),
@@ -430,9 +431,9 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                 value: 'contact',
                 child: Row(
                   children: [
-                    Icon(Icons.email_outlined, color: Colors.grey[400], size: 16.sp),
+                    Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 16.sp),
                     SizedBox(width: 8.w),
-                    Text('Send Message', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                    Text('Send Message', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12.sp)),
                   ],
                 ),
               ),
@@ -440,9 +441,9 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
                 value: 'refund',
                 child: Row(
                   children: [
-                    Icon(Icons.money_off_outlined, color: Colors.red[400], size: 16.sp),
+                    Icon(Icons.money_off_outlined, color: Theme.of(context).colorScheme.error, size: 16.sp),
                     SizedBox(width: 8.w),
-                    Text('Issue Refund', style: TextStyle(color: Colors.red[400], fontSize: 12.sp)),
+                    Text('Issue Refund', style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12.sp)),
                   ],
                 ),
               ),
@@ -457,13 +458,13 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
   Color _getTicketTypeColor(String ticketType) {
     switch (ticketType) {
       case 'VIP ACCESS':
-        return const Color(0xFF8B5CF6);
+        return Theme.of(context).colorScheme.primary;
       case 'GENERAL ADMISSION':
-        return const Color(0xFF06B6D4);
+        return AppColors.primaryLight;
       case 'EARLY BIRD':
-        return const Color(0xFF4ADE80);
+        return AppColors.success;
       default:
-        return const Color(0xFF64748B);
+        return AppColors.inkSoft;
     }
   }
 
@@ -471,20 +472,20 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Export Attendee List',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildExportOption('CSV Format', Icons.table_chart_outlined),
+            _buildExportOption(context, 'CSV Format', Icons.table_chart_outlined),
             SizedBox(height: 12.h),
-            _buildExportOption('PDF Report', Icons.picture_as_pdf_outlined),
+            _buildExportOption(context, 'PDF Report', Icons.picture_as_pdf_outlined),
             SizedBox(height: 12.h),
-            _buildExportOption('Excel Format', Icons.grid_on_outlined),
+            _buildExportOption(context, 'Excel Format', Icons.grid_on_outlined),
           ],
         ),
         actions: [
@@ -492,7 +493,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             onPressed: () => context.pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
             ),
           ),
         ],
@@ -500,14 +501,14 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     );
   }
 
-  Widget _buildExportOption(String title, IconData icon) {
+  Widget _buildExportOption(BuildContext context, String title, IconData icon) {
     return GestureDetector(
       onTap: () {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Exporting attendee list as $title...'),
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
           ),
@@ -516,19 +517,19 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
       child: Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A0B2E),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B5CF6), size: 20.sp),
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20.sp),
             SizedBox(width: 12.w),
             Text(
               title,
-              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14.sp),
             ),
           ],
         ),
@@ -557,20 +558,20 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Attendee Profile',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileRow('Name', attendee['name']),
-            _buildProfileRow('Purchase Date', attendee['purchaseDate']),
-            _buildProfileRow('Ticket Type', attendee['ticketType']),
-            _buildProfileRow('Status', attendee['isCheckedIn'] ? 'Checked In' : 'Not Checked In'),
+            _buildProfileRow(context, 'Name', attendee['name']),
+            _buildProfileRow(context, 'Purchase Date', attendee['purchaseDate']),
+            _buildProfileRow(context, 'Ticket Type', attendee['ticketType']),
+            _buildProfileRow(context, 'Status', attendee['isCheckedIn'] ? 'Checked In' : 'Not Checked In'),
           ],
         ),
         actions: [
@@ -578,7 +579,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             onPressed: () => context.pop(),
             child: Text(
               'Close',
-              style: TextStyle(color: const Color(0xFF8B5CF6), fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 14.sp),
             ),
           ),
         ],
@@ -586,7 +587,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     );
   }
 
-  Widget _buildProfileRow(String label, String value) {
+  Widget _buildProfileRow(BuildContext context, String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
@@ -597,7 +598,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             child: Text(
               '$label:',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -607,7 +608,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             child: Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12.sp,
               ),
             ),
@@ -627,7 +628,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
         content: Text(
           '${attendee['name']} ${attendee['isCheckedIn'] ? 'checked in' : 'checked out'} successfully',
         ),
-        backgroundColor: attendee['isCheckedIn'] ? const Color(0xFF4ADE80) : const Color(0xFFF59E0B),
+        backgroundColor: attendee['isCheckedIn'] ? AppColors.success : AppColors.accentDark,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -638,7 +639,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Opening message composer for ${attendee['name']}...'),
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -649,22 +650,22 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A1B3D),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Text(
           'Issue Refund',
-          style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16.sp),
         ),
         content: Text(
           'Are you sure you want to issue a refund to ${attendee['name']}? This action cannot be undone.',
-          style: TextStyle(color: Colors.grey[300], fontSize: 14.sp),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
         ),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.grey[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14.sp),
             ),
           ),
           TextButton(
@@ -673,7 +674,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Refund issued to ${attendee['name']}'),
-                  backgroundColor: const Color(0xFF4ADE80),
+                  backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                 ),
@@ -681,7 +682,7 @@ class _AttendeeListScreenState extends State<AttendeeListScreen> {
             },
             child: Text(
               'Issue Refund',
-              style: TextStyle(color: Colors.red[400], fontSize: 14.sp),
+              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14.sp),
             ),
           ),
         ],

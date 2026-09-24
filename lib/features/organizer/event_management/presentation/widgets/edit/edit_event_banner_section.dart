@@ -21,18 +21,18 @@ class EditEventBannerSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Event Banner'),
+        _buildSectionTitle(context, 'Event Banner'),
         SizedBox(height: 8.h),
         _buildImagePicker(context),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
       style: TextStyle(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 16.sp,
         fontWeight: FontWeight.w600,
       ),
@@ -46,9 +46,9 @@ class EditEventBannerSection extends StatelessWidget {
         width: double.infinity,
         height: 200.h,
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1B3D),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.grey[700]!, width: 1),
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
         ),
         child: selectedImagePath != null
             ? Stack(
@@ -62,7 +62,7 @@ class EditEventBannerSection extends StatelessWidget {
                             height: 200.h,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
-                                _buildImagePlaceholder(),
+                                _buildImagePlaceholder(context),
                           )
                         : Image.file(
                             File(selectedImagePath!),
@@ -70,7 +70,7 @@ class EditEventBannerSection extends StatelessWidget {
                             height: 200.h,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
-                                _buildImagePlaceholder(),
+                                _buildImagePlaceholder(context),
                           ),
                   ),
                   if (editable)
@@ -87,7 +87,7 @@ class EditEventBannerSection extends StatelessWidget {
                           ),
                           child: Icon(
                             Icons.close,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 16.sp,
                           ),
                         ),
@@ -95,25 +95,25 @@ class EditEventBannerSection extends StatelessWidget {
                     ),
                 ],
               )
-            : _buildImagePlaceholder(),
+            : _buildImagePlaceholder(context),
       ),
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           editable ? Icons.add_photo_alternate_outlined : Icons.image_outlined,
-          color: Colors.grey[400],
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           size: 48.sp,
         ),
         SizedBox(height: 12.h),
         Text(
           editable ? 'Add Event Banner' : 'No Banner Image',
           style: TextStyle(
-            color: Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -123,7 +123,7 @@ class EditEventBannerSection extends StatelessWidget {
           Text(
             'Tap to select an image',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 12.sp,
             ),
           ),

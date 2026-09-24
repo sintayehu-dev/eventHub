@@ -168,14 +168,14 @@ class OrganizerEventItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Banner
-            _buildBanner(colorScheme),
+            _buildBanner(context, colorScheme),
 
             Padding(
               padding: EdgeInsets.fromLTRB(10.w, 14.h, 10.w, 8.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(theme, colorScheme, statusColor, context),
+                  _buildHeader(context, theme, colorScheme, statusColor, context),
                   SizedBox(height: 16.h),
                   Text(
                     event.title,
@@ -187,13 +187,13 @@ class OrganizerEventItemCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 8.h),
-                  _buildInfoRow(Icons.calendar_today, OrganizerEventUtils.formatDateTime(event.dateTime), colorScheme, theme),
+                  _buildInfoRow(context, Icons.calendar_today, OrganizerEventUtils.formatDateTime(event.dateTime), colorScheme, theme),
                   SizedBox(height: 4.h),
-                  _buildInfoRow(Icons.location_on, event.location, colorScheme, theme),
+                  _buildInfoRow(context, Icons.location_on, event.location, colorScheme, theme),
                   SizedBox(height: 16.h),
-                  _buildStats(theme, colorScheme, statusColor, soldTickets, totalTickets, revenue),
+                  _buildStats(context, theme, colorScheme, statusColor, soldTickets, totalTickets, revenue),
                   SizedBox(height: 12.h),
-                  _buildProgressBar(colorScheme, statusColor, progress),
+                  _buildProgressBar(context, colorScheme, statusColor, progress),
                   SizedBox(height: 8.h),
                   Text(
                     '${(progress * 100).toInt()}% sold',
@@ -208,7 +208,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBanner(ColorScheme colorScheme) {
+  Widget _buildBanner(BuildContext context, ColorScheme colorScheme) {
     return Container(
       height: 150.h,
       width: double.infinity,
@@ -218,14 +218,14 @@ class OrganizerEventItemCard extends StatelessWidget {
             ? Image.network(
                 event.bannerUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(colorScheme),
+                errorBuilder: (_, __, ___) => _buildPlaceholder(context, colorScheme),
               )
-            : _buildPlaceholder(colorScheme),
+            : _buildPlaceholder(context, colorScheme),
       ),
     );
   }
 
-  Widget _buildHeader(ThemeData theme, ColorScheme colorScheme, Color statusColor, BuildContext context) {
+  Widget _buildHeader(BuildContext context, ThemeData theme, ColorScheme colorScheme, Color statusColor, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -270,7 +270,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildInfoRow(BuildContext context, IconData icon, String text, ColorScheme colorScheme, ThemeData theme) {
     return Row(
       children: [
         Icon(icon, color: colorScheme.onSurfaceVariant, size: 14.sp),
@@ -287,7 +287,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStats(ThemeData theme, ColorScheme colorScheme, Color statusColor, int sold, int total, double revenue) {
+  Widget _buildStats(BuildContext context, ThemeData theme, ColorScheme colorScheme, Color statusColor, int sold, int total, double revenue) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -314,7 +314,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressBar(ColorScheme colorScheme, Color statusColor, double progress) {
+  Widget _buildProgressBar(BuildContext context, ColorScheme colorScheme, Color statusColor, double progress) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(4.r),
       child: LinearProgressIndicator(
@@ -326,7 +326,7 @@ class OrganizerEventItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder(ColorScheme colorScheme) {
+  Widget _buildPlaceholder(BuildContext context, ColorScheme colorScheme) {
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(

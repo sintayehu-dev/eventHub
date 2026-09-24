@@ -74,8 +74,8 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
           return state.when(
             initial: () => const Center(child: Text('Welcome')),
             loading: () => const OrganizerProfileShimmer(),
-            loaded: (profile) => _buildProfileContent(profile),
-            profileUpdated: (profile) => _buildProfileContent(profile),
+            loaded: (profile) => _buildProfileContent(context, profile),
+            profileUpdated: (profile) => _buildProfileContent(context, profile),
             error: (message) => AppErrorRetryWidget(
               errorMessage: message,
               onRetry: () {
@@ -98,14 +98,14 @@ class _OrganizerProfileViewState extends State<OrganizerProfileView> {
                 const Center(child: Text('Organizer data updated')),
             attendeeDataUpdated: (attendeeData) =>
                 const Center(child: Text('Attendee data updated')),
-            profileRefreshed: (profile) => _buildProfileContent(profile),
+            profileRefreshed: (profile) => _buildProfileContent(context, profile),
           );
         },
       ),
     );
   }
 
-  Widget _buildProfileContent(UserProfileEntity profile) {
+  Widget _buildProfileContent(BuildContext context, UserProfileEntity profile) {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
         20.w,
